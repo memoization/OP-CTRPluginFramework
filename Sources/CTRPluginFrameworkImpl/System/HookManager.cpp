@@ -67,6 +67,22 @@ static inline u32 ARMBranchLink(const void *src, const void *dst)
     return instrBase | ((off >> 2) & 0xFFFFFF);
 }
 
+static inline u32 ARMBranch(const void *src, const void *dst)
+{
+    u32 instrBase = 0xEA000000;
+    u32 off = (u32)((const u8 *)dst - ((const u8 *)src + 8));
+
+    return instrBase | ((off >> 2) & 0xFFFFFF);
+}
+
+static inline u32 DecodeARMBranch(const vu32 *src)
+{
+    s32 off = (*src & 0xFFFFFF) << 2;
+    off = (off << 6) >> 6; // sign extend
+
+    return (u32)src + 8 + off;
+}
+
 static inline u32 ARM__LDR_LR_PC(u32 offset)
 {
     return 0xE59FE000 | offset;
@@ -93,11 +109,22 @@ static __attribute__((noinline)) void     GenerateAsm(AsmWrapper& asmWrapper, Ho
 
     if (flags & MITM_MODE)
     {
+        u32 op = ctx.overwrittenInstr >> 24;
+
         // Jump to callback
         *code++ = 0xE51FF004; ///< ldr pc, [pc, #-4]
         *code++ = ctx.callbackAddress;
-        // Jump to original function - code[6]
-        *code++ = ctx.overwrittenInstr;
+
+        if (op == 0xEB) // If instruction is branch with link
+            *code = ARMBranchLink(code, (void *)DecodeARMBranch((vu32 *)ctx.targetAddress));
+        else if (op == 0xEA) // If instruction is branch
+            *code = ARMBranch(code, (void *)DecodeARMBranch((vu32 *)ctx.targetAddress));
+        else
+            *code = ctx.overwrittenInstr;
+        
+        ++code;
+
+        // Jump back to original function - code[7]
         *code++ = 0xE51FF004;///< ldr pc, [pc, #-4]
         *code = ctx.returnAddress;
 
