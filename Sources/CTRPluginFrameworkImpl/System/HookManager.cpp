@@ -116,9 +116,9 @@ static __attribute__((noinline)) void     GenerateAsm(AsmWrapper& asmWrapper, Ho
         *code++ = ctx.callbackAddress;
 
         if (op == 0xEB) // If instruction is branch with link
-            *code = ARMBranchLink(code, (void *)DecodeARMBranch((vu32 *)ctx.targetAddress));
+            *code = ARMBranchLink((void *)code, (void *)DecodeARMBranch((vu32 *)ctx.targetAddress));
         else if (op == 0xEA) // If instruction is branch
-            *code = ARMBranch(code, (void *)DecodeARMBranch((vu32 *)ctx.targetAddress));
+            *code = ARMBranch((void *)code, (void *)DecodeARMBranch((vu32 *)ctx.targetAddress));
         else
             *code = ctx.overwrittenInstr;
         
@@ -175,7 +175,7 @@ static __attribute__((noinline)) void     GenerateAsm(AsmWrapper& asmWrapper, Ho
         // Set callbacks addresses
         *code++ = ctx.callbackAddress;
         *code++ = DecodeARMBranch((vu32 *)ctx.targetAddress);
-        *code = ctx.callbackAddres2;
+        *code = ctx.callbackAddress2;
 
         *ldrLrCb = ARM__LDR_LR_PC(u32(code) - u32(ldrLrCb) - 16);
         *ldrLrSub = ARM__LDR_LR_PC(u32(code) - u32(ldrLrSub) - 12);
