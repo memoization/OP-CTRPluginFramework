@@ -228,7 +228,7 @@ HookResult    Hook::Enable(void)
             return HookResult::TargetInstructionCannotBeHandledAutomatically;
 
     // Check validity for WRAP_SUB mode
-    if (_ctx->overwrittenInstr >> 24 != 0xEB)
+    if (flags & WRAP_SUB && _ctx->overwrittenInstr >> 24 != 0xEB)
         return HookResult::HookParamsError;
 
     // Apply the hook
