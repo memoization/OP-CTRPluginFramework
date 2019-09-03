@@ -121,7 +121,7 @@ static __attribute__((noinline)) void     GenerateAsm(AsmWrapper& asmWrapper, Ho
             *code = ARMBranch((void *)code, (void *)DecodeARMBranch((vu32 *)ctx.targetAddress));
         else
             *code = ctx.overwrittenInstr;
-        
+
         ++code;
 
         // Jump back to original function - code[7]
