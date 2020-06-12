@@ -103,7 +103,7 @@ void     OnLoadCro(void)
 namespace CTRPluginFramework
 {
     void WEAK_SYMBOL    PatchProcess(FwkSettings& settings) {}
-    void WEAK_SYMBOL    DebugFromStart(void);
+    void WEAK_SYMBOL    EarlyCallback(u32* savedInstructions);
     void WEAK_SYMBOL    OnProcessExit(void) {}
     void WEAK_SYMBOL    OnPluginToSwap(void) {}
     void WEAK_SYMBOL    OnPluginFromSwap(void) {}
@@ -466,34 +466,12 @@ namespace CTRPluginFramework
         REG32(0x10202204) = 0;
     }
 
-    void WEAK_SYMBOL __WaitForDebug()
-    {
-        // A little debug routine to wait for debugger to connect
-        u32 debug = 0;
-
-        for (u32 i = 0; i < 200; ++i)
-        {
-            debug |= HID_PAD & BUTTON_Y;
-            Sleep(Milliseconds(1));
-        }
-
-        if (DebugFromStart || debug)
-        {
-            flash(0xFF0000);
-            u32 stall = 0;
-            do
-            {
-                Sleep(Milliseconds(100));
-                stall = HID_PAD & BUTTON_X;
-            } while (!stall);
-        }
-    }
-
     extern "C"
     int   __entrypoint(int arg)
     {
-        if (__WaitForDebug)
-            __WaitForDebug();
+        // Call early callback, with pointer to the 2 saved instructions
+        if (EarlyCallback)
+            EarlyCallback((u32*)arg);
 
         // Set ProcessImpl::MainThreadTls
         ProcessImpl::MainThreadTls = (u32)getThreadLocalStorage();
