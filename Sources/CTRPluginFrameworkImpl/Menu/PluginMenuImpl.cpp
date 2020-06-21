@@ -278,24 +278,26 @@ namespace CTRPluginFramework
 
                 }
                 */
+                //CTGP-7: Remove changing the state to innaccessible menus, just in case
+                /*
                 else if (mode == 2)
-                { /* Guide */
+                { // Guide
                     if (guide(eventList, delta))
                         mode = 0;
                 }
                 else if (mode == 3)
-                { /* Search */
+                { // Search
                     if (search(eventList, delta))
                         mode = 0;
                     goto __skip;
                 }
                 else if (mode == 4)
-                { /* ActionReplay  */
+                { // ActionReplay
                     if (ar(eventList, delta))
                         mode = 0;
-                }
+                }*/
                 else if (mode == 5)
-                { /* Tools  */
+                { // Tools
                     if (tools(eventList, delta))
                         mode = 0;
                 }

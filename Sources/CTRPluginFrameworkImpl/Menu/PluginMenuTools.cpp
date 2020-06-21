@@ -72,6 +72,10 @@ namespace CTRPluginFramework
 
     void    PluginMenuTools::UpdateSettings(void)
     {
+        // CTGP-7: All of this functionalities can be abused to cheat online by lagging the game, need to be disabled.
+        // Solution: Stub the function
+        return;
+        /*
         using MenuItemIter =  MenuFolderImpl::MenuItemIter;
 
 		// Settings
@@ -113,7 +117,7 @@ namespace CTRPluginFramework
         else (*item++)->AsMenuEntryTools().Disable();
 
         if (Preferences::IsEnabled(Preferences::ShowBottomFps)) (*item)->AsMenuEntryTools().Enable();
-        else (*item)->AsMenuEntryTools().Disable();
+        else (*item)->AsMenuEntryTools().Disable(); */
     }
 
     using   FsTryOpenFileType = u32(*)(u32, u16*, u32);
@@ -549,15 +553,21 @@ namespace CTRPluginFramework
 
     void    PluginMenuTools::InitMenu(void)
     {
+        // CTGP-7: Some of these tools can be used to cheat or dump plugin mem
+        // Solution: Disable some of the menus
         // Main menu
         _mainMenu.Append(new MenuEntryTools("About", [] { g_mode = ABOUT; }, Icon::DrawAbout));
 
         _hexEditorEntry = new MenuEntryTools("Hex Editor", [] { g_mode = HEXEDITOR; }, Icon::DrawGrid);
-        _mainMenu.Append(_hexEditorEntry);
-        _mainMenu.Append(new MenuEntryTools("Gateway RAM Dumper", [] { g_mode = GWRAMDUMP; }, Icon::DrawRAM));
+        // _mainMenu.Append(_hexEditorEntry);
+        // _mainMenu.Append(new MenuEntryTools("Gateway RAM Dumper", [] { g_mode = GWRAMDUMP; }, Icon::DrawRAM));
         _mainMenu.Append(new MenuEntryTools("Screenshots", nullptr, Icon::DrawUnsplash, new u32(SCREENSHOT)));
-        _mainMenu.Append(new MenuEntryTools("Miscellaneous", nullptr, Icon::DrawMore, new u32(MISCELLANEOUS)));
-		_mainMenu.Append(new MenuEntryTools("Settings", nullptr, Icon::DrawSettings, this));
+        // _mainMenu.Append(new MenuEntryTools("Miscellaneous", nullptr, Icon::DrawMore, new u32(MISCELLANEOUS)));
+
+        // CTGP-7 Move the hotkeys menu here to prevent another submenu
+        _mainMenu.Append(new MenuEntryTools("Change menu hotkeys", MenuHotkeyModifier, Icon::DrawGameController));
+
+		//_mainMenu.Append(new MenuEntryTools("Settings", nullptr, Icon::DrawSettings, this));
         _mainMenu.Append(new MenuEntryTools("Shutdown the 3DS", Shutdown, Icon::DrawShutdown));
         _mainMenu.Append(new MenuEntryTools("Reboot the 3DS", Reboot, Icon::DrawRestart));
 
@@ -567,17 +577,17 @@ namespace CTRPluginFramework
                                 << "\x18, " << Color::Orange << "Both screens", Screenshot_Enabler, true)));
 
         // Miscellaneous menu
-        _miscellaneousMenu.Append(new MenuEntryTools("Display loaded files", _DisplayLoadedFiles, true));
+        /*_miscellaneousMenu.Append(new MenuEntryTools("Display loaded files", _DisplayLoadedFiles, true));
         _miscellaneousMenu.Append(new MenuEntryTools("Write loaded files to file", _WriteLoadedFiles, true));
         _miscellaneousMenu.Append(new MenuEntryTools("Display touch cursor", [] { Preferences::Toggle(Preferences::DrawTouchCursor); }, true, Preferences::IsEnabled(Preferences::DrawTouchCursor)));
         _miscellaneousMenu.Append(new MenuEntryTools("Display touch coordinates", [] { Preferences::Toggle(Preferences::DrawTouchPosition); }, true, Preferences::IsEnabled(Preferences::DrawTouchPosition)));
         _miscellaneousMenu.Append(new MenuEntryTools("Display top screen's fps", [] { Preferences::Toggle(Preferences::ShowTopFps); }, true, Preferences::IsEnabled(Preferences::ShowTopFps)));
-        _miscellaneousMenu.Append(new MenuEntryTools("Display bottom screen's fps", [] { Preferences::Toggle(Preferences::ShowBottomFps); }, true, Preferences::IsEnabled(Preferences::ShowBottomFps)));
-
+        _miscellaneousMenu.Append(new MenuEntryTools("Display bottom screen's fps", [] { Preferences::Toggle(Preferences::ShowBottomFps); }, true, Preferences::IsEnabled(Preferences::ShowBottomFps)));*/
+        
         // Settings menu
-        _settingsMenu.Append(new MenuEntryTools("Change menu hotkeys", MenuHotkeyModifier, Icon::DrawGameController));
+        // _settingsMenu.Append(new MenuEntryTools("Change menu hotkeys", MenuHotkeyModifier, Icon::DrawGameController));
 
-        _settingsMenu.Append(new MenuEntryTools("Set backlight (Experimental)", EditBacklight, false, false));
+        /*_settingsMenu.Append(new MenuEntryTools("Set backlight (Experimental)", EditBacklight, false, false));
 		_settingsMenu.Append(new MenuEntryTools("Use floating button", [] { Preferences::Toggle(Preferences::UseFloatingBtn); }, true, Preferences::IsEnabled(Preferences::UseFloatingBtn)));
 
 		_settingsMenu.Append(new MenuEntryTools("Auto save enabled cheats", [] { Preferences::Toggle(Preferences::AutoSaveCheats); }, true, Preferences::IsEnabled(Preferences::AutoSaveCheats)));
@@ -585,12 +595,14 @@ namespace CTRPluginFramework
         _settingsMenu.Append(new MenuEntryTools("Auto load enabled cheats at starts", [] { Preferences::Toggle(Preferences::AutoLoadCheats); }, true, Preferences::IsEnabled(Preferences::AutoLoadCheats)));
         _settingsMenu.Append(new MenuEntryTools("Auto load favorites at starts", [] { Preferences::Toggle(Preferences::AutoLoadFavorites); }, true, Preferences::IsEnabled(Preferences::AutoSaveFavorites)));
         _settingsMenu.Append(new MenuEntryTools("Load enabled cheats now", [] { Preferences::LoadSavedEnabledCheats(); }, nullptr));
-        _settingsMenu.Append(new MenuEntryTools("Load favorites now", [] { Preferences::LoadSavedFavorites(); }, nullptr));
+        _settingsMenu.Append(new MenuEntryTools("Load favorites now", [] { Preferences::LoadSavedFavorites(); }, nullptr));*/
 	}
 
     bool    PluginMenuTools::operator()(EventList &eventList, Time &delta)
     {
-        if (g_mode == HEXEDITOR)
+        //CTGP-7: Just in case, stub the ifs
+        //Solution: Add && false to the conditional
+        if (g_mode == HEXEDITOR && false)
         {
             if (_hexEditor(eventList))
                 g_mode = NORMAL;
@@ -605,7 +617,7 @@ namespace CTRPluginFramework
                 g_mode = NORMAL;
         }
 
-        if (g_mode == GWRAMDUMP)
+        if (g_mode == GWRAMDUMP && false)
         {
             _gatewayRamDumper();
             g_mode = NORMAL;

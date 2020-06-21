@@ -17,22 +17,25 @@ namespace CTRPluginFramework
 
         #define SETTINGS_VERSION SETTINGS_VERSION11
     public:
+        // CTGP-7: Some settings shall not be loaded from the save file
+        // Solution: Set the bit flag to 0
         enum
         {
             // Settings
-            UseFloatingBtn      = 1,
-            AutoSaveCheats      = 1 << 2,
-            AutoSaveFavorites   = 1 << 3,
-            AutoLoadCheats      = 1 << 4,
-            AutoLoadFavorites   = 1 << 5,
+            UseFloatingBtn      = 0, // = 1,
+            AutoSaveCheats      = 0,// = 1 << 2,
+            AutoSaveFavorites   = 0,// = 1 << 3,
+            AutoLoadCheats      = 0,// = 1 << 4,
+            AutoLoadFavorites   = 0,// = 1 << 5,
 
             // Misc
-            DisplayLoadedFiles  = 1 << 16,
-            WriteLoadedFiles    = 1 << 17,
-            DrawTouchCursor     = 1 << 18,
-            DrawTouchPosition   = 1 << 19,
-            ShowTopFps          = 1 << 20,
-            ShowBottomFps       = 1 << 21,
+            DisplayLoadedFiles  = 0,// = 1 << 16,
+            WriteLoadedFiles    = 0,// = 1 << 17,
+            DrawTouchCursor     = 0,// = 1 << 18,
+            DrawTouchPosition   = 0,// = 1 << 19,
+            ShowTopFps          = 0,// = 1 << 20,
+            ShowBottomFps       = 0,// = 1 << 21,
+            Invalid             = 1 << 31
         };
 
         /*struct HeaderV1

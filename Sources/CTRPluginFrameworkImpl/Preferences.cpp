@@ -118,8 +118,10 @@ namespace CTRPluginFramework
 
             if (header.version != SETTINGS_VERSION)
             {
-                OSD::Notify(Color::Orange << "Config file version mismatch!");
-                OSD::Notify("Default settings applied");
+                //CTGP-7: This notify was causing confusion to CTGP-7 players
+                //Solution: Silently reset settings
+                // OSD::Notify(Color::Orange << "Config file version mismatch!");
+                // OSD::Notify("Default settings applied");
                 return -1;
             }
 
