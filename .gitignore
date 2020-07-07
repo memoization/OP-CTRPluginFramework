@@ -1,4 +1,5 @@
 /Build
+/Ignored
 /Debug
 /Ressources
 /Guide
@@ -18,4 +19,11 @@
 *.7z
 *.bmp
 *.3gx
+
 objdump
+
+/* Until I correctly configured those */
+.clang-format
+.devcontainer/
+.gitlab-cy.yml
+.vscode/
