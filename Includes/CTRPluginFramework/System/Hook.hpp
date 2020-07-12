@@ -45,7 +45,7 @@ namespace CTRPluginFramework
         // The functions below are to be used only with MITM_MODE hooks
         template <typename TResult, typename... Args>
         typename std::enable_if<!std::is_same<TResult, void>::value, TResult>::type
-        OriginalFunction(Args... args)
+        OriginalFunction(Args... args) const
         {
             using FPtr = TResult(*)(Args...);
 
@@ -59,7 +59,7 @@ namespace CTRPluginFramework
 
         template <typename TResult, typename... Args>
         typename std::enable_if<std::is_same<TResult, void>::value, void>::type
-        OriginalFunction(Args... args)
+        OriginalFunction(Args... args) const
         {
             using FPtr = void(*)(Args...);
 
@@ -69,8 +69,8 @@ namespace CTRPluginFramework
                 fptr(args...);
         }
 
-    private:
-        void    *GetCallCode(void);
+        // Get funcptr of the function
+        void    *GetCallCode(void) const;
     };
 
     struct  Hook
