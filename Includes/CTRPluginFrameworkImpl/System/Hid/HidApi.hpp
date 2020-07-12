@@ -141,6 +141,12 @@ namespace CTRPluginFramework
             PadLifoRing *       pLifoRing;
         } PACKED;
 
+        struct TouchPanel
+        {
+            u32                 handle;
+            u32                 pLifoRing;
+        } PACKED;
+
         struct AnalogStickClamper
         {
             s16                 minOfStickClampCircle;
@@ -149,7 +155,7 @@ namespace CTRPluginFramework
             s16                 maxOfStickClampCircle;
             s16                 maxOfStickClampCross;
             s16                 maxOfStickClampMinimum;
-            u8                  mtickClampMode;
+            u8                  stickClampMode;
             u8                  padding;
             s16                 threshold;
             float               scale;
@@ -169,6 +175,8 @@ namespace CTRPluginFramework
             u8                  padding[3];
             u8                  padding2[4];
             s64                 tickOfRead;
+
+            static bool     InstallHooks(void);
         };
 
         struct ExtraPadReader
@@ -185,6 +193,17 @@ namespace CTRPluginFramework
             u8                  padding2[3];
             u8                  padding3[4];
             s64                 tickOfRead;
+
+            static bool     InstallHooks(void);
+        } PACKED;
+
+        struct TouchPanelReader
+        {
+            TouchPanel&         touchPanel;
+            s32                 indexOfRead;
+            s64                 tickOfRead;
+
+            static bool     InstallHooks(void);
         } PACKED;
 
         /*
@@ -216,6 +235,19 @@ namespace CTRPluginFramework
                 u32 m_pResource;
             };
 
+            struct SharedMemoryBlock {
+                SharedMemoryBlock *head;
+                SharedMemoryBlock *tail;
+
+                u32    m_Addr;
+                u32  m_Size;
+                bool    m_ReadOnly;
+                u8      padding[3];
+                u32     handle;
+                bool    m_SpaceAllocated;
+                u8 padding2[3];
+                u32 padding3;
+            } ;
 
             struct HidDevices
             {
