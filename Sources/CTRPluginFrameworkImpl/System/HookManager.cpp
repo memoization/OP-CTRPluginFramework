@@ -332,7 +332,7 @@ HookWrapper&    HookManager::GetFreeHookWrapper(s32& index)
     return *begin;
 }
 
-AsmWrapper&     HookManager::GetAsmWrapper(HookContext *ctx)
+AsmWrapper&     HookManager::GetAsmWrapper(const HookContext *ctx)
 {
     CTRPluginFramework::Lock    lock(_mutex);
 

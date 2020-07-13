@@ -52,7 +52,7 @@ namespace CTRPluginFramework
 
         AsmWrapper&     GetFreeAsmWrapper(void);
         HookWrapper&    GetFreeHookWrapper(s32& index);
-        AsmWrapper&     GetAsmWrapper(HookContext *ctx);
+        AsmWrapper&     GetAsmWrapper(const HookContext *ctx);
 
         static void            Lock();
         static void            Unlock();

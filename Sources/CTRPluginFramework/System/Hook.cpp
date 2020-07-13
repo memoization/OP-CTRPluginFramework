@@ -23,7 +23,7 @@ extern "C" void *__ctrpfHookCtx__GetCallerCode(HookContext *ctx)
     return nullptr; ///< mitm mode only
 }
 
-void *  HookContext::GetCallCode(void)
+void *  HookContext::GetCallCode(void) const
 {
     if (flags & MITM_MODE)
     {
