@@ -10,6 +10,7 @@ namespace CTRPluginFramework
         extern u32     _keysDown;
         extern u32     _keysHeld;
         extern u32     _keysReleased;
+        extern u32     _gameCounter;
     }
 
     namespace Hid
@@ -34,6 +35,8 @@ namespace CTRPluginFramework
 
             if (!couldRead)
                 return couldRead;
+
+            ControllerImpl::_gameCounter++;
 
             g_extraPadStatus = *padStatus;
 

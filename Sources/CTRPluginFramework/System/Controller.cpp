@@ -11,6 +11,8 @@ namespace CTRPluginFramework
         u32     _keysDown = 0;
         u32     _keysHeld = 0;
         u32     _keysReleased = 0;
+        u32     _counter = 0;
+        u32     _gameCounter = 0;
     }
 
     using namespace ControllerImpl;
@@ -70,5 +72,10 @@ namespace CTRPluginFramework
             Hid::PadReader::ReadLatest();
             Hid::TouchPanelReader::ReadLatest();
         }
+        else
+        {
+            _counter++;
+        }
+
     }
 }
