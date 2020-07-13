@@ -19,7 +19,7 @@ namespace CTRPluginFramework
 
         static Hook             g_padReaderHook;
         static PadStatus        g_padStatus;
-        static PadReader *      g_padReader = nullptr;
+        static PadReader        g_padReader;
         static ReadLatestFunc   PadReader__ReadLatest = [](PadReader*, PadStatus*) { return false; }; // Stub so this funcptr is always set
 
         static void    UpdateControllerFromGame(PadStatus* padStatus)
@@ -31,7 +31,7 @@ namespace CTRPluginFramework
 
         bool    PadReaderHookFunc(PadReader* padReader, PadStatus* padStatus)
         {
-            g_padReader = padReader;
+            g_padReader = *padReader;
 
             // Use game function to read inputs
             bool couldRead = PadReader__ReadLatest(padReader, padStatus);
@@ -53,10 +53,10 @@ namespace CTRPluginFramework
 
         bool    PadReader::ReadLatest(void)
         {
-            if (!g_padReader)
+            if (!g_padReader.pad)
                 return false;
 
-            bool couldRead = PadReader__ReadLatest(g_padReader, &g_padStatus);
+            bool couldRead = PadReader__ReadLatest(&g_padReader, &g_padStatus);
 
             if (!couldRead)
                 return couldRead;

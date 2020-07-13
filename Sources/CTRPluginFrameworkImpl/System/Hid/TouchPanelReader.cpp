@@ -17,7 +17,7 @@ namespace CTRPluginFramework
         using ReadLatestFunc = bool (*)(TouchPanelReader*, TouchPanelStatus* status);
 
         static Hook             g_touchPanelReaderHook;
-        static TouchPanelReader* g_touchPanelReader = nullptr;
+        static TouchPanelReader g_touchPanelReader;
         static TouchPanelStatus g_touchPanelStatus;
         static ReadLatestFunc   TouchPanelReader__ReadLatest = [](TouchPanelReader*, TouchPanelStatus*) { return false; }; // Stub so this funcptr is always set
 
@@ -29,7 +29,7 @@ namespace CTRPluginFramework
 
         static bool    TouchPanelReaderHookFunc(TouchPanelReader* panelReader, TouchPanelStatus* panelStatus)
         {
-            g_touchPanelReader = panelReader;
+            g_touchPanelReader = *panelReader;
 
             // Use game function to read inputs
             bool couldRead = TouchPanelReader__ReadLatest(panelReader, panelStatus);
@@ -47,10 +47,10 @@ namespace CTRPluginFramework
 
         bool    TouchPanelReader::ReadLatest(void)
         {
-            if (!g_touchPanelReader)
+            if (!g_touchPanelReader.touchPanel)
                 return false;
 
-            bool couldRead = TouchPanelReader__ReadLatest(g_touchPanelReader, &g_touchPanelStatus);
+            bool couldRead = TouchPanelReader__ReadLatest(&g_touchPanelReader, &g_touchPanelStatus);
 
             if (couldRead)
                 UpdateControllerFromGame(&g_touchPanelStatus);
