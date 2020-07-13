@@ -21,7 +21,7 @@ namespace CTRPluginFramework
         static PadReader *      g_padReader = nullptr;
         static ReadLatestFunc   PadReader__ReadLatest = [](PadReader*, PadStatus*) { return false; }; // Stub so this funcptr is always set
 
-        void    UpdateControllerFromGame(PadStatus* padStatus)
+        static void    UpdateControllerFromGame(PadStatus* padStatus)
         {
             ControllerImpl::_keysDown = padStatus->trigger;
             ControllerImpl::_keysHeld = padStatus->hold;
@@ -61,6 +61,31 @@ namespace CTRPluginFramework
             return couldRead;
         }
 
+        static void    PatchSelect(void)
+        {
+            u32 address = 0;
+
+            const std::vector<std::vector<u32>> patterns =
+            {
+                { 0xE8900006, 0xE3A0300C, 0xE1D3C002 },
+                { 0xE2802008, 0xE2801004 }
+            };
+
+            for (const auto& pattern : patterns)
+            {
+                address = Utils::Search<u32>(0x00100000, Process::GetTextSize(), pattern);
+
+                if (address)
+                    break;
+            }
+
+            if (!address)
+                return;
+
+            // Apply patch
+            *(vu32 *)address = 0xE12FFF1E; // bx lr
+        }
+
         bool    PadReader::InstallHooks(void)
         {
             u32     address = 0;
@@ -93,6 +118,9 @@ namespace CTRPluginFramework
 
             // Set funcptr
             PadReader__ReadLatest = (ReadLatestFunc)g_padReaderHook.GetContext().GetCallCode();
+
+            // Apply patch
+            PatchSelect();
 
             return true;
         }

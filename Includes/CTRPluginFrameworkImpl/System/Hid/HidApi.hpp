@@ -30,6 +30,18 @@ namespace CTRPluginFramework
             // TouchReader::ReadLatest (Zelda OOT)
             E92D4010 E24DD018 E1A04001 E3E01000 E58D1010 E58D1014
 
+            // Jump to GatherStartAndSelect
+            EB0051B2 E28DD018 E3A00001 E8BD8070
+
+            // PadReader::GatherStartAndSelect (mhgen - pokemon sun 1.2)
+            E2802008 E2801004
+
+            // PadReader::GatherStartAndSelecct (Zelda OOT)
+            E8900006 E3A0300C E1D3C002
+
+            // ExtraPadReader::GatherStartAndSelect (mhgen - xenoblade)
+            // E2802010 E280100C E2800008
+
         */
         struct AnalogStickStatus
         {

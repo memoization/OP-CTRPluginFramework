@@ -43,6 +43,30 @@ namespace CTRPluginFramework
             return couldRead;
         }
 
+        static void    PatchSelect(void)
+        {
+            u32 address = 0;
+
+            const std::vector<std::vector<u32>> patterns =
+            {
+                { 0xE2802010, 0xE280100C, 0xE2800008 }
+            };
+
+            for (const auto& pattern : patterns)
+            {
+                address = Utils::Search<u32>(0x00100000, Process::GetTextSize(), pattern);
+
+                if (address)
+                    break;
+            }
+
+            if (!address)
+                return;
+
+            // Apply patch
+            *(vu32 *)address = 0xE12FFF1E; // bx lr
+        }
+
         bool    ExtraPadReader::InstallHooks(void)
         {
             u32     address = 0;
@@ -74,6 +98,9 @@ namespace CTRPluginFramework
 
             // Set funcptr
             ExtraPadReader__ReadLatest = (ReadLatestFunc)g_extraPadReaderHook.GetContext().GetCallCode();
+
+            // Apply patch
+            PatchSelect();
 
             return true;
         }
