@@ -1,6 +1,6 @@
 #include "PointerSearcher.hpp"
 #include "CTRPluginFramework/System/Process.hpp"
-#include "ctrulib/result.h"
+#include <3ds.h>
 #include "CTRPluginFramework/Utils/Utils.hpp"
 
 namespace CTRPluginFramework

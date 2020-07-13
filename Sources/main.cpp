@@ -27,7 +27,7 @@ typedef unsigned long __PTRDIFF_TYPE__;
 #include "csvc.h"
 #include "CTRPluginFrameworkImpl/System/Screen.hpp"
 #include "CTRPluginFrameworkImpl/Graphics/BMPImage.hpp"
-//#include "OSDManager.hpp"
+#include "Excluded/OSDManager.hpp"
 #include "CTRPluginFrameworkImpl/System/ProcessImpl.hpp"
 #include <list>
 #include "CTRPluginFrameworkImpl/Graphics/TextBox.hpp"
@@ -389,6 +389,12 @@ exit:
 
     // Uncomment to stall process at the beginning until Y is pressed
     //void    DebugFromStart(void){}
+    namespace ControllerImpl
+    {
+        extern u32     _keysDown;
+        extern u32     _keysHeld;
+        extern u32     _keysReleased;
+    }
 
     int     main(void)
     {
@@ -402,6 +408,12 @@ exit:
 
         task.Start();
         menu.SynchronizeWithFrame(true);
+
+        menu += []{
+            OSDManager[0].SetScreen(true).SetPos(0, 0) = Utils::Format("Pressed: %08X", ControllerImpl::_keysDown);
+            OSDManager[1].SetScreen(true).SetPos(0, 10) = Utils::Format("Held: %08X", ControllerImpl::_keysHeld);
+            OSDManager[2].SetScreen(true).SetPos(0, 20) = Utils::Format("Released: %08X", ControllerImpl::_keysReleased);
+        };
 
         int ret = menu.Run();
 

@@ -28,6 +28,7 @@ SOURCES 	:= 	Sources \
 				Sources/CTRPluginFrameworkImpl/Menu \
 				Sources/CTRPluginFrameworkImpl/Search \
 				Sources/CTRPluginFrameworkImpl/System \
+				Sources/CTRPluginFrameworkImpl/System/Hid \
 				Sources/ctrulibExtension \
 				Sources/ctrulibExtension/allocator \
 				Sources/ctrulibExtension/gpu \
@@ -35,7 +36,8 @@ SOURCES 	:= 	Sources \
 				Sources/ctrulibExtension/system \
 				Sources/ctrulibExtension/util/utf \
 				Sources/ctrulibExtension/util/rbtree \
-				Sources/lodepng
+				Sources/lodepng \
+				Sources/Excluded
 
 IP			:=  5
 FTP_HOST 	:=	192.168.1.
@@ -127,7 +129,7 @@ AR:
 	@$(TOPDIR)/sendfile.py $(ACTIONREPLAY) "ActionReplay/" "$(FTP_HOST)$(IP)" $(FTP_PORT)
 
 install:
-	@mv $(OUTPUT).3gx d:/luma/plugins/default.3gx
+	@mv $(OUTPUT).3gx g:/luma/plugins/default.3gx
 
 #---------------------------------------------------------------------------------
 
@@ -141,7 +143,7 @@ DEPENDS	:=	$(OFILES:.o=.d)
 EXCLUDE := main.o cheats.o ActionReplayTest.o OSDManager.o PointerTesting.o Speedometer.o
 
 
-$(OUTPUT).3gx : $(OFILES) $(LIBOUT)
+$(OUTPUT).3gx : $(OUTPUT).elf
 $(LIBOUT):	$(filter-out $(EXCLUDE), $(OFILES))
 
 #---------------------------------------------------------------------------------
@@ -156,6 +158,8 @@ $(LIBOUT):	$(filter-out $(EXCLUDE), $(OFILES))
 %.3gx: %.elf
 	@echo creating $(notdir $@)
 	@3gxtool -s $(OUTPUT).elf $(TOPDIR)/$(PSF) $@
+
+$(OUTPUT).elf: $(OFILES) $(LIBOUT)
 
 -include $(DEPENDS)
 
