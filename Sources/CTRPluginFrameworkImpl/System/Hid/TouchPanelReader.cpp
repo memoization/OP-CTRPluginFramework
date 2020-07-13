@@ -5,28 +5,55 @@
 
 namespace CTRPluginFramework
 {
+    namespace ControllerImpl
+    {
+        extern u32     _keysDown;
+        extern u32     _keysHeld;
+        extern u32     _keysReleased;
+    }
+
     namespace Hid
     {
         using ReadLatestFunc = bool (*)(TouchPanelReader*, TouchPanelStatus* status);
 
         static Hook             g_touchPanelReaderHook;
+        static TouchPanelReader* g_touchPanelReader = nullptr;
+        static TouchPanelStatus g_touchPanelStatus;
         static ReadLatestFunc   TouchPanelReader__ReadLatest = [](TouchPanelReader*, TouchPanelStatus*) { return false; }; // Stub so this funcptr is always set
 
         static void    UpdateControllerFromGame(TouchPanelStatus* panelStatus)
         {
-            // Hmm, not sure of the approach yet
+            if (panelStatus->touch)
+                ControllerImpl::_keysHeld |= KEY_TOUCH;
         }
 
         static bool    TouchPanelReaderHookFunc(TouchPanelReader* panelReader, TouchPanelStatus* panelStatus)
         {
+            g_touchPanelReader = panelReader;
+
             // Use game function to read inputs
             bool couldRead = TouchPanelReader__ReadLatest(panelReader, panelStatus);
 
             if (!couldRead)
                 return couldRead;
 
+            g_touchPanelStatus = *panelStatus;
+
             // Update controller
             UpdateControllerFromGame(panelStatus);
+
+            return couldRead;
+        }
+
+        bool    TouchPanelReader::ReadLatest(void)
+        {
+            if (!g_touchPanelReader)
+                return false;
+
+            bool couldRead = TouchPanelReader__ReadLatest(g_touchPanelReader, &g_touchPanelStatus);
+
+            if (couldRead)
+                UpdateControllerFromGame(&g_touchPanelStatus);
 
             return couldRead;
         }
@@ -64,6 +91,11 @@ namespace CTRPluginFramework
             TouchPanelReader__ReadLatest = (ReadLatestFunc)g_touchPanelReaderHook.GetContext().GetCallCode();
 
             return true;
+        }
+
+        const TouchPanelStatus& TouchPanelStatus::Get()
+        {
+            return g_touchPanelStatus;
         }
     }
 }

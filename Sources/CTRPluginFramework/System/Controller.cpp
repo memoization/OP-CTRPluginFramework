@@ -1,6 +1,8 @@
 #include "types.h"
 #include <3ds.h>
 #include "CTRPluginFramework/System/Controller.hpp"
+#include "CTRPluginFramework/System/Process.hpp"
+#include "CTRPluginFrameworkImpl/System/Hid/HidApi.hpp"
 
 namespace CTRPluginFramework
 {
@@ -59,9 +61,14 @@ namespace CTRPluginFramework
 
     void    Controller::Update(void)
     {
-        hidScanInput();
+        /*hidScanInput();
         _keysDown = hidKeysDown();
         _keysHeld = hidKeysHeld();
-        _keysReleased = hidKeysUp();
+        _keysReleased = hidKeysUp();*/
+        if (Process::IsPaused())
+        {
+            Hid::PadReader::ReadLatest();
+            Hid::TouchPanelReader::ReadLatest();
+        }
     }
 }

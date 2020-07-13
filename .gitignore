@@ -3,6 +3,7 @@
 /Debug
 /Ressources
 /Guide
+Sources/Excluded/
 /.vs
 *.sln
 *.vcxproj

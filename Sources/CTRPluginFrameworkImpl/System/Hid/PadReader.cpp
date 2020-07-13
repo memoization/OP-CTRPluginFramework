@@ -5,21 +5,33 @@
 
 namespace CTRPluginFramework
 {
+    namespace ControllerImpl
+    {
+        extern u32     _keysDown;
+        extern u32     _keysHeld;
+        extern u32     _keysReleased;
+    }
+
     namespace Hid
     {
         using ReadLatestFunc = bool (*)(PadReader*, PadStatus* status);
 
         static Hook             g_padReaderHook;
         static PadStatus        g_padStatus;
+        static PadReader *      g_padReader = nullptr;
         static ReadLatestFunc   PadReader__ReadLatest = [](PadReader*, PadStatus*) { return false; }; // Stub so this funcptr is always set
 
         void    UpdateControllerFromGame(PadStatus* padStatus)
         {
-            // Hmm, not sure of the approach yet
+            ControllerImpl::_keysDown = padStatus->trigger;
+            ControllerImpl::_keysHeld = padStatus->hold;
+            ControllerImpl::_keysReleased = padStatus->release;
         }
 
         bool    PadReaderHookFunc(PadReader* padReader, PadStatus* padStatus)
         {
+            g_padReader = padReader;
+
             // Use game function to read inputs
             bool couldRead = PadReader__ReadLatest(padReader, padStatus);
 
@@ -30,6 +42,21 @@ namespace CTRPluginFramework
 
             // Update controller
             UpdateControllerFromGame(padStatus);
+
+            return couldRead;
+        }
+
+        bool    PadReader::ReadLatest(void)
+        {
+            if (!g_padReader)
+                return false;
+
+            bool couldRead = PadReader__ReadLatest(g_padReader, &g_padStatus);
+
+            if (!couldRead)
+                return couldRead;
+
+            UpdateControllerFromGame(&g_padStatus);
 
             return couldRead;
         }

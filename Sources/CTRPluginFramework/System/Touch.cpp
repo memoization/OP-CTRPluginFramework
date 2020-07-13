@@ -4,18 +4,21 @@
 #include "CTRPluginFramework/System/Controller.hpp"
 #include "CTRPluginFramework/System/Touch.hpp"
 
+#include "CTRPluginFrameworkImpl/System/Hid/HidApi.hpp"
+
 namespace CTRPluginFramework
 {
+    using namespace Hid;
+
     bool        Touch::IsDown(void)
     {
-        return (Controller::GetKeysDown() & Key::Touchpad);
+        return TouchPanelStatus::Get().touch;//(Controller::GetKeysDown() & Key::Touchpad);
     }
 
     UIntVector  Touch::GetPosition(void)
     {
-        touchPosition   tp;
+        const TouchPanelStatus& tps = TouchPanelStatus::Get();
 
-        hidTouchRead(&tp);
-        return (UIntVector(tp.px, tp.py));
+        return (UIntVector(tps.x, tps.y));
     }
 }

@@ -5,6 +5,7 @@
 #include "CTRPluginFrameworkImpl/Graphics/Font.hpp"
 #include "CTRPluginFrameworkImpl/System/Screenshot.hpp"
 #include "CTRPluginFrameworkImpl/System/HookManager.hpp"
+#include "CTRPluginFrameworkImpl/System/Hid/HidApi.hpp"
 #include "csvc.h"
 #include "plgldr.h"
 
@@ -178,7 +179,7 @@ namespace CTRPluginFramework
         acInit();
         amInit();
         fsInit();
-        hidInit();
+        //hidInit();
         cfguInit();
         plgLdrInit();
 
@@ -197,10 +198,13 @@ namespace CTRPluginFramework
         // Init Screen
         ScreenImpl::Initialize();
 
+        // This must be done after ProcessImpl::Initialize
+        Hid::Initialize();
+
         // Init default settings
         FwkSettings &settings = FwkSettings::Get();
 
-        settings.ThreadPriority = 0x30;
+        settings.ThreadPriority = 0x31;
         settings.AllowActionReplay = true;
         settings.AllowSearchEngine = true;
         settings.WaitTimeToBoot = Seconds(5.f);

@@ -63,6 +63,8 @@ namespace CTRPluginFramework
             u16                 y;
             u8                  touch;
             u8                  padding[3];
+
+            static const TouchPanelStatus& Get();
         } PACKED;
 
         struct IAnalogStickStatus
@@ -97,19 +99,6 @@ namespace CTRPluginFramework
             s64                 oldTickWriteZero;
             s32                 writePointer;
             u8                  padding[4];
-        } PACKED;
-
-        struct PadLifoRing
-        {
-            s64                 tickWriteZero;
-            s64                 oldTickWriteZero;
-            s32                 writePointer;
-            u8                  padding[4];
-            float               Svr2Volume;
-            u32                 RawButtons;
-            IAnalogStickStatus  RawAnalogStick;
-            u8                  padding[4];
-            IPadStatus          buffers[8];
         } PACKED;
 
         struct PadLifoRing
@@ -176,6 +165,7 @@ namespace CTRPluginFramework
             u8                  padding2[4];
             s64                 tickOfRead;
 
+            static bool     ReadLatest(void);
             static bool     InstallHooks(void);
         };
 
@@ -199,12 +189,15 @@ namespace CTRPluginFramework
 
         struct TouchPanelReader
         {
-            TouchPanel&         touchPanel;
+            TouchPanel *        touchPanel;
             s32                 indexOfRead;
             s64                 tickOfRead;
 
+            static bool     ReadLatest(void);
             static bool     InstallHooks(void);
         } PACKED;
+
+        void    Initialize(void);
 
         /*
 
