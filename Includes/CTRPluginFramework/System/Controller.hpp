@@ -60,13 +60,6 @@ namespace CTRPluginFramework
         static bool     IsKeysReleased(u32 keys);
         // Update Controller status
         static void     Update(void);
-
-        static void     InjectTouch(u16 posX, u16 posY);
-        static void     InjectKey(u32 key);
-    private:
-        static u32      _keysDown;
-        static u32      _keysHeld;
-        static u32      _keysReleased;
     };
 }
 
