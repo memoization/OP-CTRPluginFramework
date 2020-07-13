@@ -211,6 +211,12 @@ namespace CTRPluginFramework
 
         void    Initialize(void);
 
+        namespace RightStick
+        {
+            void    Initialize(void);
+            void    ReadLatest(PadStatus* padStatus);
+        }
+
         /*
 
             // TODO: remove if prove to be useless

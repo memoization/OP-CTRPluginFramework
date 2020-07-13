@@ -40,8 +40,10 @@ namespace CTRPluginFramework
 
             g_padStatus = *padStatus;
 
+            RightStick::ReadLatest(&g_padStatus);
+
             // Update controller
-            UpdateControllerFromGame(padStatus);
+            UpdateControllerFromGame(&g_padStatus);
 
             return couldRead;
         }
@@ -55,6 +57,8 @@ namespace CTRPluginFramework
 
             if (!couldRead)
                 return couldRead;
+
+            RightStick::ReadLatest(&g_padStatus);
 
             UpdateControllerFromGame(&g_padStatus);
 
