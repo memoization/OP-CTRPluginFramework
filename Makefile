@@ -29,6 +29,7 @@ SOURCES 	:= 	Sources \
 				Sources/CTRPluginFrameworkImpl/Search \
 				Sources/CTRPluginFrameworkImpl/System \
 				Sources/CTRPluginFrameworkImpl/System/Hid \
+				Sources/CTRPluginFrameworkImpl/System/Services \
 				Sources/ctrulibExtension \
 				Sources/ctrulibExtension/allocator \
 				Sources/ctrulibExtension/gpu \
