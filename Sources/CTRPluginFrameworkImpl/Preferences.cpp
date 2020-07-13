@@ -11,7 +11,7 @@ namespace CTRPluginFramework
     BMPImage *  Preferences::topBackgroundImage = nullptr;
     BMPImage *  Preferences::bottomBackgroundImage = nullptr;
 
-    u32         Preferences::MenuHotkeys = static_cast<u32>(Key::Start); //static_cast<u32>(Key::Select);
+    u32         Preferences::MenuHotkeys = static_cast<u32>(Key::Select);
     u64         Preferences::Flags = 0;
     LCDBacklight Preferences::Backlights[2];
     FwkSettings Preferences::Settings;
