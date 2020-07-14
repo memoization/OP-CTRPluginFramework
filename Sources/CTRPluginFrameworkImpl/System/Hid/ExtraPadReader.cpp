@@ -19,6 +19,7 @@ namespace CTRPluginFramework
 
         static Hook             g_extraPadReaderHook;
         static ExtraPadStatus   g_extraPadStatus;
+        static ExtraPadReader   g_extraPadReader;
         static ReadLatestFunc   ExtraPadReader__ReadLatest = [](ExtraPadReader*, ExtraPadStatus*) { return false; }; // Stub so this funcptr is always set
 
         static void    UpdateControllerFromGame(ExtraPadStatus* padStatus)
@@ -37,6 +38,8 @@ namespace CTRPluginFramework
                 return couldRead;
 
             ControllerImpl::_gameCounter++;
+
+            g_extraPadReader = *padReader;
 
             g_extraPadStatus = *padStatus;
 
@@ -68,6 +71,21 @@ namespace CTRPluginFramework
 
             // Apply patch
             *(vu32 *)address = 0xE12FFF1E; // bx lr
+        }
+
+        bool    ExtraPadReader::ReadLatest(void)
+        {
+            if (!g_extraPadReader.vtable)
+                return false;
+
+            bool couldRead = ExtraPadReader__ReadLatest(&g_extraPadReader, &g_extraPadStatus);
+
+            if (!couldRead)
+                return couldRead;
+
+            UpdateControllerFromGame(&g_extraPadStatus);
+
+            return couldRead;
         }
 
         bool    ExtraPadReader::InstallHooks(void)

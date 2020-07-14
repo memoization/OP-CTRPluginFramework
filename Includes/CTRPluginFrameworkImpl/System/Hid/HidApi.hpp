@@ -196,6 +196,7 @@ namespace CTRPluginFramework
             u8                  padding3[4];
             s64                 tickOfRead;
 
+            static bool     ReadLatest(void);
             static bool     InstallHooks(void);
         } PACKED;
 
@@ -209,13 +210,14 @@ namespace CTRPluginFramework
             static bool     InstallHooks(void);
         } PACKED;
 
-        void    Initialize(void);
-
         namespace RightStick
         {
             void    Initialize(void);
             void    ReadLatest(PadStatus* padStatus);
         }
+
+        void    Initialize(void);
+        void    ReadLatest(void);
 
         /*
 

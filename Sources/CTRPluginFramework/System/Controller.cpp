@@ -63,19 +63,13 @@ namespace CTRPluginFramework
 
     void    Controller::Update(void)
     {
-        /*hidScanInput();
-        _keysDown = hidKeysDown();
-        _keysHeld = hidKeysHeld();
-        _keysReleased = hidKeysUp();*/
         if (Process::IsPaused())
         {
-            Hid::PadReader::ReadLatest();
-            Hid::TouchPanelReader::ReadLatest();
+            Hid::ReadLatest();
         }
         else
         {
             _counter++;
         }
-
     }
 }
