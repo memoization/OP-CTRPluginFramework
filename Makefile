@@ -9,6 +9,21 @@ endif
 TOPDIR ?= $(CURDIR)
 include $(DEVKITARM)/3ds_rules
 
+export CTRPF_REVISION		:=	"$(shell git describe --always --tags --match [0-9]* --abbrev=8 | sed 's/-[0-9]*-g/-/')"
+export CTRPF_VERSION_MAJOR	:=	"$(shell git describe --always --tags | cut -f1 -d- | cut -f1 -d.)"
+export CTRPF_VERSION_MINOR	:=	"$(shell git describe --always --tags | cut -f1 -d- | cut -f2 -d.)"
+export CTRPF_VERSION_BUILD	:=	"$(shell git describe --always --tags | cut -f1 -d- | cut -f3 -d.)"
+export COMMIT			:=	"$(shell git rev-parse --short=8 HEAD)"
+export COMPILE_DATE 	:=  "$(shell date)"
+
+
+#ifeq ($(strip $(CTRPF_REVISION)),)
+#	export CTRPF_REVISION			:=	v0.0.0-0
+#	export CTRPF_VERSION_MAJOR	:=	0
+#	export CTRPF_VERSION_MINOR	:=	0
+#	export CTRPF_VERSION_BUILD	:=	0
+#endif
+
 TARGET		:= 	$(notdir $(CURDIR))
 BUILD		:= 	Build
 INCLUDES	:= 	Includes \
@@ -58,7 +73,8 @@ CFLAGS	:=	-Os -mword-relocations \
  			-fomit-frame-pointer -ffunction-sections -fno-strict-aliasing \
 			$(ARCH)
 
-CFLAGS		+=	$(INCLUDE) -DARM11 -D_3DS
+CFLAGS		+=	$(INCLUDE) -DARM11 -D_3DS -DCTRPF_VERSION_MAJOR=\"$(CTRPF_VERSION_MAJOR)\" -DCTRPF_VERSION_MINOR=\"$(CTRPF_VERSION_MINOR)\" \
+								-DCTRPF_VERSION_BUILD=\"$(CTRPF_VERSION_BUILD)\" -DCOMMIT_HASH=\"$(COMMIT)\" -DCOMPILE_DATE=\"$(COMPILE_DATE)\"
 #-Wall -Wextra -Wdouble-promotion -Werror
 
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
@@ -127,7 +143,7 @@ AR:
 	@$(TOPDIR)/sendfile.py $(ACTIONREPLAY) "ActionReplay/" "$(FTP_HOST)$(IP)" $(FTP_PORT)
 
 install:
-	@mv $(OUTPUT).3gx d:/luma/plugins/default.3gx
+	@mv $(OUTPUT).3gx g:/luma/plugins/default.3gx
 
 #---------------------------------------------------------------------------------
 
