@@ -1,8 +1,10 @@
-/Build
+*/Build
 /Debug
 /Ressources
 /Guide
 /Ignored
+/Library/debug
+/Library/release
 /.devcontainer
 /.vscode
 /.vs
@@ -21,4 +23,5 @@
 *.7z
 *.bmp
 *.3gx
+*.tar.bz2
 objdump

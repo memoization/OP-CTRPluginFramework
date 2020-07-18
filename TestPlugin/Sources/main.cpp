@@ -22,17 +22,18 @@ typedef unsigned long __PTRDIFF_TYPE__;
 
 #include <3ds.h>
 #include <CTRPluginFramework.hpp>
-#include <string>
-#include <iterator>
+
 #include "csvc.h"
 #include "CTRPluginFrameworkImpl/System/Screen.hpp"
 #include "CTRPluginFrameworkImpl/System/SystemImpl.hpp"
-#include "CTRPluginFrameworkImpl/Graphics/BMPImage.hpp"
-#include "./Excluded/OSDManager.hpp"
+
 #include "CTRPluginFrameworkImpl/System/ProcessImpl.hpp"
+
+#include "./Excluded/OSDManager.hpp"
+
+#include <string>
+#include <iterator>
 #include <list>
-//#include "CTRPluginFrameworkImpl/Graphics/TextBox.hpp"
-#include "plgldr.h"
 
 namespace CTRPluginFramework
 {

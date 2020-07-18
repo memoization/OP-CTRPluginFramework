@@ -131,7 +131,7 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 all: lib/libctrpf.a
 
 dist-bin: all
-	@tar --exclude=*~ -cjf libctrpf-$(CTRPF_REVISION).tar.bz2 include/CTRPluginFramework include/CTRPluginFramework.hpp include/types.h include/ctrulibExtension.h lib
+	@tar --exclude=*~ -cjf libctrpf-$(CTRPF_REVISION).tar.bz2 include/CTRPluginFramework include/CTRPluginFramework.hpp lib
 
 dist-src:
 	@tar --exclude=*~ -cjf libctru-src-$(CTRPF_REVISION).tar.bz2 include source data Makefile Doxyfile
@@ -139,6 +139,7 @@ dist-src:
 dist: dist-bin #dist-src
 
 install: dist-bin
+	@rm -rf $(DESTDIR)$(DEVKITPRO)/libctrpf
 	@mkdir -p $(DESTDIR)$(DEVKITPRO)/libctrpf
 	@bzip2 -cd libctrpf-$(CTRPF_REVISION).tar.bz2 | tar -xf - -C $(DESTDIR)$(DEVKITPRO)/libctrpf
 	@echo "CTRPF was successfully installed in $(DESTDIR)$(DEVKITPRO)/libctrpf"
@@ -154,17 +155,12 @@ debug:
 
 lib/libctrpf.a : lib release
 	@$(MAKE) BUILD=release OUTPUT=$(CURDIR)/$@ \
-	BUILD_CFLAGS="-DNDEBUG=1 -O2 -fomit-frame-pointer" \
-	DEPSDIR=$(CURDIR)/release \
-	--no-print-directory -C release \
-	-f $(CURDIR)/Makefile
+	BUILD_CFLAGS="-DNDEBUG=1 -O2 -fomit-frame-pointer" DEPSDIR=$(CURDIR)/release \
+	--no-print-directory -C release	-f $(CURDIR)/Makefile
 
-lib/libctrpf.a : lib debug
-	@$(MAKE) BUILD=debug OUTPUT=$(CURDIR)/$@ \
-	BUILD_CFLAGS="-DDEBUG=1 -Og" \
-	DEPSDIR=$(CURDIR)/debug \
-	--no-print-directory -C debug \
-	-f $(CURDIR)/Makefile
+lib/libctrpfd.a : lib debug
+	@$(MAKE) BUILD=debug OUTPUT=$(CURDIR)/$@ BUILD_CFLAGS="-DDEBUG=1 -Og" \
+	DEPSDIR=$(CURDIR)/debug --no-print-directory -C debug -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
 clean:
