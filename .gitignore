@@ -2,6 +2,9 @@
 /Debug
 /Ressources
 /Guide
+/Ignored
+/.devcontainer
+/.vscode
 /.vs
 *.sln
 *.vcxproj
