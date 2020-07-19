@@ -34,8 +34,6 @@ build:
     - echo $CTRPF_REVISION
     - cd Library && make dist-bin
   artifacts:
-    reports:
-      dotenv: build.env
     paths:      
       - Library/libctrpf-$CTRPF_REVISION.tar.bz2
     expire_in: 1 hour
@@ -53,5 +51,7 @@ deploy-hourly:
         - echo $CTRPF_REVISION
         - gitlab-release --message "hourly $CI_COMMIT_SHORT_SHA" libctrpf-$CTRPF_REVISION.tar.bz2
     needs:
-    - job: build
-      artifacts: true
+      - job: prep
+        artifacts: true
+      - job: build
+        artifacts: true
