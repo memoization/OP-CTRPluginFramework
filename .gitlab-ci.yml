@@ -33,9 +33,11 @@ build:
   script:
     - echo $CTRPF_REVISION
     - cd Library && make dist-bin
+    - cd ..
+    - mv Library/libctrpf-$CTRPF_REVISION.tar.bz2 libctrpf-$CTRPF_REVISION.tar.bz2
   artifacts:
     paths:      
-      - Library/libctrpf-$CTRPF_REVISION.tar.bz2
+      - libctrpf-$CTRPF_REVISION.tar.bz2
     expire_in: 1 hour
   needs:
     - job: prep
