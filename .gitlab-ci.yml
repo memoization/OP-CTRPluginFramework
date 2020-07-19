@@ -1,0 +1,28 @@
+stages:
+    - build
+    - deploy
+
+build:
+  image: nanquitas/luma3ds:latest
+  stage: build
+  services:
+  only:
+    - develop
+    - merge_requests
+  before_script:
+  script:
+    - make dist-bin
+    - CTRPF_REVISION=`git describe --always --tags --match [0-9]* --abbrev=8 | sed 's/-[0-9]*-g/-/'`
+  artifacts:
+    paths:      
+      - libctrpf-$CTRPF_REVISION.tar.bz2
+    expire_in: 1 hour
+
+deploy-hourly:
+    image: inetprocess/gitlab-release
+    stage: deploy
+    only:
+        - develop
+    script:
+        - CTRPF_REVISION=`git describe --always --tags --match [0-9]* --abbrev=8 | sed 's/-[0-9]*-g/-/'`
+        - gitlab-release --message "hourly $CI_COMMIT_SHORT_SHA" $CTRPF_REVISION
