@@ -27,8 +27,7 @@ deploy-hourly:
     only:
         - develop
     script:
-        - CTRPF_REVISION=`git describe --always --tags --match [0-9]* --abbrev=8 | sed 's/-[0-9]*-g/-/'`
-        - gitlab-release --message "hourly $CI_COMMIT_SHORT_SHA" $CTRPF_REVISION
+        - gitlab-release --message "hourly $CI_COMMIT_SHORT_SHA" libctrpf-$CTRPF_REVISION.tar.bz2
     needs:
     - job: build
       artifacts: true
