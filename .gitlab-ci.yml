@@ -4,7 +4,7 @@ stages:
 
 .vars-global:
   variables:
-    CTRPF_REVISION="unset"
+    CTRPF_REVISION : "unset"
 
 build:
   image: nanquitas/luma3ds:latest
