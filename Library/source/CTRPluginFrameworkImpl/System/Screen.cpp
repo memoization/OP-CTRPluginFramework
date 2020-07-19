@@ -4,6 +4,7 @@
 #include "CTRPluginFrameworkImpl/System.hpp"
 #include "CTRPluginFramework/System/System.hpp"
 #include "CTRPluginFramework/Utils/Utils.hpp"
+#include "CTRPluginFramework/Graphics/OSD.hpp"
 #include "3ds.h"
 #include "CTRPluginFrameworkImpl/Preferences.hpp"
 #include "csvc.h"
@@ -347,6 +348,54 @@ namespace CTRPluginFramework
             } while (__builtin_expect(strexFailed, 0));
         }
 
+        struct QueueBody
+        {
+            u32 control;
+            s32 droppedPdc0Count;
+            s32 droppedPdc1Count;
+            u8 data[52];
+        } PACKED;
+
+        static QueueBody g_backup;
+
+        static void SaveQueue(void)
+        {
+            QueueBody *queue = (QueueBody *)EventData;
+
+            __ldrex((s32 *)EventData);
+            g_backup.control = queue->control;
+            g_backup.droppedPdc0Count = queue->droppedPdc0Count;
+            g_backup.droppedPdc1Count = queue->droppedPdc1Count;
+
+            for (int i = 0; i < 52; ++i)
+            {
+                g_backup.data[i] = queue->data[i];
+            }
+
+            __clrex();
+
+            OSD::Notify(Utils::Format("SQ Count: %08X", queue->control));
+        }
+
+        static void RestoreQueue(void)
+        {
+            QueueBody *queue = (QueueBody *)EventData;
+
+            __ldrex((s32 *)EventData);
+            queue->control = g_backup.control;
+            queue->droppedPdc0Count = g_backup.droppedPdc0Count;
+            queue->droppedPdc1Count = g_backup.droppedPdc1Count;
+
+            for (int i = 0; i < 52; ++i)
+            {
+                queue->data[i] = g_backup.data[i];
+            }
+
+            __clrex();
+
+            OSD::Notify(Utils::Format("RQ Count: %08X", queue->control));
+        }
+
         static int  PopInterrupt(void)
         {
             int     curEvt;
@@ -453,9 +502,14 @@ namespace CTRPluginFramework
                 {
                     if (!RunInterruptReceiver)
                         break;
+                    RestoreQueue();
                     LightSemaphore_Release(&Semaphore, 1);
+                    OSD::Notify("IR Off");
                     svcWaitSynchronization(WakeEvent, U64_MAX);
                     LightSemaphore_Acquire(&Semaphore, 1);
+                    svcWaitSynchronization(GSPEvent, U64_MAX);
+                    SaveQueue();
+                    OSD::Notify("IR On");
                 }
 
                 ClearInterrupts();
@@ -489,15 +543,8 @@ namespace CTRPluginFramework
             svcExitThread();
         }
 
-        void    PauseInterruptReceiver(void)
+        void    TriggerAllEvents(void)
         {
-            svcClearEvent(WakeEvent);
-            CatchInterrupt = false;
-            svcSignalEvent(GSPEvent);
-            LightSemaphore_Acquire(&Semaphore, 1);
-            ClearInterrupts();
-
-            // Trigger all the events in case the game is waiting on one of them
             EnqueueEvent(GSPGPU_EVENT_PSC0, false);
             EnqueueEvent(GSPGPU_EVENT_PSC1, false);
             EnqueueEvent(GSPGPU_EVENT_PPF, false);
@@ -505,10 +552,28 @@ namespace CTRPluginFramework
             EnqueueEvent(GSPGPU_EVENT_DMA, true);
         }
 
+        void    PauseInterruptReceiver(void)
+        {
+            svcClearEvent(WakeEvent);
+            CatchInterrupt = false;
+            svcSignalEvent(GSPEvent);
+            LightSemaphore_Acquire(&Semaphore, 1);
+            //if (g_backup.control & 0xFF00)
+            //    svcSignalEvent(GSPEvent);
+            //ClearInterrupts();
+
+            // Trigger all the events in case the game is waiting on one of them
+            //EnqueueEvent(GSPGPU_EVENT_PSC0, true);
+            //EnqueueEvent(GSPGPU_EVENT_PSC1, true);
+           // EnqueueEvent(GSPGPU_EVENT_PPF, true);
+           // EnqueueEvent(GSPGPU_EVENT_P3D, true);
+           // EnqueueEvent(GSPGPU_EVENT_DMA, true);
+        }
+
         void    ResumeInterruptReceiver(void)
         {
             CatchInterrupt = true;
-            ClearInterrupts();
+            //ClearInterrupts();//
             LightSemaphore_Release(&Semaphore, 1);
             svcSignalEvent(WakeEvent);
         }
