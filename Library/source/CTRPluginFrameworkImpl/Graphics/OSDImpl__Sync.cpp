@@ -20,7 +20,21 @@ namespace CTRPluginFramework
     {
         Mutex   FrameLockingMutex;
         bool    IsForced = false;
-        bool    GameResumed = false;
+        bool    HasGameResumed = false;
+        Task    CheckFrameResumedTask([](void *arg) -> s32
+        {
+            while (!HasGameResumed)
+            {
+                Sleep(Milliseconds(32)); ///< Wait for 2 frames
+
+                if (!HasGameResumed)
+                {
+                    GSP::TriggerAllEvents();
+                }
+            }
+
+            return 0;
+        });
     }
 
     void    OSDImpl::Lock(void)
@@ -94,7 +108,7 @@ namespace CTRPluginFramework
 
     int    OSDImpl::PauseFrame(void)
     {
-        GameResumed = true;
+        HasGameResumed = true;
         // Check if we need to pause frame
         if (WaitingForScreenshot || FramesToPlay || !ProcessImpl::IsPaused || !NeedToPauseFrame)
             return 0;
@@ -158,18 +172,12 @@ namespace CTRPluginFramework
         GSP::ResumeInterruptReceiver();
     }
 
-    namespace GSP
-    {
-        void    TriggerAllEvents(void);
-    }
-    //void    GSP::TriggerAllEvents(void);
-
     void    OSDImpl::ResumeFrame(const u32 nbFrames)
     {
         if (!IsFramePaused)
             return;
 
-        GameResumed = false;
+        HasGameResumed = false;
 
         bool    isAsync = ProcessImpl::Status & NoImage;
 
@@ -183,23 +191,8 @@ namespace CTRPluginFramework
         // Unlock game threads
         ProcessImpl::UnlockGameThreads();
 
-        Task task([](void *arg) -> s32
-        {
-            while (!GameResumed)
-            {
-                Sleep(Milliseconds(32)); ///< wait for 2 frames
-
-                if (!GameResumed)
-                {
-                    GSP::TriggerAllEvents();
-                }
-            }
-
-            return 0;
-        });
-
         // Async job to ensure frame is resumed
-        task.Start();
+        CheckFrameResumedTask.Start();
 
         // Wake up game's thread
         LightEvent_Signal(&OnFrameResume);

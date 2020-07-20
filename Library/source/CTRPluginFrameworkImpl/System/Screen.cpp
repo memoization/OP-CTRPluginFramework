@@ -45,7 +45,7 @@ namespace CTRPluginFramework
         static LightEvent               VBlank1Event;
         static LightSemaphore           Semaphore;
         static Hook                     GSPRegisterInterruptReceiverHook;
-        static ThreadEx                 InterruptReceiverThread{InterruptReceiver, 0x1000, 0x35, -1};
+        static ThreadEx                 InterruptReceiverThread{InterruptReceiver, 0x1000, 0x1A, -1};
         static FrameBufferInfoShared *  SharedFrameBuffers[2]{nullptr};
         u32    InterruptReceiverThreadPriority;
 
@@ -374,7 +374,7 @@ namespace CTRPluginFramework
 
             __clrex();
 
-            OSD::Notify(Utils::Format("SQ Count: %08X", queue->control));
+            // OSD::Notify(Utils::Format("SQ Count: %08X", queue->control));
         }
 
         static void RestoreQueue(void)
@@ -393,7 +393,7 @@ namespace CTRPluginFramework
 
             __clrex();
 
-            OSD::Notify(Utils::Format("RQ Count: %08X", queue->control));
+            // OSD::Notify(Utils::Format("RQ Count: %08X", queue->control));
         }
 
         static int  PopInterrupt(void)
@@ -502,17 +502,16 @@ namespace CTRPluginFramework
                 {
                     if (!RunInterruptReceiver)
                         break;
-                    RestoreQueue();
+
                     LightSemaphore_Release(&Semaphore, 1);
-                    OSD::Notify("IR Off");
+
                     svcWaitSynchronization(WakeEvent, U64_MAX);
+
                     LightSemaphore_Acquire(&Semaphore, 1);
-                    svcWaitSynchronization(GSPEvent, U64_MAX);
                     SaveQueue();
-                    OSD::Notify("IR On");
                 }
 
-                ClearInterrupts();
+                // ClearInterrupts();
                 while (CatchInterrupt)
                 {
                     svcClearEvent(GSPEvent);
@@ -546,10 +545,10 @@ namespace CTRPluginFramework
         void    TriggerAllEvents(void)
         {
             EnqueueEvent(GSPGPU_EVENT_PSC0, false);
-            EnqueueEvent(GSPGPU_EVENT_PSC1, false);
-            EnqueueEvent(GSPGPU_EVENT_PPF, false);
-            EnqueueEvent(GSPGPU_EVENT_P3D, false);
-            EnqueueEvent(GSPGPU_EVENT_DMA, true);
+            EnqueueEvent(GSPGPU_EVENT_PSC1, true);
+            // EnqueueEvent(GSPGPU_EVENT_PPF, false);
+            // EnqueueEvent(GSPGPU_EVENT_P3D, false);
+            // EnqueueEvent(GSPGPU_EVENT_DMA, true);
         }
 
         void    PauseInterruptReceiver(void)
@@ -558,36 +557,25 @@ namespace CTRPluginFramework
             CatchInterrupt = false;
             svcSignalEvent(GSPEvent);
             LightSemaphore_Acquire(&Semaphore, 1);
-            //if (g_backup.control & 0xFF00)
-            //    svcSignalEvent(GSPEvent);
-            //ClearInterrupts();
-
-            // Trigger all the events in case the game is waiting on one of them
-            //EnqueueEvent(GSPGPU_EVENT_PSC0, true);
-            //EnqueueEvent(GSPGPU_EVENT_PSC1, true);
-           // EnqueueEvent(GSPGPU_EVENT_PPF, true);
-           // EnqueueEvent(GSPGPU_EVENT_P3D, true);
-           // EnqueueEvent(GSPGPU_EVENT_DMA, true);
         }
 
         void    ResumeInterruptReceiver(void)
         {
             CatchInterrupt = true;
-            //ClearInterrupts();//
             LightSemaphore_Release(&Semaphore, 1);
             svcSignalEvent(WakeEvent);
         }
 
         void    WaitForVBlank(void)
         {
-            ClearInterrupts();
+            // ClearInterrupts();
             LightEvent_Clear(&VBlank0Event);
             LightEvent_Wait(&VBlank0Event);
         }
 
         void    WaitForVBlank1(void)
         {
-            ClearInterrupts();
+            // ClearInterrupts();
             LightEvent_Clear(&VBlank1Event);
             LightEvent_Wait(&VBlank1Event);
         }
