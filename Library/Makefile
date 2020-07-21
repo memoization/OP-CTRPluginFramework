@@ -66,6 +66,8 @@ ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 DEFINES	:=	-DCTRPF_VERSION_MAJOR="\"$(CTRPF_VERSION_MAJOR)\"" -DCTRPF_VERSION_MINOR="\"$(CTRPF_VERSION_MINOR)\"" \
 			-DCTRPF_VERSION_BUILD="\"$(CTRPF_VERSION_BUILD)\"" -DCOMMIT_HASH="\"$(COMMIT)\"" -DCOMPILE_DATE="\"$(COMPILE_DATE)\""
 
+DEFINES +=  -DFORCE_SCREEN_RESET=1
+
 CFLAGS	:=	-Wall -mword-relocations \
 			-ffunction-sections \
 			-fdata-sections \
