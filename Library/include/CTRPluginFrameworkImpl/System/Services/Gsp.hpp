@@ -1,6 +1,7 @@
 #pragma once
 
 #include <3ds.h>
+#include "CTRPluginFramework/System/Time.hpp"
 
 namespace CTRPluginFrameworkImpl {
 namespace Services
@@ -47,6 +48,7 @@ namespace Services
             u32 unk;                    ///< Unknown.
 
             void    FillFrameBufferFrom(FrameBufferInfo& src);
+            void    FillFrameBufferFrom(u32 screen);
         };
 
         struct FrameBufferInfoShared
@@ -55,12 +57,23 @@ namespace Services
             FrameBufferInfo           fbInfo[2];
 
             void    FillFrameBuffersFrom(FrameBufferInfoShared& src);
+            void    FillFrameBuffersFrom(u32 screen);
+        };
+
+        struct SavedFrameBuffer
+        {
+            using Time = CTRPluginFramework::Time;
+
+            bool                initialized{false};
+            Time                savedTime;
+            FrameBufferInfo     frameBuffer;
         };
 
         extern u32  InterruptReceiverThreadPriority;
         extern s32  BufferFlags;
 
         Result  Initialize(void);
+        bool    IsReady(void);
         void    Update(u32 threadId, Handle eventHandle, Handle sharedMemHandle);
         void    PauseInterruptReceiver(void);
         void    ResumeInterruptReceiver(void);
@@ -73,6 +86,9 @@ namespace Services
 
         u32     ImportFrameBufferInfo(FrameBufferInfoShared& dest, int screen);
         void    SetFrameBufferInfo(FrameBufferInfoShared& src, int screen, bool convert);
+        void    SetFrameBufferInfo(FrameBufferInfo& fb, int screen, bool convert);
+        void    Restore(u32 screen);
+        void    SaveGameFrameBuffer(u32 screen, int nextBank, void *leftFb, void *rightFb, int stride, int format, int swap);
 
         static inline s32      __ldrex__(s32 *addr)
         {

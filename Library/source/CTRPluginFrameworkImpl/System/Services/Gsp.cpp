@@ -25,7 +25,7 @@ namespace Services
         static vu8 *                    SharedMemoryBlock{nullptr};
         static vu8 *                    EventData{nullptr};
         static vu8 *                    CmdReqQueue{nullptr};
-        static volatile Handle          GSPEvent;
+        static volatile Handle          GSPEvent = 0;
         static Handle                   WakeEvent;
         static LightEvent               VBlank0Event;
         static LightEvent               VBlank1Event;
@@ -33,6 +33,7 @@ namespace Services
         static Hook                     GSPRegisterInterruptReceiverHook;
         static ThreadEx                 InterruptReceiverThread{InterruptReceiver, 0x1000, 0x1A, -1};
         static FrameBufferInfoShared *  SharedFrameBuffers[2]{nullptr};
+        static SavedFrameBuffer         SavedFrameBuffers[2];
 
         s32    BufferFlags{0};
         u32    InterruptReceiverThreadPriority;
@@ -61,6 +62,13 @@ namespace Services
             );
 #endif
         }
+
+        bool    IsReady(void)
+        {
+            // This is not perfect as it doesn't check for gsp rights
+            return GSPEvent != 0;
+        }
+
         Result  Initialize(void)
         {
             const std::vector<u32> gspgpuRegisterInterruptPattern =
@@ -316,11 +324,44 @@ namespace Services
             }
         }
 
+        void    FrameBufferInfo::FillFrameBufferFrom(u32 screen)
+        {
+            SavedFrameBuffer& sfb = SavedFrameBuffers[screen];
+
+            if (!sfb.initialized)
+            {
+                // Fill with black
+                u16 *start = (u16 *)(framebuf0_vaddr);
+                u16 *end = (u16 *)((u32)start * (framebuf_widthbytesize * (screen ? 320 : 400)));
+                std::fill(start, end, 0);
+                return;
+            }
+
+            FillFrameBufferFrom(sfb.frameBuffer);
+        }
+
         void    FrameBufferInfoShared::FillFrameBuffersFrom(FrameBufferInfoShared &src)
         {
             const u32 displayed = src.header.screen;
 
             fbInfo[0].FillFrameBufferFrom(src.fbInfo[displayed]);
+        }
+
+        void    FrameBufferInfoShared::FillFrameBuffersFrom(u32 screen)
+        {
+            //const u32 displayed = src.header.screen;
+            SavedFrameBuffer& sfb = SavedFrameBuffers[screen];
+
+            if (!sfb.initialized)
+            {
+                // Fill with black
+                u16 *start = (u16 *)(fbInfo[0].framebuf0_vaddr);
+                u16 *end = (u16 *)((u32)start * (fbInfo[0].framebuf_widthbytesize * (screen ? 320 : 400)));
+                std::fill(start, end, 0);
+                return;
+            }
+
+            fbInfo[0].FillFrameBufferFrom(sfb.frameBuffer);
         }
 
         static void  ClearInterrupts(void)
@@ -475,12 +516,12 @@ namespace Services
                     if (!RunInterruptReceiver)
                         break;
 
-                    LightSemaphore_Release(&Semaphore, 1);
+                    // LightSemaphore_Release(&Semaphore, 1);
 
                     svcWaitSynchronization(WakeEvent, U64_MAX);
 
-                    LightSemaphore_Acquire(&Semaphore, 1);
-                    SaveQueue();
+                    // LightSemaphore_Acquire(&Semaphore, 1);
+                    // SaveQueue();
                 }
 
                 ClearInterrupts();
@@ -525,13 +566,13 @@ namespace Services
             svcClearEvent(WakeEvent);
             CatchInterrupt = false;
             svcSignalEvent(GSPEvent);
-            LightSemaphore_Acquire(&Semaphore, 1);
+            // LightSemaphore_Acquire(&Semaphore, 1);
         }
 
         void    ResumeInterruptReceiver(void)
         {
             CatchInterrupt = true;
-            LightSemaphore_Release(&Semaphore, 1);
+            // LightSemaphore_Release(&Semaphore, 1);
             svcSignalEvent(WakeEvent);
         }
 
@@ -648,6 +689,62 @@ namespace Services
             {
                 __ldrex(addr);
             } while (__strex(addr, src.header.header));
+        }
+
+        void    SetFrameBufferInfo(FrameBufferInfo& fb, int screen, bool convert)
+        {
+            u8 *s = reinterpret_cast<u8 *>(&fb);
+            u8 *dst = reinterpret_cast<u8 *>(&SharedFrameBuffers[screen]->fbInfo);
+            int pos = 1 - SharedFrameBuffers[screen]->header.screen;
+            FrameBufferInfo& fbDst = SharedFrameBuffers[screen]->fbInfo[pos];
+
+            fbDst = fb;
+
+            // VA to PA to expected VA (plugin fbs)
+            if (convert)
+            {
+                fbDst.framebuf0_vaddr = plgVAtoGameVa(fb.framebuf0_vaddr);
+                if (fb.framebuf1_vaddr)
+                    fbDst.framebuf1_vaddr = plgVAtoGameVa(fb.framebuf1_vaddr);
+            }
+
+            __dsb();
+
+            //src.header.screen = pos;
+            //src.header.update = 1;
+            FrameBufferInfoHeader header{0};
+
+            header.screen = pos;
+            header.update = 1;
+            s32 *addr = &SharedFrameBuffers[screen]->header.header;
+            do
+            {
+                __ldrex(addr);
+            } while (__strex(addr, header.header));
+        }
+
+        void    SaveGameFrameBuffer(u32 screen, int nextBank, void *leftFb, void *rightFb, int stride, int format, int swap)
+        {
+            SavedFrameBuffer&   sfb = SavedFrameBuffers[screen];
+            FrameBufferInfo&    fb = sfb.frameBuffer;
+
+            sfb.initialized = true;
+            sfb.savedTime = Time::GetCurrent();
+            fb.active_framebuf = nextBank;
+            fb.framebuf0_vaddr = (u32 *)leftFb;
+            fb.framebuf1_vaddr = (u32 *)rightFb;
+            fb.framebuf_widthbytesize = stride;
+            fb.format = format;
+            fb.framebuf_dispselect = swap;
+        }
+
+        void    Restore(u32 screen)
+        {
+            SavedFrameBuffer&   sfb = SavedFrameBuffers[screen];
+            FrameBufferInfo&    fb = sfb.frameBuffer;
+
+            if (sfb.initialized)
+                SetFrameBufferInfo(fb, screen, false);
         }
     } ///< GSP
 }}

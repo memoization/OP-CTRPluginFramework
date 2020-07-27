@@ -141,11 +141,12 @@ namespace CTRPluginFramework
     u32     ScreenImpl::Acquire(void)
     {
         // Fetch game frame buffers & check validity
-        if (ImportFromGsp())
+        if (!GSP::IsReady())
             return -1;
 
         // Copy images and convert to RGB565 to ctrpf's frame buffer (0)
-        _frameBufferInfo.FillFrameBuffersFrom(_gameFrameBufferInfo);
+        // _frameBufferInfo.FillFrameBuffersFrom(_gameFrameBufferInfo);
+        _frameBufferInfo.FillFrameBuffersFrom(!_isTopScreen);
 
         _format = GSP_RGB565_OES;
         _stride = 240*2;
@@ -174,7 +175,7 @@ namespace CTRPluginFramework
         Flush();
 
         // Apply current frame buffers
-        GSP::SetFrameBufferInfo(_frameBufferInfo, !_isTopScreen, true);
+        // GSP::SetFrameBufferInfo(_frameBufferInfo, !_isTopScreen, true);
 
         _isGspAcquired = true;
 
@@ -184,8 +185,10 @@ namespace CTRPluginFramework
     u32     ScreenImpl::ImportFromGsp(void)
     {
         // GSP screens are plugin screens, so don't fetch
-        if (_isGspAcquired)
+        if (_isGspAcquired || GSP::IsReady())
             return 0;
+
+        return -1;
 
         // Fetch game frame buffers
         if (GSP::ImportFrameBufferInfo(_gameFrameBufferInfo, !_isTopScreen))
@@ -201,7 +204,8 @@ namespace CTRPluginFramework
 
     void    ScreenImpl::Release(void)
     {
-        GSP::SetFrameBufferInfo(_gameFrameBufferInfo, !_isTopScreen, false);
+        // GSP::SetFrameBufferInfo(_gameFrameBufferInfo, !_isTopScreen, false);
+        GSP::Restore(!_isTopScreen);
         _isGspAcquired = false;
     }
 
@@ -247,7 +251,7 @@ namespace CTRPluginFramework
     {
         const u32 displayed = _gameFrameBufferInfo.header.screen;
 
-        _frameBufferInfo.fbInfo[!_currentBuffer].FillFrameBufferFrom(_gameFrameBufferInfo.fbInfo[displayed]);
+        _frameBufferInfo.fbInfo[!_currentBuffer].FillFrameBufferFrom(!_isTopScreen);
 
         Fade(0.3f);
 
@@ -392,9 +396,9 @@ namespace CTRPluginFramework
     {
         svcFlushDataCacheRange(GetLeftFrameBuffer(), GetFrameBufferSize());
 
-        GSP::SwapBuffer(!_isTopScreen);
-
+        //GSP::SwapBuffer(!_isTopScreen);
         _currentBuffer = !_currentBuffer;
+        GSP::SetFrameBufferInfo(_frameBufferInfo.fbInfo[_currentBuffer], !_isTopScreen, true);
     }
 
     void    ScreenImpl::SwapBufferInternal(void)

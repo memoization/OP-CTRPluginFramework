@@ -17,6 +17,7 @@
 #include "CTRPluginFrameworkImpl/Preferences.hpp"
 #include "CTRPluginFrameworkImpl/Menu/PluginMenuImpl.hpp"
 #include "CTRPluginFrameworkImpl/System/Screenshot.hpp"
+#include "CTRPluginFrameworkImpl/System/Services/Gsp.hpp"
 
 #define THREADVARS_MAGIC  0x21545624 // !TV$
 // Thanks to Luma3DS custom mapping, we have a direct access to those
@@ -25,6 +26,8 @@
 #define GPU_PSC1_CNT                REG32(0x1040002C)
 #define GPU_TRANSFER_CNT            REG32(0x10400C18)
 #define GPU_CMDLIST_CNT             REG32(0x104018F0)
+
+using namespace CTRPluginFrameworkImpl::Services;
 
 namespace CTRPluginFramework
 {
@@ -200,6 +203,7 @@ namespace CTRPluginFramework
         // Only call our OSD callback if left frame buffer is valid
         if (leftFb)
         {
+            GSP::SaveGameFrameBuffer(isBottom, nextBank, leftFb, rightFb, stride, format, swap);
             CallbackCommon(isBottom, leftFb, rightFb, stride, format);
         }
 

@@ -116,8 +116,8 @@ namespace CTRPluginFramework
             return 0;
 
         // Check frame buffers validity before pausing
-        if (ScreenImpl::CheckGspFrameBuffersInfo())
-            return 0;
+        /*if (ScreenImpl::CheckGspFrameBuffersInfo())
+            return 0;*/
 
         {
             CTRPFLock   lock(FrameLockingMutex);
