@@ -7,9 +7,9 @@ namespace CTRPluginFramework {
 #define PUBLISHER 64
 
 struct SMDHTitle {
-    utf16 ShortDescription[SHORT_DESCRIPTOR];
-    utf16 LongDescription[LONG_DESCRIPTOR];
-    utf16 Publisher[PUBLISHER];
+    u16 ShortDescription[SHORT_DESCRIPTOR];
+    u16 LongDescription[LONG_DESCRIPTOR];
+    u16 Publisher[PUBLISHER];
 };
 
 struct SMDH {
