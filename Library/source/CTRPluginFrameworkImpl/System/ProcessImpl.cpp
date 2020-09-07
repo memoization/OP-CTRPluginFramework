@@ -155,6 +155,39 @@ namespace CTRPluginFramework
         return (false);
     }
 
+    bool     ProcessImpl::PatchFSAccess(bool patch)
+    {
+        Handle handle;
+        s64 info;
+        u32 text_addr, text_size, map_addr = 0x20000000;
+        u16 value = patch ? 0x0200 : 0x4620;
+
+        if(R_SUCCEEDED(svcOpenProcess(&handle, 0)))
+        {
+            if(R_FAILED(svcGetProcessInfo(&info, handle, 0x10005))) // get start of .text
+                return false;
+            text_addr = static_cast<u32>(info);
+
+            if(R_FAILED(svcGetProcessInfo(&info, handle, 0x10002))) // get .text size
+                return false;
+            text_size = static_cast<u32>(info);
+
+            if(R_FAILED(svcMapProcessMemoryEx(CUR_PROCESS_HANDLE, map_addr, handle, text_addr, text_size)))
+                return false;
+
+            // Patching fs permisson:
+            *(u16*)((0x0010E782 + map_addr) - text_addr) = value;
+
+
+            svcUnmapProcessMemoryEx(CUR_PROCESS_HANDLE, map_addr, text_size);
+            svcCloseHandle(handle);
+
+            return true;
+        }
+
+        return false;
+    }
+
     void    ProcessImpl::GetHandleTable(KProcessHandleTable& table, std::vector<HandleDescriptor>& handleDescriptors)
     {
         bool    isNew3DS = System::IsNew3DS();
