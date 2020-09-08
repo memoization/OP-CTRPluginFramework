@@ -37,10 +37,17 @@
                 "C:\\devkitPro\\msys2\\usr\\include"
             ],
             "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "_UNICODE"
+                "ARM11",
+                "_3DS"
             ],
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/include/**",
+                    "C:/devkitPro/libctru/include/**"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            },
             "windowsSdkVersion": "10.0.18362.0",
             "compilerPath": "C:\\devkitPro\\devkitARM\\bin\\arm-none-eabi-g++.exe",
             "cStandard": "c11",
