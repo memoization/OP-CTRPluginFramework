@@ -11,6 +11,7 @@ static bool      operator==(const MemInfo left, const MemInfo right)
 #include "CTRPluginFrameworkImpl/Preferences.hpp"
 #include "CTRPluginFrameworkImpl/Graphics/OSDImpl.hpp"
 #include "CTRPluginFrameworkImpl/System/Services/Gsp.hpp"
+#include "CTRPluginFramework/Utils/Utils.hpp"
 
 #include <cstdio>
 #include <cstring>
@@ -157,10 +158,10 @@ namespace CTRPluginFramework
 
     bool     ProcessImpl::PatchFSAccess(bool patch)
     {
+        static const std::vector<u32> pattern = { 0x42089800, 0x2000D001 };
         Handle handle;
         s64 info;
-        u32 text_addr, text_size, map_addr = 0x20000000;
-        u16 value = patch ? 0x0200 : 0x4620;
+        u32 text_addr, text_size, map_addr;
 
         if(R_SUCCEEDED(svcOpenProcess(&handle, 0)))
         {
@@ -171,12 +172,14 @@ namespace CTRPluginFramework
             if(R_FAILED(svcGetProcessInfo(&info, handle, 0x10002))) // get .text size
                 return false;
             text_size = static_cast<u32>(info);
+            map_addr = GetFreeMemRegion(text_size);
 
             if(R_FAILED(svcMapProcessMemoryEx(CUR_PROCESS_HANDLE, map_addr, handle, text_addr, text_size)))
                 return false;
 
             // Patching fs permisson:
-            *(u16*)((0x0010E782 + map_addr) - text_addr) = value;
+            u32 addr = Utils::Search(map_addr, text_size, pattern);
+            if(addr) *(u16*)(addr + 10) = patch ? 0x0200 : 0x4620;
 
 
             svcUnmapProcessMemoryEx(CUR_PROCESS_HANDLE, map_addr, text_size);
