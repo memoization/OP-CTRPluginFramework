@@ -14,12 +14,13 @@ namespace CTRPluginFramework
 
     namespace Hid
     {
-        using ReadLatestFunc = bool (*)(TouchPanelReader*, TouchPanelStatus* status);
+        using ReadLatestFunc = bool (*)(TouchPanelReader*, TouchPanelStatus* status, u32* unk);
 
         static Hook             g_touchPanelReaderHook;
         static TouchPanelReader g_touchPanelReader;
         static TouchPanelStatus g_touchPanelStatus;
-        static ReadLatestFunc   TouchPanelReader__ReadLatest = [](TouchPanelReader*, TouchPanelStatus*) { return false; }; // Stub so this funcptr is always set
+        static u32              g_unk;
+        static ReadLatestFunc   TouchPanelReader__ReadLatest = [](TouchPanelReader*, TouchPanelStatus*, u32*) { return false; }; // Stub so this funcptr is always set
 
         static void    UpdateControllerFromGame(TouchPanelStatus* panelStatus)
         {
@@ -27,12 +28,12 @@ namespace CTRPluginFramework
                 ControllerImpl::_keysHeld |= KEY_TOUCH;
         }
 
-        static bool    TouchPanelReaderHookFunc(TouchPanelReader* panelReader, TouchPanelStatus* panelStatus)
+        static bool    TouchPanelReaderHookFunc(TouchPanelReader* panelReader, TouchPanelStatus* panelStatus, u32* unk)
         {
             g_touchPanelReader = *panelReader;
 
             // Use game function to read inputs
-            bool couldRead = TouchPanelReader__ReadLatest(panelReader, panelStatus);
+            bool couldRead = TouchPanelReader__ReadLatest(panelReader, panelStatus, unk);
 
             if (!couldRead)
                 return couldRead;
@@ -50,7 +51,7 @@ namespace CTRPluginFramework
             if (!g_touchPanelReader.touchPanel)
                 return false;
 
-            bool couldRead = TouchPanelReader__ReadLatest(&g_touchPanelReader, &g_touchPanelStatus);
+            bool couldRead = TouchPanelReader__ReadLatest(&g_touchPanelReader, &g_touchPanelStatus, &g_unk);
 
             if (couldRead)
                 UpdateControllerFromGame(&g_touchPanelStatus);
@@ -66,6 +67,7 @@ namespace CTRPluginFramework
             const std::vector<std::vector<u32>> patterns =
             {
                 { 0xE92D4010, 0xE24DD018, 0xE1A04001, 0xE3E01000 },
+                { 0xE92D40F0, 0xE1A05002, 0xE1A07001, 0xE1A02003 }
             };
 
             for (const auto& pattern : patterns)
