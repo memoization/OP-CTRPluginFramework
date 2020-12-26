@@ -35,6 +35,7 @@ SOURCES		:=	source \
 				source/CTRPluginFramework \
 				source/CTRPluginFramework/Graphics \
 				source/CTRPluginFramework/Menu \
+				source/CTRPluginFramework/Sound \
 				source/CTRPluginFramework/System \
 				source/CTRPluginFramework/Utils \
 				source/CTRPluginFrameworkImpl \
@@ -44,6 +45,7 @@ SOURCES		:=	source \
 				source/CTRPluginFrameworkImpl/Graphics/Icons \
 				source/CTRPluginFrameworkImpl/Menu \
 				source/CTRPluginFrameworkImpl/Search \
+				source/CTRPluginFrameworkImpl/Sound \
 				source/CTRPluginFrameworkImpl/System \
 				source/CTRPluginFrameworkImpl/System/Services \
 				source/ctrulibExtension \
@@ -83,8 +85,8 @@ ASFLAGS	:=	$(G) $(ARCH) $(INCLUDE) -Os -Wl,$(WL)--gc-sections
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBS	:= -lctru -lm
-LIBDIRS	:= $(CTRULIB)
+LIBS	:= -lctru -lm -lcwav
+LIBDIRS	:= $(CTRULIB) $(DEVKITPRO)/libcwav
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
