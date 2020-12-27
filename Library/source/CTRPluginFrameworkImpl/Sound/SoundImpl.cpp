@@ -14,15 +14,17 @@ namespace CTRPluginFramework
         cwavSetVAToPACallback(function);
     }
 
-    SoundImpl::SoundImpl(const File& bcwavFile, int maxSimultPlays)
+    SoundImpl::SoundImpl(const std::string& bcwavFile, int maxSimultPlays)
     {
-        if (!bcwavFile.IsOpen())
+        File cwavFile(bcwavFile, File::READ);
+
+        if (!cwavFile.IsOpen())
         {
             _cwav.loadStatus = CWAV_FILE_OPEN_FAILED;
             return;
         }
 
-        u32 fileSize = bcwavFile.GetSize();
+        u32 fileSize = cwavFile.GetSize();
 
         _dataBuffer = static_cast<void *>(::operator new(fileSize, std::nothrow));
         if (_dataBuffer == nullptr)
@@ -31,8 +33,8 @@ namespace CTRPluginFramework
             return;
         }
 
-        bcwavFile.Seek(0);
-        bcwavFile.Read(_dataBuffer, fileSize);
+        cwavFile.Seek(0);
+        cwavFile.Read(_dataBuffer, fileSize);
 
         cwavLoad(&_cwav, _dataBuffer, maxSimultPlays);
     }

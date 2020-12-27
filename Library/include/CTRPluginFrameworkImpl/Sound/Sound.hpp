@@ -17,7 +17,7 @@ namespace CTRPluginFramework
     {
     public:
 
-        SoundImpl(const File& bcwavFile, int maxSimultPlays = 1);
+        SoundImpl(const std::string& bcwavFile, int maxSimultPlays = 1);
 
         SoundImpl(const void* bcwavBuffer, int maxSimultPlays = 1);
 
@@ -40,6 +40,8 @@ namespace CTRPluginFramework
         void Stop(int leftEarChannel, int rightEarChannel);
 
         ~SoundImpl();
+
+        s32     _refcount = 0;
 
     private:
         CWAV    _cwav;
