@@ -34,13 +34,13 @@ namespace CTRPluginFramework
         bcwavFile.Seek(0);
         bcwavFile.Read(_dataBuffer, fileSize);
 
-        cwavLoadFromBuffer(&_cwav, _dataBuffer, maxSimultPlays);
+        cwavLoad(&_cwav, _dataBuffer, maxSimultPlays);
     }
 
     SoundImpl::SoundImpl(const void* bcwavBuffer, int maxSimultPlays)
     {
         _dataBuffer = nullptr;
-        cwavLoadFromBuffer(&_cwav, bcwavBuffer, maxSimultPlays);
+        cwavLoad(&_cwav, bcwavBuffer, maxSimultPlays);
     }
 
     cwavLoadStatus_t SoundImpl::GetLoadStatus()
