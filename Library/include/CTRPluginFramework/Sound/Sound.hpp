@@ -69,22 +69,24 @@ namespace CTRPluginFramework
 
     public:
         enum class Event {
-            CURSOR,
+            CURSOR = 0,
             ACCEPT,
             CANCEL,
             SELECT,
             DESELECT,
 
-            TOTAL_EVENTS
+            NUM_EVENTS
         };
 
-        //static bool RegisterMenuSoundEvent(Event eventType, Sound& sound);
+        static bool RegisterMenuSoundEvent(Event eventType, Sound& sound);
 
-        //static bool PlayMenuSound(Event eventType);
+        static Sound& GetMenuSoundEvent(SoundEngine::Event eventType);
 
-        //static bool StopMenuSound(Event eventType);
+        static bool PlayMenuSound(Event eventType);
 
-        //static void DeRegisterMenuSoundEvent(Event eventType);
+        static bool StopMenuSound(Event eventType);
+
+        static void DeRegisterMenuSoundEvent(Event eventType);
 
     };
 }

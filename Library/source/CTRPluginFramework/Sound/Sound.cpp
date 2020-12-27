@@ -157,7 +157,8 @@ namespace CTRPluginFramework
             return false;
     }
 
-    void Sound::Stop() {
+    void Sound::Stop()
+    {
         Stop(-1);
     }
 
@@ -170,5 +171,30 @@ namespace CTRPluginFramework
     {
         if (_soundImpl)
             PublicToImpl(_soundImpl)->Stop(leftEarChannel, rightEarChannel);
+    }
+
+    bool SoundEngine::RegisterMenuSoundEvent(Event eventType, Sound& sound)
+    {
+        return SoundEngineImpl::RegisterMenuSoundEvent(eventType, sound);
+    }
+
+    Sound& SoundEngine::GetMenuSoundEvent(Event eventType)
+    {
+        return SoundEngineImpl::GetMenuSoundEvent(eventType);
+    }
+
+    bool SoundEngine::PlayMenuSound(Event eventType)
+    {
+        return SoundEngineImpl::PlayMenuSound(eventType);
+    }
+
+    bool SoundEngine::StopMenuSound(Event eventType)
+    {
+        return SoundEngineImpl::StopMenuSound(eventType);
+    }
+
+    void SoundEngine::DeRegisterMenuSoundEvent(Event eventType)
+    {
+        SoundEngineImpl::DeRegisterMenuSoundEvent(eventType);
     }
 }

@@ -4,6 +4,18 @@
 
 namespace CTRPluginFramework
 {
+    std::vector<Sound> SoundEngineImpl::menuSounds;
+    Sound SoundEngineImpl::fallbackSound;
+
+    static const char* defaultSoundFiles[(u32)SoundEngine::Event::NUM_EVENTS] =
+    {
+        "sound_cursor.bcwav",
+        "sound_accept.bcwav",
+        "sound_cancel.bcwav",
+        "sound_select.bcwav",
+        "sound_deselect.bcwav"
+    };
+
     void SoundEngineImpl::NotifyAptEvent(APT_HookType event)
     {
         cwavNotifyAptEvent(event);
@@ -12,6 +24,60 @@ namespace CTRPluginFramework
     void SoundEngineImpl::SetVaToPaConvFunction(vaToPaCallback_t function)
     {
         cwavSetVAToPACallback(function);
+    }
+
+    bool SoundEngineImpl::RegisterMenuSoundEvent(SoundEngine::Event eventType, Sound& sound)
+    {
+        if (sound.GetLoadStatus() == Sound::LoadStatus::SUCCESS && eventType < SoundEngine::Event::NUM_EVENTS)
+        {
+            menuSounds[(u32)eventType] = sound;
+            return true;
+        }
+        return false;
+    }
+
+    Sound& SoundEngineImpl::GetMenuSoundEvent(SoundEngine::Event eventType)
+    {
+        if (eventType < SoundEngine::Event::NUM_EVENTS)
+            return  menuSounds[(u32)eventType];
+        else
+            return fallbackSound;
+    }
+
+    bool SoundEngineImpl::PlayMenuSound(SoundEngine::Event eventType)
+    {
+        if (eventType < SoundEngine::Event::NUM_EVENTS)
+            return menuSounds[(u32)eventType].Play();
+    }
+
+    bool SoundEngineImpl::StopMenuSound(SoundEngine::Event eventType)
+    {
+        if (eventType < SoundEngine::Event::NUM_EVENTS)
+            menuSounds[(u32)eventType].Stop();
+    }
+
+    void SoundEngineImpl::DeRegisterMenuSoundEvent(SoundEngine::Event eventType)
+    {
+        if (eventType < SoundEngine::Event::NUM_EVENTS)
+            menuSounds[(u32)eventType] = Sound();
+    }
+
+    void SoundEngineImpl::InitializeMenuSounds()
+    {
+        menuSounds.resize((u32)SoundEngine::Event::NUM_EVENTS);
+
+        for (u32 i = 0; i < (u32)SoundEngine::Event::NUM_EVENTS; i++)
+        {
+            Sound curr(defaultSoundFiles[i], 3);
+            if (curr.GetLoadStatus() == Sound::LoadStatus::SUCCESS)
+                RegisterMenuSoundEvent((SoundEngine::Event)i, curr);
+        }
+    }
+
+    void SoundEngineImpl::ClearMenuSounds()
+    {
+        for (u32 i = 0; i < (u32)SoundEngine::Event::NUM_EVENTS; i++)
+            menuSounds[i] = Sound();
     }
 
     SoundImpl::SoundImpl(const std::string& bcwavFile, int maxSimultPlays)
@@ -90,7 +156,8 @@ namespace CTRPluginFramework
         cwavStop(&_cwav, leftEarChannel, rightEarChannel);
     }
 
-    SoundImpl::~SoundImpl() {
+    SoundImpl::~SoundImpl()
+    {
         cwavFree(&_cwav);
         if (_dataBuffer)
             ::operator delete(_dataBuffer);
