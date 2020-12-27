@@ -3,6 +3,7 @@
 #include "CTRPluginFrameworkImpl/Preferences.hpp"
 #include "CTRPluginFrameworkImpl/Menu/PluginMenuExecuteLoop.hpp"
 #include "CTRPluginFramework/Menu/MenuFolder.hpp"
+#include "CTRPluginFramework/Sound.hpp"
 
 #include <cstring>
 
@@ -259,6 +260,8 @@ namespace CTRPluginFramework
             // If entry is unselectable scroll again
             if (IsUnselectableEntry(folder[selector]))
                 ScrollUp(selector, folder, step);
+            else
+                SoundEngine::PlayMenuSound(SoundEngine::Event::CURSOR);
             return;
         }
         // Else go up
@@ -271,6 +274,8 @@ namespace CTRPluginFramework
             step = step > 1 ? step - 1 : 1;
             ScrollUp(selector, folder, step);
         }
+        else
+            SoundEngine::PlayMenuSound(SoundEngine::Event::CURSOR);
     }
 
     static void ScrollDown(int &selector, MenuFolderImpl &folder, int step)
@@ -287,6 +292,8 @@ namespace CTRPluginFramework
             // If entry is unselectable scroll again
             if (IsUnselectableEntry(folder[selector]))
                 ScrollDown(selector, folder, step);
+            else
+                SoundEngine::PlayMenuSound(SoundEngine::Event::CURSOR);
             return;
         }
         // Else go down
@@ -299,6 +306,8 @@ namespace CTRPluginFramework
             step = step > 1 ? step - 1 : 1;
             ScrollDown(selector, folder, step);
         }
+        else
+            SoundEngine::PlayMenuSound(SoundEngine::Event::CURSOR);
     }
 
     //###########################################
