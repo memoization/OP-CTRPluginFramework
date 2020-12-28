@@ -21,7 +21,7 @@ namespace CTRPluginFramework
             INVAID_DATA_BLOCK = 7, ///< The DATA block in the CWAV file is invalid or not supported.
             UNSUPPORTED_AUDIO_ENCODING = 8 ///< The audio encoding is not supported.
         };
-        Sound(void);
+        Sound();
         // Warning: copies share the same auidio buffer
         Sound(const Sound& sound);
         Sound(Sound&& sound) noexcept;
@@ -30,7 +30,7 @@ namespace CTRPluginFramework
 
         Sound(const std::string& bcwavFile, int maxSimultPlays = 1);
 
-        Sound(const void* bcwavBuffer, int maxSimultPlays = 1);
+        Sound(const u8* bcwavBuffer, int maxSimultPlays = 1);
 
         LoadStatus GetLoadStatus();
 
@@ -84,7 +84,7 @@ namespace CTRPluginFramework
 
         static bool PlayMenuSound(Event eventType);
 
-        static bool StopMenuSound(Event eventType);
+        static void StopMenuSound(Event eventType);
 
         static void DeRegisterMenuSoundEvent(Event eventType);
 

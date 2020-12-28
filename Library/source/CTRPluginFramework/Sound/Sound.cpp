@@ -13,7 +13,7 @@ namespace CTRPluginFramework
         return static_cast<SoundImpl*>(publ);
     }
 
-    Sound::Sound(void)
+    Sound::Sound()
     {
         _soundImpl = nullptr;
     }
@@ -37,7 +37,7 @@ namespace CTRPluginFramework
         _soundImpl = ImplToPublic(new SoundImpl(bcwavFile, maxSimultPlays));
     }
 
-    Sound::Sound(const void* bcwavBuffer, int maxSimultPlays)
+    Sound::Sound(const u8* bcwavBuffer, int maxSimultPlays)
     {
         _soundImpl = ImplToPublic(new SoundImpl(bcwavBuffer, maxSimultPlays));
     }
@@ -63,7 +63,6 @@ namespace CTRPluginFramework
     Sound&   Sound::operator=(Sound &&sound) noexcept
     {
         SoundImpl* thisImpl = PublicToImpl(_soundImpl);
-        SoundImpl* otherImpl = PublicToImpl(sound._soundImpl);
 
         if (thisImpl)
             AtomicDecrement(&thisImpl->_refcount);
@@ -81,10 +80,13 @@ namespace CTRPluginFramework
     {
         SoundImpl* thisImpl = PublicToImpl(_soundImpl);
 
-        AtomicDecrement(&thisImpl->_refcount);
+        if (thisImpl)
+        {
+            AtomicDecrement(&thisImpl->_refcount);
 
-        if (thisImpl->_refcount == 0)
-            delete thisImpl;
+            if (thisImpl->_refcount == 0)
+                delete thisImpl;
+        }
     }
 
     Sound::LoadStatus Sound::GetLoadStatus()
@@ -188,9 +190,9 @@ namespace CTRPluginFramework
         return SoundEngineImpl::PlayMenuSound(eventType);
     }
 
-    bool SoundEngine::StopMenuSound(Event eventType)
+    void SoundEngine::StopMenuSound(Event eventType)
     {
-        return SoundEngineImpl::StopMenuSound(eventType);
+        SoundEngineImpl::StopMenuSound(eventType);
     }
 
     void SoundEngine::DeRegisterMenuSoundEvent(Event eventType)

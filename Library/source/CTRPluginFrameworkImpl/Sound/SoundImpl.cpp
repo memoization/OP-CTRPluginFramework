@@ -1,6 +1,7 @@
 
 #include "CTRPluginFrameworkImpl/Sound.hpp"
 #include "CTRPluginFramework/System/File.hpp"
+#include <cstring>
 
 namespace CTRPluginFramework
 {
@@ -48,9 +49,10 @@ namespace CTRPluginFramework
     {
         if (eventType < SoundEngine::Event::NUM_EVENTS)
             return menuSounds[(u32)eventType].Play();
+        return false;
     }
 
-    bool SoundEngineImpl::StopMenuSound(SoundEngine::Event eventType)
+    void SoundEngineImpl::StopMenuSound(SoundEngine::Event eventType)
     {
         if (eventType < SoundEngine::Event::NUM_EVENTS)
             menuSounds[(u32)eventType].Stop();
@@ -83,6 +85,8 @@ namespace CTRPluginFramework
     SoundImpl::SoundImpl(const std::string& bcwavFile, int maxSimultPlays)
     {
         File cwavFile(bcwavFile, File::READ);
+        std::memset(&_cwav, 0, sizeof(CWAV));
+        _dataBuffer = nullptr;
 
         if (!cwavFile.IsOpen())
         {
@@ -105,7 +109,7 @@ namespace CTRPluginFramework
         cwavLoad(&_cwav, _dataBuffer, maxSimultPlays);
     }
 
-    SoundImpl::SoundImpl(const void* bcwavBuffer, int maxSimultPlays)
+    SoundImpl::SoundImpl(const u8* bcwavBuffer, int maxSimultPlays)
     {
         _dataBuffer = nullptr;
         cwavLoad(&_cwav, bcwavBuffer, maxSimultPlays);

@@ -21,7 +21,7 @@ namespace CTRPluginFramework
 
         static bool PlayMenuSound(SoundEngine::Event eventType);
 
-        static bool StopMenuSound(SoundEngine::Event eventType);
+        static void StopMenuSound(SoundEngine::Event eventType);
 
         static void DeRegisterMenuSoundEvent(SoundEngine::Event eventType);
 
@@ -38,7 +38,7 @@ namespace CTRPluginFramework
 
         SoundImpl(const std::string& bcwavFile, int maxSimultPlays = 1);
 
-        SoundImpl(const void* bcwavBuffer, int maxSimultPlays = 1);
+        SoundImpl(const u8* bcwavBuffer, int maxSimultPlays = 1);
 
         cwavLoadStatus_t GetLoadStatus();
 
@@ -60,7 +60,7 @@ namespace CTRPluginFramework
 
         ~SoundImpl();
 
-        s32     _refcount = 0;
+        s32     _refcount = 1;
 
     private:
         CWAV    _cwav;

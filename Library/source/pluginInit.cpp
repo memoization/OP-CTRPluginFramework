@@ -254,6 +254,9 @@ namespace CTRPluginFramework
         // Init System::Heap
         InitHeap();
 
+        // Init menu sounds.
+        SoundEngineImpl::InitializeMenuSounds();
+
         // Patch process before it starts & let the dev init some settings
         PatchProcess(settings);
 
@@ -344,6 +347,7 @@ namespace CTRPluginFramework
                     OnProcessExit();
 
                     SoundEngineImpl::NotifyAptEvent(APT_HookType::APTHOOK_ONEXIT);
+                    SoundEngineImpl::ClearMenuSounds();
 
                     SystemImpl::AptStatus |= BIT(3);
                     Scheduler::Exit();
