@@ -10,11 +10,11 @@ namespace CTRPluginFramework
 
     static const char* defaultSoundFiles[(u32)SoundEngine::Event::NUM_EVENTS] =
     {
-        "sound_cursor.bcwav",
-        "sound_accept.bcwav",
-        "sound_cancel.bcwav",
-        "sound_select.bcwav",
-        "sound_deselect.bcwav"
+        "snd/sound_cursor.bcwav",
+        "snd/sound_accept.bcwav",
+        "snd/sound_cancel.bcwav",
+        "snd/sound_select.bcwav",
+        "snd/sound_deselect.bcwav"
     };
 
     void SoundEngineImpl::NotifyAptEvent(APT_HookType event)
