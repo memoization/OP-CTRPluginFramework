@@ -16,6 +16,7 @@ namespace CTRPluginFramework
         _isPressed = tk._isPressed;
         _enabled = tk._enabled;
         _execute = tk._execute;
+        _acceptSoundEvent = tk._acceptSoundEvent;
 
         tk._content = nullptr;
     }
@@ -26,6 +27,7 @@ namespace CTRPluginFramework
         _icon = nullptr;
         _uiProperties = ui;
         _enabled = isEnabled;
+        _acceptSoundEvent = SoundEngine::Event::ACCEPT;
 
         _isPressed = false;
         _execute = false;
@@ -47,6 +49,7 @@ namespace CTRPluginFramework
         _icon = nullptr;
         _uiProperties = ui;
         _enabled = isEnabled;
+        _acceptSoundEvent = SoundEngine::Event::ACCEPT;
 
         _isPressed = false;
         _execute = false;
@@ -63,6 +66,7 @@ namespace CTRPluginFramework
         _icon = icon;
         _uiProperties = ui;
         _enabled = isEnabled;
+        _acceptSoundEvent = SoundEngine::Event::ACCEPT;
 
         _isPressed = false;
         _execute = false;
@@ -145,6 +149,15 @@ namespace CTRPluginFramework
             _execute = true;
         }
 
+        if (_isPressed != _wasPressed)
+        {
+            if (_isPressed)
+                SoundEngine::PlayMenuSound(SoundEngine::Event::SELECT);
+            else
+                SoundEngine::PlayMenuSound(SoundEngine::Event::DESELECT);
+        }
+        _wasPressed = _isPressed;
+
         _isPressed = isTouchDown && isTouched;
     }
 
@@ -175,5 +188,10 @@ namespace CTRPluginFramework
         }
 
         return (-1);
+    }
+
+    void TouchKey::SetAcceptSoundEvent(SoundEngine::Event event)
+    {
+        _acceptSoundEvent = event;
     }
 }

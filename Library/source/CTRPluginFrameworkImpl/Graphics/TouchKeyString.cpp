@@ -9,8 +9,10 @@ namespace CTRPluginFramework
         _uiProperties = ui;
         _posY = _uiProperties.leftTop.y;
         _enabled = isEnabled;
+        _acceptSoundEvent = SoundEngine::Event::ACCEPT;
 
         _isPressed = false;
+        _wasPressed = false;
         _isForcePressed = false;
         _execute = false;
 
@@ -97,6 +99,15 @@ namespace CTRPluginFramework
             _execute = true;
         }
 
+        if (_isPressed != _wasPressed)
+        {
+            if (_isPressed)
+                SoundEngine::PlayMenuSound(SoundEngine::Event::SELECT);
+            else
+                SoundEngine::PlayMenuSound(SoundEngine::Event::DESELECT);
+        }
+        _wasPressed = _isPressed;
+
         _isPressed = isTouchDown && isTouched;
     }
 
@@ -130,5 +141,10 @@ namespace CTRPluginFramework
             return (1);
         }
         return (-1);
+    }
+
+    void TouchKeyString::SetAcceptSoundEvent(SoundEngine::Event event)
+    {
+        _acceptSoundEvent = event;
     }
 }

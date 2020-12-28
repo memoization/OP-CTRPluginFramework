@@ -321,6 +321,8 @@ namespace CTRPluginFramework
                 // Close menu
                 if (shouldClose || SystemImpl::WantsToSleep())
                 {
+                    if (shouldClose)
+                        SoundEngine::PlayMenuSound(SoundEngine::Event::CANCEL);
                     ProcessImpl::Play(true);
                     _isOpen = false;
                     shouldClose = false;

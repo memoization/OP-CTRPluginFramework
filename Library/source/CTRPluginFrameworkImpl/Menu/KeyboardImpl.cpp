@@ -8,6 +8,7 @@
 #include "CTRPluginFramework/Utils/Utils.hpp"
 #include "CTRPluginFrameworkImpl/Menu/PluginMenuImpl.hpp"
 #include "CTRPluginFramework/Graphics/CustomIcon.hpp"
+#include "CTRPluginFramework/Sound.hpp"
 
 namespace CTRPluginFramework
 {
@@ -735,11 +736,16 @@ namespace CTRPluginFramework
             {
                 keyPressIntended = true;
                 if (_canAbort)
+                {
                     _userAbort = true;
+                    SoundEngine::PlayMenuSound(SoundEngine::Event::CANCEL);
+                }
+
                 return;
             }
             if (!_customKeyboard && event.key.code == Y && !_userInput.empty())
             {
+                SoundEngine::PlayMenuSound(SoundEngine::Event::DESELECT);
                 keyPressIntended  = true;
                 _userInput.clear();
                 _ClearKeyboardEvent();
@@ -751,6 +757,7 @@ namespace CTRPluginFramework
             }
             if (event.key.code == X && !_customKeyboard && _layout != QWERTY && _canChangeLayout)
             {
+                SoundEngine::PlayMenuSound(SoundEngine::Event::DESELECT);
                 keyPressIntended = true;
                 _userInput.clear();
                 _ClearKeyboardEvent();
@@ -2223,6 +2230,7 @@ namespace CTRPluginFramework
         _manualKey = newVal;
         static bool preventRecursion = false;
         if (_onKeyboardEvent != nullptr && _owner != nullptr && _manualKey != _prevManualKey && !preventRecursion) {
+            SoundEngine::PlayMenuSound(SoundEngine::Event::CURSOR);
             preventRecursion = true;
             _ClearKeyboardEvent();
             _KeyboardEvent.type = KeyboardEvent::EventType::SelectionChanged;
