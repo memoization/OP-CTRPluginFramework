@@ -311,6 +311,7 @@ namespace CTRPluginFramework
             {
                 case A:
                 {
+                    SoundEngine::PlayMenuSound(SoundEngine::Event::ACCEPT);
                     // MenuEntryImpl
                     if (item->_type == MenuType::Entry)
                     {
@@ -374,6 +375,7 @@ namespace CTRPluginFramework
                 }
                 case B:
                 {
+                    SoundEngine::PlayMenuSound(SoundEngine::Event::CANCEL);
                     MenuFolderImpl *p = _folder->_Close(_selector);
                     if (p != nullptr)
                     {
@@ -401,6 +403,7 @@ namespace CTRPluginFramework
         if (step > 0)
             _selector = std::max(0, static_cast<int>(_folder->ItemsCount() - 1));
         _input.Restart();
+        SoundEngine::PlayMenuSound(SoundEngine::Event::CURSOR);
     }
 
     void    Menu::_ScrollDown(int step)
@@ -412,6 +415,7 @@ namespace CTRPluginFramework
         if (step > 0)
             _selector = 0;
         _input.Restart();
+        SoundEngine::PlayMenuSound(SoundEngine::Event::CURSOR);
     }
 
     void    Menu::Update(const Time &delta)
