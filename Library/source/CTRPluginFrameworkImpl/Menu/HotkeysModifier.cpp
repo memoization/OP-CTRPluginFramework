@@ -6,6 +6,7 @@
 #include "Unicode.h"
 #include "CTRPluginFramework/System/System.hpp"
 #include "CTRPluginFrameworkImpl/Preferences.hpp"
+#include "CTRPluginFramework/Sound.hpp"
 
 namespace CTRPluginFramework
 {
@@ -78,7 +79,7 @@ namespace CTRPluginFramework
             u32 oldDpadY = _keys & (DPADY);
 
             _keys = 0;
-            
+
             if (_checkboxs[GetIndex(Key::DPadLeft)].GetState()) {
 				_checkboxs[GetIndex(Key::DPadRight)].SetState(false);
 				_checkboxs[GetIndex(Key::DPadRight)].Enable(false);
@@ -94,7 +95,7 @@ namespace CTRPluginFramework
 			else {
 				_checkboxs[GetIndex(Key::DPadDown)].Enable(true);
 			}
-            
+
             for (int i = 0; i < 14; i++)
             {
                 if (_checkboxs[i].GetState())
@@ -123,6 +124,7 @@ namespace CTRPluginFramework
                 checkbox.Enable(false);
             }
         }
+        SoundEngine::PlayMenuSound(SoundEngine::Event::CANCEL);
     }
 
     void    HotkeysModifier::_DrawTop(void) const

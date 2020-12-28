@@ -52,6 +52,7 @@ namespace CTRPluginFramework
         int    operator()(void);
 
         void    SetAcceptSoundEvent(SoundEngine::Event event);
+        SoundEngine::Event GetAcceptSoundEvent();
 
     private:
         std::string     _content;

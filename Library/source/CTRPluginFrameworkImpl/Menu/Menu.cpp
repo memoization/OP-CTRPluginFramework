@@ -311,22 +311,29 @@ namespace CTRPluginFramework
             {
                 case A:
                 {
-                    SoundEngine::PlayMenuSound(SoundEngine::Event::ACCEPT);
                     // MenuEntryImpl
                     if (item->_type == MenuType::Entry)
                     {
                         MenuEntryImpl &e = item->AsMenuEntryImpl();
 
                         if (e.IsActivated())
+                        {
+                            SoundEngine::PlayMenuSound(SoundEngine::Event::DESELECT);
                             e.Disable();
+                        }
                         else
+                        {
+                            SoundEngine::PlayMenuSound(SoundEngine::Event::SELECT);
                             e.Enable();
+                        }
                         return (MenuEvent::EntrySelected);
                     }
                     // MenuEntryTools
                     else if (item->_type == MenuType::EntryTools)
                     {
                         MenuEntryTools *e = reinterpret_cast<MenuEntryTools *>(item);
+
+                        SoundEngine::PlayMenuSound(SoundEngine::Event::ACCEPT);
 
                         if (e->UseCheckBox)
                             e->TriggerState();
@@ -359,9 +366,15 @@ namespace CTRPluginFramework
                         bool state = e->_TriggerState();
 
                         if (state)
+                        {
+                            SoundEngine::PlayMenuSound(SoundEngine::Event::SELECT);
                             PluginMenuExecuteLoop::AddAR(e);
+                        }
                         else
+                        {
+                            SoundEngine::PlayMenuSound(SoundEngine::Event::DESELECT);
                             PluginMenuExecuteLoop::RemoveAR(e);
+                        }
 
                         return (MenuEvent::EntrySelected);
                     }
