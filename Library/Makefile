@@ -161,11 +161,21 @@ lib/libctrpf.a : lib release
 	BUILD_CFLAGS="-DNDEBUG=1 -O2 -fomit-frame-pointer" DEPSDIR=$(CURDIR)/release \
 	--no-print-directory -C release	-f $(CURDIR)/Makefile
 	@rm release/PluginMenuTools.o # Force update of revision, date etc
+	@cp $(DESTDIR)$(DEVKITPRO)/libcwav/lib/libcwav.a lib/libcwav.a
+	@mv $@ $@tmp
+	@$(AR) -M <<< $$'create $@ \naddlib $@tmp \naddlib lib/libcwav.a\nsave\nend'
+	@rm $@tmp
+	@rm lib/libcwav.a
 
 lib/libctrpfd.a : lib debug
 	@$(MAKE) BUILD=debug OUTPUT=$(CURDIR)/$@ BUILD_CFLAGS="-DDEBUG=1" G=-g \
 	DEPSDIR=$(CURDIR)/debug --no-print-directory -C debug -f $(CURDIR)/Makefile
 	@rm debug/PluginMenuTools.o # Force update of revision, date etc.
+	@cp $(DESTDIR)$(DEVKITPRO)/libcwav/lib/libcwav.a lib/libcwav.a
+	@mv $@ $@tmp
+	@$(AR) -M <<< $$'create $@ \naddlib $@tmp \naddlib lib/libcwav.a\nsave\nend'
+	@rm $@tmp
+	@rm lib/libcwav.a
 
 #---------------------------------------------------------------------------------
 clean:
