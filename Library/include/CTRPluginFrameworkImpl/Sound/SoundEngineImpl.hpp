@@ -3,6 +3,7 @@
 
 #include "CTRPluginFramework/Sound.hpp"
 #include "cwav.h"
+#include <vector>
 
 namespace CTRPluginFramework
 {
@@ -27,6 +28,7 @@ namespace CTRPluginFramework
         static void InitializeMenuSounds();
 
         static void ClearMenuSounds();
+
     private:
         static std::vector<Sound> menuSounds;
         static Sound fallbackSound;

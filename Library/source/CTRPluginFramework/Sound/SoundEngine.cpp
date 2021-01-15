@@ -3,7 +3,6 @@
 
 namespace CTRPluginFramework
 {
-
     bool SoundEngine::RegisterMenuSoundEvent(Event eventType, Sound& sound)
     {
         return SoundEngineImpl::RegisterMenuSoundEvent(eventType, sound);

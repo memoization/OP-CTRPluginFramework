@@ -3,6 +3,7 @@
 
 #include "cwav.h"
 #include <vector>
+#include <string>
 
 namespace CTRPluginFramework
 {
