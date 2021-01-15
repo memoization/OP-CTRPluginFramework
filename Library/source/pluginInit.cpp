@@ -211,6 +211,7 @@ namespace CTRPluginFramework
         settings.AllowActionReplay = true;
         settings.AllowSearchEngine = true;
         settings.WaitTimeToBoot = Seconds(5.f);
+        settings.TryLoadSDSounds = true;
 
         // Set default theme
         FwkSettings::SetThemeDefault();
@@ -254,11 +255,11 @@ namespace CTRPluginFramework
         // Init System::Heap
         InitHeap();
 
-        // Init menu sounds.
-        SoundEngineImpl::InitializeMenuSounds();
-
         // Patch process before it starts & let the dev init some settings
         PatchProcess(settings);
+
+        // Init menu sounds.
+        SoundEngineImpl::InitializeMenuSounds();
 
         // Load settings
         Preferences::LoadSettings();

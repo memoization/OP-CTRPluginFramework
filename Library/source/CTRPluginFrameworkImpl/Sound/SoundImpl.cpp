@@ -1,6 +1,7 @@
 
 #include "CTRPluginFrameworkImpl/Sound.hpp"
 #include "CTRPluginFramework/System/File.hpp"
+#include "CTRPluginFramework/System/FwkSettings.hpp"
 #include <cstring>
 
 namespace CTRPluginFramework
@@ -66,7 +67,12 @@ namespace CTRPluginFramework
 
     void SoundEngineImpl::InitializeMenuSounds()
     {
+        FwkSettings &settings = FwkSettings::Get();
+
         menuSounds.resize((u32)SoundEngine::Event::NUM_EVENTS);
+
+        if (!settings.TryLoadSDSounds)
+            return;
 
         for (u32 i = 0; i < (u32)SoundEngine::Event::NUM_EVENTS; i++)
         {
