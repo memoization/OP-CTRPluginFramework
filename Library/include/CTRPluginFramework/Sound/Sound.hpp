@@ -1,7 +1,6 @@
 #ifndef CTRPLUGINFRAMEWORK_SOUND_SOUND_HPP
 #define CTRPLUGINFRAMEWORK_SOUND_SOUND_HPP
 
-#include "CTRPluginFramework/System/File.hpp"
 #include "types.h"
 #include <string>
 
@@ -62,32 +61,6 @@ namespace CTRPluginFramework
 
     private:
         void*   _soundImpl;
-    };
-
-    class SoundEngine
-    {
-
-    public:
-        enum class Event {
-            CURSOR = 0,
-            ACCEPT,
-            CANCEL,
-            SELECT,
-            DESELECT,
-
-            NUM_EVENTS
-        };
-
-        static bool RegisterMenuSoundEvent(Event eventType, Sound& sound);
-
-        static Sound& GetMenuSoundEvent(SoundEngine::Event eventType);
-
-        static bool PlayMenuSound(Event eventType);
-
-        static void StopMenuSound(Event eventType);
-
-        static void DeRegisterMenuSoundEvent(Event eventType);
-
     };
 }
 
