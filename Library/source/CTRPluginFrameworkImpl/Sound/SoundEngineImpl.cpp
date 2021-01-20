@@ -15,6 +15,11 @@ namespace CTRPluginFramework
         "snd/sound_deselect.bcwav"
     };
 
+    void SoundEngineImpl::Initializelibcwav()
+    {
+        cwavUseEnvironment(CWAV_ENV_CSND);
+    }
+
     void SoundEngineImpl::NotifyAptEvent(APT_HookType event)
     {
         cwavNotifyAptEvent(event);

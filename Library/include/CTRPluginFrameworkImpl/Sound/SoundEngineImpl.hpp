@@ -10,6 +10,7 @@ namespace CTRPluginFramework
     class SoundEngineImpl
     {
     public:
+        static void Initializelibcwav();
 
         static void NotifyAptEvent(APT_HookType event);
 

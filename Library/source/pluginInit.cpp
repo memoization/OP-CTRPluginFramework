@@ -187,6 +187,7 @@ namespace CTRPluginFramework
         plgLdrInit();
 
         // Set cwav VA to PA function
+        SoundEngineImpl::Initializelibcwav();
         SoundEngineImpl::SetVaToPaConvFunction([](const void* addr) {return svcConvertVAToPA(addr, false);});
 
         // Initialize Kernel stuff
