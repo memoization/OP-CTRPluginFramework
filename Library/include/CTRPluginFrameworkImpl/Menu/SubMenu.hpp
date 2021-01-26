@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORKIMPL_SUBMENU_HPP
 #define CTRPLUGINFRAMEWORKIMPL_SUBMENU_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFramework/System/Clock.hpp"
 #include <string>
 #include <vector>

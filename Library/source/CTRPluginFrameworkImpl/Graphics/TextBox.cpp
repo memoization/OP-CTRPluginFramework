@@ -1,4 +1,4 @@
-#include "types.h"
+#include "3ds/types.h"
 #include <3ds.h>
 #include "CTRPluginFrameworkImpl/Preferences.hpp"
 #include "CTRPluginFrameworkImpl/Graphics/TextBox.hpp"

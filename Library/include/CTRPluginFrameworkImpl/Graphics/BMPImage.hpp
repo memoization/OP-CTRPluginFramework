@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORK_BMPIMAGE_HPP
 #define CTRPLUGINFRAMEWORK_BMPIMAGE_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 
 #include "CTRPluginFramework/System/File.hpp"
 #include "CTRPluginFramework/System/Vector.hpp"

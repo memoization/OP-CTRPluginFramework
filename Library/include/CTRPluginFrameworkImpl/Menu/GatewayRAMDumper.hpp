@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORKIMPL_GATEWAYRAMDUMPER_HPP
 #define CTRPLUGINFRAMEWORKIMPL_GATEWAYRAMDUMPER_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFrameworkImpl/Search/Search.hpp"
 
 namespace CTRPluginFramework

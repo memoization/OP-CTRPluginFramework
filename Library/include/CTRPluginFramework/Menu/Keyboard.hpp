@@ -3,7 +3,7 @@
 
 #include "CTRPluginFramework/Graphics/CustomIcon.hpp"
 #include "CTRPluginFramework/System/Controller.hpp"
-#include "types.h"
+#include "3ds/types.h"
 #include <string>
 #include <vector>
 #include <memory>

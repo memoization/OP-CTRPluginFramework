@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORK_UTILS_LINEREADER_HPP
 #define CTRPLUGINFRAMEWORK_UTILS_LINEREADER_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include <string>
 
 namespace CTRPluginFramework

@@ -1,4 +1,4 @@
-#include "types.h"
+#include "3ds/types.h"
 #include "3ds.h"
 #include "CTRPluginFramework/System/Process.hpp"
 #include "CTRPluginFramework/System/File.hpp"

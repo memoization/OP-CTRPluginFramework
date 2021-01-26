@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORKIMPL_ACTIONREPLAY_ARCODEEDITOR
 #define CTRPLUGINFRAMEWORKIMPL_ACTIONREPLAY_ARCODEEDITOR
 
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFramework/System/Clock.hpp"
 #include "CTRPluginFrameworkImpl/Menu/KeyboardImpl.hpp"
 #include "CTRPluginFrameworkImpl/Menu/Converter.hpp"

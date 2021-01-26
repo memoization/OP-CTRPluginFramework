@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORK_SYSTEM_TASK_HPP
 #define CTRPLUGINFRAMEWORK_SYSTEM_TASK_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include "3ds.h"
 #include <atomic>
 #include <memory>

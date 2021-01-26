@@ -1,4 +1,4 @@
-#include "types.h"
+#include "3ds/types.h"
 #include <3ds.h>
 #include "CTRPluginFrameworkImpl/System/SystemImpl.hpp"
 #include "CTRPluginFrameworkImpl/System/Scheduler.hpp"

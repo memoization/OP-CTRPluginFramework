@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORK_CUSTOMICON_HPP
 #define CTRPLUGINFRAMEWORK_CUSTOMICON_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 
 namespace CTRPluginFramework
 {

@@ -3,7 +3,7 @@
 
 extern "C"
 {
-    #include "types.h"
+    #include "3ds/types.h"
     #include "3ds/util/rbtree.h"
 }
 

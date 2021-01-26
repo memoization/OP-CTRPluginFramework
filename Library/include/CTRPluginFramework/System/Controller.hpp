@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORK_CONTROLLER_HPP
 #define CTRPLUGINFRAMEWORK_CONTROLLER_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 
 namespace CTRPluginFramework
 {

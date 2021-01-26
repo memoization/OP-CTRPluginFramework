@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORKIMPL_OSDIMPL_HPP
 #define CTRPLUGINFRAMEWORKIMPL_OSDIMPL_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include "3ds.h"
 
 #include "CTRPluginFramework/Graphics/OSD.hpp"

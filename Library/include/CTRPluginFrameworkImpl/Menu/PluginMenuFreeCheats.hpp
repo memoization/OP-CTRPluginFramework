@@ -5,7 +5,7 @@
 
 #if FREECHEATS
 
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFrameworkImpl/Preferences.hpp"
 #include "CTRPluginFrameworkImpl/Menu/Menu.hpp"
 #include "CTRPluginFrameworkImpl/Menu/MenuEntryFreeCheat.hpp"

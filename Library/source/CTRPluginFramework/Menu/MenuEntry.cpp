@@ -1,4 +1,4 @@
-#include "types.h"
+#include "3ds/types.h"
 
 #include "CTRPluginFramework/Menu/MenuEntry.hpp"
 #include "CTRPluginFrameworkImpl/Menu/MenuEntryImpl.hpp"

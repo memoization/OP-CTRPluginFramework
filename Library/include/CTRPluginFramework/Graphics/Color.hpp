@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORK_COLOR_HPP
 #define CTRPLUGINFRAMEWORK_COLOR_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include <algorithm>
 #include <string>
 

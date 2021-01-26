@@ -1,6 +1,6 @@
 #pragma once
 
-#include "types.h"
+#include "3ds/types.h"
 
 typedef struct
 {

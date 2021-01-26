@@ -12,7 +12,7 @@
 #include "csvc.h"
 #include "CTRPluginFrameworkImpl/System/SystemImpl.hpp"
 #include "CTRPluginFrameworkImpl/System/ProcessImpl.hpp"
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFramework/Menu/MessageBox.hpp"
 #include "CTRPluginFrameworkImpl/Graphics/OSDImpl.hpp"
 

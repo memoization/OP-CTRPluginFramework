@@ -1,7 +1,7 @@
 #ifndef POINTERSEARCHER_HPP
 #define POINTERSEARCHER_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include <vector>
 
 namespace CTRPluginFramework

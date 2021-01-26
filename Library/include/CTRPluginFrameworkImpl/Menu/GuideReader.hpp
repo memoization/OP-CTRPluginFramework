@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORKIMPL_GUIDEREADER_HPP
 #define CTRPLUGINFRAMEWORKIMPL_GUIDEREADER_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFrameworkImpl/Menu/Menu.hpp"
 #include "CTRPluginFrameworkImpl/Menu/MenuItem.hpp"
 #include "CTRPluginFrameworkImpl/Menu/MenuEntryImpl.hpp"

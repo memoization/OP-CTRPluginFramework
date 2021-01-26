@@ -1,7 +1,7 @@
 #ifndef CTRPPLUGINFRAMEWORK_PREFERENCES_HPP
 #define CTRPPLUGINFRAMEWORK_PREFERENCES_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include "3ds.h"
 #include "CTRPluginFramework/System/FwkSettings.hpp"
 #include "CTRPluginFrameworkImpl/Graphics/BMPImage.hpp"

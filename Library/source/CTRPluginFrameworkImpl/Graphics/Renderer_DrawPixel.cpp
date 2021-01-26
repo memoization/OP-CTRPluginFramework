@@ -1,4 +1,4 @@
-#include "types.h"
+#include "3ds/types.h"
 
 #include "CTRPluginFrameworkImpl/Graphics/Renderer.hpp"
 #include "CTRPluginFrameworkImpl/System/Screen.hpp"
@@ -27,7 +27,7 @@ again:
     }
 
     void        Renderer::RenderBGR8(int posX, int posY, Color &color)
-    { 
+    {
         u8  *screen = _screen->GetLeftFramebuffer(posX, posY);// + offset;
 
 again:
@@ -64,7 +64,7 @@ again:
     }
 
     void        Renderer::RenderRGB5A1(int posX, int posY, Color &color)
-    {  
+    {
         u8  *screen = _screen->GetLeftFramebuffer(posX, posY);// + offset;
 
         union
