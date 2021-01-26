@@ -76,9 +76,13 @@ namespace CTRPluginFramework
         if (!settings.TryLoadSDSounds)
             return;
 
+        std::string source;
+        if (FwkSettings::Header->isDefaultPlugin)
+                source = "/luma/plugins/ActionReplay/";
+
         for (u32 i = 0; i < (u32)SoundEngine::Event::NUM_EVENTS; i++)
         {
-            Sound curr(defaultSoundFiles[i], 3);
+            Sound curr(source + defaultSoundFiles[i], 3);
             if (curr.GetLoadStatus() == Sound::LoadStatus::SUCCESS)
                 RegisterMenuSoundEvent((SoundEngine::Event)i, curr);
         }
