@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORK_SYSTEM_HOOK_H
 #define CTRPLUGINFRAMEWORK_SYSTEM_HOOK_H
 
-#include "types.h"
+#include "3ds/types.h"
 #include <type_traits>
 
 namespace CTRPluginFramework

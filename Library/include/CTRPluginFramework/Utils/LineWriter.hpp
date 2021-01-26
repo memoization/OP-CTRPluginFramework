@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORK_LINEWRITER_HPP
 #define CTRPLUGINFRAMEWORK_LINEWRITER_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include <string>
 #include "CTRPluginFramework/Utils/StringExtensions.hpp"
 

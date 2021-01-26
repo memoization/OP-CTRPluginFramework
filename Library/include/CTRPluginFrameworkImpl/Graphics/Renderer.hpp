@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORK_RENDERER_HPP
 #define CTRPLUGINFRAMEWORK_RENDERER_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include "3ds.h"
 
 #include "CTRPluginFramework/Graphics/Color.hpp"

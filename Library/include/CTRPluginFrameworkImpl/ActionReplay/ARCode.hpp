@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORKIMPL_ACTIONREPLAY_ARCODE_HPP
 #define CTRPLUGINFRAMEWORKIMPL_ACTIONREPLAY_ARCODE_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFramework/System/File.hpp"
 #include "CTRPluginFramework/System/Hook.hpp"
 

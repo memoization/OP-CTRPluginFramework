@@ -1,4 +1,4 @@
-#include "types.h"
+#include "3ds/types.h"
 
 #include "CTRPluginFrameworkImpl/Graphics.hpp"
 #include "CTRPluginFrameworkImpl/Graphics/Font.hpp"

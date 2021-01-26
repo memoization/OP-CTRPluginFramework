@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORKIMPL_ACTIONREPLAY_ARHANDLER_HPP
 #define CTRPLUGINFRAMEWORKIMPL_ACTIONREPLAY_ARHANDLER_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFrameworkImpl/ActionReplay/ARCode.hpp"
 
 namespace CTRPluginFramework

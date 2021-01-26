@@ -1,4 +1,4 @@
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFrameworkImpl/Graphics/Renderer.hpp"
 #include "CTRPluginFrameworkImpl/Graphics/PrivColor.hpp"
 #include "CTRPluginFrameworkImpl/System/Screen.hpp"

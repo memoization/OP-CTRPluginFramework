@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORKIMPL_MENUIMPL_HPP
 #define CTRPLUGINFRAMEWORKIMPL_MENUIMPL_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFrameworkImpl/Graphics.hpp"
 #include "CTRPluginFrameworkImpl/Menu/MenuFolderImpl.hpp"
 #include "CTRPluginFrameworkImpl/System/Events.hpp"

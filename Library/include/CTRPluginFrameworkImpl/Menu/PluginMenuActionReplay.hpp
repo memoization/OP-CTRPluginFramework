@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORK_PLUGINMENUACTIONREPLAY_HPP
 #define CTRPLUGINFRAMEWORK_PLUGINMENUACTIONREPLAY_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFrameworkImpl/Menu/Menu.hpp"
 #include "CTRPluginFrameworkImpl/ActionReplay/ARCodeEditor.hpp"
 

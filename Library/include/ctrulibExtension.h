@@ -1,6 +1,6 @@
 #pragma once
 #include <sys/reent.h>
-#include "types.h"
+#include "3ds/types.h"
 #include "3ds.h"
 
 #define THREADVARS_MAGIC  0x21545624 // !TV$

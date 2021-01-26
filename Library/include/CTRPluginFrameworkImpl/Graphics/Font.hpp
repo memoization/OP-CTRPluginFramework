@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORKIMPL_FONT_HPP
 #define CTRPLUGINFRAMEWORKIMPL_FONT_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFramework/System/Mutex.hpp"
 
 namespace CTRPluginFramework

@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORK_MENUENTRYHOTKEYS_HPP
 #define CTRPLUGINFRAMEWORK_MENUENTRYHOTKEYS_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 
 #include <string>
 #include <vector>

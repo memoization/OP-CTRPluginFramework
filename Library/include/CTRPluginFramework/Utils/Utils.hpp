@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORK_UTILS_UTILS_HPP
 #define CTRPLUGINFRAMEWORK_UTILS_UTILS_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 
 #include "CTRPluginFramework/System/Process.hpp"
 

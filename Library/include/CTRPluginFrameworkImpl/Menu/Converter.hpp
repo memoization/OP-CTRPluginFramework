@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORKIMPL_CONVERTER_HPP
 #define CTRPLUGINFRAMEWORKIMPL_CONVERTER_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFrameworkImpl/Graphics/NumericTextBox.hpp"
 
 namespace CTRPluginFramework

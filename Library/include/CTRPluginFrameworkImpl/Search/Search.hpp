@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORKIMPL_SEARCH_HPP
 #define CTRPLUGINFRAMEWORKIMPL_SEARCH_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFramework/System/Clock.hpp"
 #include "CTRPluginFramework/System/File.hpp"
 

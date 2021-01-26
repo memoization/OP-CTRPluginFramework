@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORK_DIRECTORY_HPP
 #define CTRPLUGINFRAMEWORK_DIRECTORY_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFramework/System/File.hpp"
 
 #include <string>

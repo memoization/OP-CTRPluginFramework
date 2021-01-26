@@ -2,7 +2,7 @@
 #define CTRPLUGINFRAMEWORKIMPL_STORAGE_HPP
 
 #include <cstring>
-#include "types.h"
+#include "3ds/types.h"
 #include "ctrulib/allocator/linear.h"
 
 namespace CTRPluginFramework

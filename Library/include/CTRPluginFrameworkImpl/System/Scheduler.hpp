@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORKIMPL_SYSTEM_SCHEDULER_HPP
 #define CTRPLUGINFRAMEWORKIMPL_SYSTEM_SCHEDULER_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFramework/System/Mutex.hpp"
 #include "CTRPluginFramework/System/Task.hpp"
 #include "CTRPluginFramework/System/Thread.hpp"

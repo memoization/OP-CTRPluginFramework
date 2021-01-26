@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORKIMPL_SYSTEM_KERNEL_HPP
 #define CTRPLUGINFRAMEWORKIMPL_SYSTEM_KERNEL_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include <string>
 
 enum class KType

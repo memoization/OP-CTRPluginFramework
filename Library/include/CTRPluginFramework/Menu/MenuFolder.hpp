@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORK_MENUFOLDER_HPP
 #define CTRPLUGINFRAMEWORK_MENUFOLDER_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include <string>
 #include <memory>
 

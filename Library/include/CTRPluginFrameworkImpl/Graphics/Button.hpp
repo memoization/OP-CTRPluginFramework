@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORK_BUTTON_H
 #define CTRPLUGINFRAMEWORK_BUTTON_H
 
-#include "types.h"
+#include "3ds/types.h"
 #include "CTRPluginFramework/Graphics/Color.hpp"
 #include "CTRPluginFramework/System/Touch.hpp"
 #include "CTRPluginFrameworkImpl/Graphics/Renderer.hpp"

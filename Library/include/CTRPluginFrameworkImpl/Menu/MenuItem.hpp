@@ -1,7 +1,7 @@
 #ifndef CTRPLUGINFRAMEWORKIMPL_MENUITEMIMPL_HPP
 #define CTRPLUGINFRAMEWORKIMPL_MENUITEMIMPL_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 #include <string>
 
 namespace CTRPluginFramework

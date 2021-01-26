@@ -1,7 +1,7 @@
 ﻿#ifndef CTRPLUGINFRAMEWORK_VECTOR_HPP
 #define CTRPLUGINFRAMEWORK_VECTOR_HPP
 
-#include "types.h"
+#include "3ds/types.h"
 
 namespace CTRPluginFramework
 {
@@ -110,14 +110,14 @@ namespace CTRPluginFramework
     {
         return (left.x <= right.x
             && left.y <= right.y);
-    } 
+    }
 
     template <typename T>
     bool operator >= (const Vector<T> &left, const Vector<T> &right)
     {
         return (left.x >= right.x
             && left.y >= right.y);
-    } 
+    }
 
     typedef Vector<unsigned int> UIntVector;
     typedef Vector<int> IntVector;
