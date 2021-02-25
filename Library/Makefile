@@ -165,6 +165,7 @@ release:
 debug:
 	@[ -d $@ ] || mkdir -p $@
 
+lib/libctrpf.a : SHELL := /bin/bash
 lib/libctrpf.a : libcwav-build lib release
 	@$(MAKE) BUILD=release OUTPUT=$(CURDIR)/$@ WL=--strip-discarded,--strip-debug, \
 	BUILD_CFLAGS="-DNDEBUG=1 -O2 -fomit-frame-pointer" DEPSDIR=$(CURDIR)/release \
@@ -176,6 +177,7 @@ lib/libctrpf.a : libcwav-build lib release
 	@rm $@tmp
 	@rm lib/libcwav.a
 
+lib/libctrpfd.a : SHELL := /bin/bash
 lib/libctrpfd.a : libcwav-build lib debug
 	@$(MAKE) BUILD=debug OUTPUT=$(CURDIR)/$@ BUILD_CFLAGS="-DDEBUG=1" G=-g \
 	DEPSDIR=$(CURDIR)/debug --no-print-directory -C debug -f $(CURDIR)/Makefile
