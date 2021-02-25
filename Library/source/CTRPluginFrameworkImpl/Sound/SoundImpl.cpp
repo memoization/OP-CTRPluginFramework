@@ -9,7 +9,6 @@ namespace CTRPluginFramework
     {
         File cwavFile(bcwavFile, File::READ);
         std::memset(&_cwav, 0, sizeof(CWAV));
-        _dataBuffer = nullptr;
 
         if (!cwavFile.IsOpen())
         {
@@ -19,22 +18,22 @@ namespace CTRPluginFramework
 
         u32 fileSize = cwavFile.GetSize();
 
-        _dataBuffer = static_cast<void *>(::operator new(fileSize, std::nothrow));
-        if (_dataBuffer == nullptr)
+        _cwav.dataBuffer = static_cast<void *>(::operator new(fileSize, std::nothrow));
+        if (_cwav.dataBuffer == nullptr)
         {
             _cwav.loadStatus = CWAV_FILE_TOO_LARGE;
             return;
         }
 
         cwavFile.Seek(0);
-        cwavFile.Read(_dataBuffer, fileSize);
+        cwavFile.Read(_cwav.dataBuffer, fileSize);
 
-        cwavLoad(&_cwav, _dataBuffer, maxSimultPlays);
+        cwavLoad(&_cwav, _cwav.dataBuffer, maxSimultPlays);
     }
 
     SoundImpl::SoundImpl(const u8* bcwavBuffer, int maxSimultPlays)
     {
-        _dataBuffer = nullptr;
+        _cwav.dataBuffer = nullptr;
         cwavLoad(&_cwav, bcwavBuffer, maxSimultPlays);
     }
 
@@ -86,7 +85,7 @@ namespace CTRPluginFramework
     SoundImpl::~SoundImpl()
     {
         cwavFree(&_cwav);
-        if (_dataBuffer)
-            ::operator delete(_dataBuffer);
+        if (_cwav.dataBuffer)
+            ::operator delete(_cwav.dataBuffer);
     }
 }

@@ -86,7 +86,7 @@ ASFLAGS	:=	$(G) $(ARCH) $(INCLUDE) -Os -Wl,$(WL)--gc-sections
 # include and lib
 #---------------------------------------------------------------------------------
 LIBS	:= -lctru -lm -lcwav
-LIBDIRS	:= $(CTRULIB) $(DEVKITPRO)/libcwav
+LIBDIRS	:= $(CTRULIB) $(CURDIR)/libcwav
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -147,6 +147,15 @@ install: dist
 	@bzip2 -cd libctrpf-$(CTRPF_REVISION).tar.bz2 | tar -xf - -C $(DESTDIR)$(DEVKITPRO)/libctrpf
 	@echo "CTRPF was successfully installed in $(DESTDIR)$(DEVKITPRO)/libctrpf"
 
+libcwav:
+	@git clone https://github.com/mariohackandglitch/libcwav.git $@
+
+libcwav-update: libcwav
+	@cd libcwav && git pull
+
+libcwav-build: libcwav-update
+	@cd libcwav && $(MAKE)
+
 lib:
 	@[ -d $@ ] || mkdir -p $@
 
@@ -156,22 +165,22 @@ release:
 debug:
 	@[ -d $@ ] || mkdir -p $@
 
-lib/libctrpf.a : lib release
+lib/libctrpf.a : libcwav-build lib release
 	@$(MAKE) BUILD=release OUTPUT=$(CURDIR)/$@ WL=--strip-discarded,--strip-debug, \
 	BUILD_CFLAGS="-DNDEBUG=1 -O2 -fomit-frame-pointer" DEPSDIR=$(CURDIR)/release \
 	--no-print-directory -C release	-f $(CURDIR)/Makefile
 	@rm release/PluginMenuTools.o # Force update of revision, date etc
-	@cp $(DESTDIR)$(DEVKITPRO)/libcwav/lib/libcwav.a lib/libcwav.a
+	@cp $(CURDIR)/libcwav/lib/libcwav.a lib/libcwav.a
 	@mv $@ $@tmp
 	@$(AR) -M <<< $$'create $@ \naddlib $@tmp \naddlib lib/libcwav.a\nsave\nend'
 	@rm $@tmp
 	@rm lib/libcwav.a
 
-lib/libctrpfd.a : lib debug
+lib/libctrpfd.a : libcwav-build lib debug
 	@$(MAKE) BUILD=debug OUTPUT=$(CURDIR)/$@ BUILD_CFLAGS="-DDEBUG=1" G=-g \
 	DEPSDIR=$(CURDIR)/debug --no-print-directory -C debug -f $(CURDIR)/Makefile
 	@rm debug/PluginMenuTools.o # Force update of revision, date etc.
-	@cp $(DESTDIR)$(DEVKITPRO)/libcwav/lib/libcwav.a lib/libcwav.a
+	@cp $(CURDIR)/libcwav/lib/libcwav.a lib/libcwav.a
 	@mv $@ $@tmp
 	@$(AR) -M <<< $$'create $@ \naddlib $@tmp \naddlib lib/libcwav.a\nsave\nend'
 	@rm $@tmp
@@ -180,7 +189,7 @@ lib/libctrpfd.a : lib debug
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr release debug lib docs
+	@rm -fr release debug lib docs libcwav
 
 #---------------------------------------------------------------------------------
 else

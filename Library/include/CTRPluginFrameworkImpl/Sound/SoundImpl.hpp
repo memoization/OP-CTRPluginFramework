@@ -39,7 +39,6 @@ namespace CTRPluginFramework
 
     private:
         CWAV    _cwav;
-        void*   _dataBuffer;
     };
 }
 
