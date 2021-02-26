@@ -78,6 +78,16 @@ namespace CTRPluginFramework
                 continue;
             }
 
+            if (*c == 0x11)
+            {
+                c++;
+                u16 skipToX = *(u16*)c & ~0x8000;
+                c += 2;
+                if (skipToX > w)
+                    w = skipToX;
+                continue;
+            }
+
             Glyph *glyph = Font::GetGlyph(c);
             if (glyph == nullptr) break;
 
@@ -124,6 +134,16 @@ namespace CTRPluginFramework
             if (*c == 0x1B)
             {
                 c += 4;
+                continue;
+            }
+
+            if (*c == 0x11)
+            {
+                c++;
+                u16 skipToX = *(u16*)c & ~0x8000;
+                c += 2;
+                if (skipToX > w && skipToX < maxWidth)
+                    w = skipToX;
                 continue;
             }
 
@@ -182,6 +202,16 @@ namespace CTRPluginFramework
             if (*c == 0x1B)
             {
                 c += 4;
+                continue;
+            }
+
+            if (*c == 0x11)
+            {
+                c++;
+                u16 skipToX = *(u16*)c & ~0x8000;
+                c += 2;
+                if (skipToX > w && skipToX < maxWidth)
+                    w = skipToX;
                 continue;
             }
 
@@ -360,6 +390,16 @@ namespace CTRPluginFramework
                 continue;
             }
 
+            if (c == 0x11)
+            {
+                str++;
+                u16 skipToX = *(u16*)str & ~0x8000;
+                str += 2;
+                if (skipToX > x && skipToX < xLimits)
+                    x = skipToX;
+                continue;
+            }
+
             if (posY >= maxY)
                 break;
 
@@ -434,6 +474,16 @@ namespace CTRPluginFramework
                 color.g = *str++;
                 color.b = *str++;
                 RendererPriv::g_customColor = color;
+                continue;
+            }
+
+            if (c == 0x11)
+            {
+                str++;
+                u16 skipToX = *(u16*)str & ~0x8000;
+                str += 2;
+                if (skipToX > x && skipToX < xLimits)
+                    x = skipToX;
                 continue;
             }
 

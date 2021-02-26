@@ -393,6 +393,29 @@ exit:
         {
             int res = SomeFunc(0, 2, "Hello world");
         };
+        /*
+        menu.Append(new MenuEntry("Text Stuff", nullptr, [](MenuEntry* entry) {
+            Keyboard kbd("a");
+            std::string s = "";
+            s += "This is left aligned.\n\n";
+            s += CenterAlign("This is multiline\nand is center aligned.\n\n");
+            s += RightAlign("This is aligned to the right.\n\n");
+            s += "Entry 1:" + RightAlign("0\n", 30, 240);
+            s += "Another Entry:" + RightAlign("10\n", 30, 240);
+            s += "Last entry:" + RightAlign("10000\n\n", 30, 240);
+            kbd.GetMessage() = s;
+            kbd.Populate({"OK"});
+            kbd.Open();
+        }, ""));
+
+        menu.Append(new MenuEntry("Text Stuff 2", nullptr, [](MenuEntry* entry) {
+            Keyboard kbd("a");
+            std::string s = "";
+            s += CenterAlign("This string is so so large that it doesn't fit in a single line, so the plugin breaks it automatically.");
+            kbd.GetMessage() = s;
+            kbd.Populate({"OK"});
+            kbd.Open();
+        }, ""));*/
 
         int ret = menu.Run();
 
