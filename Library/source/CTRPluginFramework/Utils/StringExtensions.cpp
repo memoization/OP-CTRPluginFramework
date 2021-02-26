@@ -12,14 +12,27 @@ namespace CTRPluginFramework
         return ("\x18");
     }
 
-    std::string     SkipToPixel(u16 px)
+    std::string     ToggleDrawMode(u32 flags)
     {
-        if (px == 0)
-            return ("");
         char code[4];
         code[0] = '\x11';
-        *(u16*)&code[1] = px | 0x8000;
-        code[3] = 0;
+        *(u16*)&code[1] = 0x4080 | (flags & 0x7F);
+        code[3] = '\0';
+        return (code);
+    }
+
+    std::string     SkipToPixel(u16 px)
+    {
+        char code[4];
+        if (px == 0)
+        {
+            code[0] = '\0';
+        } else
+        {
+            code[0] = '\x11';
+            *(u16*)&code[1] = 0x8000 | (px & 0x1FF);
+            code[3] = '\0';
+        }
         return (code);
     }
 

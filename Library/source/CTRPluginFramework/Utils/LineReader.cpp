@@ -93,13 +93,13 @@ namespace CTRPluginFramework
             if (c == 0x1B)
             {
                 line.append(cStr + _offset, 4);
-                _offset += 4;
+                _offset += 4 - 1;
                 ret = true;
             }
             else if (c == 0x11)
             {
                 line.append(cStr + _offset, 3);
-                _offset += 3;
+                _offset += 3 - 1;
                 ret = true;
             }
             else if (c && c != '\r')

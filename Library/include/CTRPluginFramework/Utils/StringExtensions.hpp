@@ -10,6 +10,9 @@ namespace CTRPluginFramework
     // Return a string with the charcter that reset the color (0x18)
     std::string     ResetColor(void);
 
+    // Allows to use the flags from Render::FontDrawMode to draw text in different modes.
+    std::string     ToggleDrawMode(u32 flags);
+
     // Makes the text draw function skip to the specified X pixel.
     std::string     SkipToPixel(u16 px);
 
