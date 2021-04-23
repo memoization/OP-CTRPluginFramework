@@ -38,9 +38,9 @@ namespace CTRPluginFramework
         /**
          * \brief Plays the sound associated with an event.
          * \param eventTypes Event to play its sound.
-         * \return Whether the operation was successful or not.
+         * \return Result from the CWAVStatus enum.
         */
-        static bool PlayMenuSound(Event eventType);
+        static Sound::CWAVStatus PlayMenuSound(Event eventType);
 
         /**
          * \brief Stops the sound associated with an event.

@@ -13,7 +13,7 @@ namespace CTRPluginFramework
         return SoundEngineImpl::GetMenuSoundEvent(eventType);
     }
 
-    bool SoundEngine::PlayMenuSound(Event eventType)
+    Sound::CWAVStatus SoundEngine::PlayMenuSound(Event eventType)
     {
         return SoundEngineImpl::PlayMenuSound(eventType);
     }

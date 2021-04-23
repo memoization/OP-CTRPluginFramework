@@ -37,7 +37,7 @@ namespace CTRPluginFramework
         cwavLoad(&_cwav, bcwavBuffer, maxSimultPlays);
     }
 
-    cwavLoadStatus_t SoundImpl::GetLoadStatus()
+    cwavStatus_t SoundImpl::GetLoadStatus()
     {
         return _cwav.loadStatus;
     }
@@ -72,9 +72,9 @@ namespace CTRPluginFramework
         return _cwav.isLooped;
     }
 
-    bool SoundImpl::Play(int leftEarChannel, int rightEarChannel)
+    cwavStatus_t SoundImpl::Play(int leftEarChannel, int rightEarChannel)
     {
-        return cwavPlay(&_cwav, leftEarChannel, rightEarChannel);
+        return cwavPlay(&_cwav, leftEarChannel, rightEarChannel).playStatus;
     }
 
     void SoundImpl::Stop(int leftEarChannel, int rightEarChannel)

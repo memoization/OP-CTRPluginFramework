@@ -32,7 +32,7 @@ namespace CTRPluginFramework
 
     bool SoundEngineImpl::RegisterMenuSoundEvent(SoundEngine::Event eventType, Sound& sound)
     {
-        if (sound.GetLoadStatus() == Sound::LoadStatus::SUCCESS && eventType < SoundEngine::Event::NUM_EVENTS)
+        if (sound.GetLoadStatus() == Sound::CWAVStatus::SUCCESS && eventType < SoundEngine::Event::NUM_EVENTS)
         {
             menuSounds[(u32)eventType] = sound;
             return true;
@@ -48,11 +48,11 @@ namespace CTRPluginFramework
             return fallbackSound;
     }
 
-    bool SoundEngineImpl::PlayMenuSound(SoundEngine::Event eventType)
+    Sound::CWAVStatus SoundEngineImpl::PlayMenuSound(SoundEngine::Event eventType)
     {
         if (eventType < SoundEngine::Event::NUM_EVENTS)
             return menuSounds[(u32)eventType].Play();
-        return false;
+        return Sound::CWAVStatus::INVALID_ARGUMENT;
     }
 
     void SoundEngineImpl::StopMenuSound(SoundEngine::Event eventType)
@@ -83,7 +83,7 @@ namespace CTRPluginFramework
         for (u32 i = 0; i < (u32)SoundEngine::Event::NUM_EVENTS; i++)
         {
             Sound curr(source + defaultSoundFiles[i], 3);
-            if (curr.GetLoadStatus() == Sound::LoadStatus::SUCCESS)
+            if (curr.GetLoadStatus() == Sound::CWAVStatus::SUCCESS)
                 RegisterMenuSoundEvent((SoundEngine::Event)i, curr);
         }
     }

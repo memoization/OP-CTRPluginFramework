@@ -10,16 +10,25 @@ namespace CTRPluginFramework
     {
     public:
 
-        enum class LoadStatus {
-            NOT_ALLOCATED = 0,              ///< Data is not allocated and cannot be used.
-            SUCCESS = 1,                    ///< Loaded properly and is ready to play.
-            INVALID_ARGUMENT = 2,           ///< An invalid argument was passed to the constructor.
-            FILE_OPEN_FAILED = 3,           ///< Failed to open the specified file.
-            FILE_TOO_LARGE = 4,             ///< The file is too large to fit in the available memory.
-            UNKNOWN_FILE_FORMAT = 5,        ///< The specified file is not a valid CWAV file.
-            INVAID_INFO_BLOCK = 6,          ///< The INFO block in the CWAV file is invalid or not supported.
-            INVAID_DATA_BLOCK = 7,          ///< The DATA block in the CWAV file is invalid or not supported.
-            UNSUPPORTED_AUDIO_ENCODING = 8  ///< The audio encoding is not supported.
+        enum class CWAVStatus
+        {
+            // General status values.
+            NOT_ALLOCATED = 0, ///< CWAV is not allocated and cannot be used.
+            SUCCESS = 1, ///< CWAV loaded properly and is ready to play.
+            INVALID_ARGUMENT = 2, ///< An invalid argument was passed to the function call.
+
+            // Load status values.
+            FILE_OPEN_FAILED = 3, ///< Failed to open the specified file.
+            FILE_TOO_LARGE = 4, ///< The file is too large to fit in the available memory.
+            UNKNOWN_FILE_FORMAT = 5, ///< The specified file is not a valid CWAV file.
+            INVAID_INFO_BLOCK = 6, ///< The INFO block in the CWAV file is invalid or not supported.
+            INVAID_DATA_BLOCK = 7, ///< The DATA block in the CWAV file is invalid or not supported.
+            UNSUPPORTED_AUDIO_ENCODING = 8, ///< The audio encoding is not supported.
+
+            // Play status values.
+            INVALID_CWAV_CHANNEL = 9, ///< The specified channel is not in the CWAV.
+            NO_CHANNEL_AVAILABLE = 10, ///< No DSP/CSND channels available to play the sound.
+
         };
 
         /**
@@ -69,9 +78,9 @@ namespace CTRPluginFramework
 
         /**
          * \brief Get the BCWAV load status. The sound will only play if the load status is SUCCESS.
-         * \return Load status from the LoadStatus enum.
+         * \return Load status from the CWAVStatus enum.
         */
-        LoadStatus GetLoadStatus();
+        CWAVStatus GetLoadStatus();
 
         /**
          * \brief Sets the sound volume. Changes only apply after the next play.
@@ -111,24 +120,24 @@ namespace CTRPluginFramework
 
         /**
          * \brief Plays the first audio channel in mono from the BCWAV file.
-         * \return Whether the operation was successful or not.
+         * \return Result from the CWAVStatus enum.
         */
-        bool Play();
+        CWAVStatus Play();
 
         /**
          * \brief Plays the specified audio channel in mono from the BCWAV file.
          * \param monoChannel Channel to play, in the range [ 0, GetChannelAmount() - 1].
-         * \return Whether the operation was successful or not.
+         * \return Result from the CWAVStatus enum.
         */
-        bool Play(int monoChannel);
+        CWAVStatus Play(int monoChannel);
 
         /**
          * \brief Plays the specified audio channels in stereo from the BCWAV file.
          * \param leftEarChannel Left ear channel to play, in the range [0, GetChannelAmount() - 1].
          * \param rightEarChannel Right each channel to play, in the range [0, GetChannelAmount() - 1].
-         * \return Whether the operation was successful or not.
+         * \return Result from the CWAVStatus enum.
         */
-        bool Play(int leftEarChannel, int rightEarChannel);
+        CWAVStatus Play(int leftEarChannel, int rightEarChannel);
 
         /**
          * \brief Stops all the playing channels.

@@ -89,12 +89,12 @@ namespace CTRPluginFramework
         }
     }
 
-    Sound::LoadStatus Sound::GetLoadStatus()
+    Sound::CWAVStatus Sound::GetLoadStatus()
     {
         if (_soundImpl)
-            return static_cast<Sound::LoadStatus>(PublicToImpl(_soundImpl)->GetLoadStatus());
+            return static_cast<Sound::CWAVStatus>(PublicToImpl(_soundImpl)->GetLoadStatus());
         else
-            return LoadStatus::NOT_ALLOCATED;
+            return CWAVStatus::NOT_ALLOCATED;
     }
 
     void Sound::SetVolume(float volume)
@@ -141,22 +141,22 @@ namespace CTRPluginFramework
             return false;
     }
 
-    bool Sound::Play()
+    Sound::CWAVStatus Sound::Play()
     {
         return Play(0);
     }
 
-    bool Sound::Play(int monoChannel)
+    Sound::CWAVStatus Sound::Play(int monoChannel)
     {
         return Play(monoChannel, -1);
     }
 
-    bool Sound::Play(int leftEarChannel, int rightEarChannel)
+    Sound::CWAVStatus Sound::Play(int leftEarChannel, int rightEarChannel)
     {
         if (_soundImpl)
-            return PublicToImpl(_soundImpl)->Play(leftEarChannel, rightEarChannel);
+            return static_cast<Sound::CWAVStatus>(PublicToImpl(_soundImpl)->Play(leftEarChannel, rightEarChannel));
         else
-            return false;
+            return CWAVStatus::NOT_ALLOCATED;
     }
 
     void Sound::Stop()

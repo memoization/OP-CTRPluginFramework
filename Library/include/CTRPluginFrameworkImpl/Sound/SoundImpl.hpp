@@ -15,7 +15,7 @@ namespace CTRPluginFramework
 
         SoundImpl(const u8* bcwavBuffer, int maxSimultPlays = 1);
 
-        cwavLoadStatus_t GetLoadStatus();
+        cwavStatus_t GetLoadStatus();
 
         void SetVolume(float volume);
 
@@ -29,7 +29,7 @@ namespace CTRPluginFramework
 
         bool IsLooped();
 
-        bool Play(int leftEarChannel, int rightEarChannel);
+        cwavStatus_t Play(int leftEarChannel, int rightEarChannel);
 
         void Stop(int leftEarChannel, int rightEarChannel);
 

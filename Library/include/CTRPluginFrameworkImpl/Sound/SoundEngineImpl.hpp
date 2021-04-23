@@ -20,7 +20,7 @@ namespace CTRPluginFramework
 
         static Sound& GetMenuSoundEvent(SoundEngine::Event eventType);
 
-        static bool PlayMenuSound(SoundEngine::Event eventType);
+        static Sound::CWAVStatus PlayMenuSound(SoundEngine::Event eventType);
 
         static void StopMenuSound(SoundEngine::Event eventType);
 
