@@ -231,7 +231,7 @@ namespace CTRPluginFramework
 
     void    KeyboardImpl::ChangeEntrySound(int entry, SoundEngine::Event soundEvent)
     {
-        if (_customKeyboard && entry >= 0 && entry < _strKeys.size() && _strKeys[entry]->CanUse())
+        if (_customKeyboard && entry >= 0 && entry < static_cast<int>(_strKeys.size()) && _strKeys[entry]->CanUse())
         {
             _strKeys[entry]->SetAcceptSoundEvent(soundEvent);
         }
