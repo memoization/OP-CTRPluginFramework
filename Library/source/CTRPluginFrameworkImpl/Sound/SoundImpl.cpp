@@ -72,6 +72,11 @@ namespace CTRPluginFramework
         return _cwav.isLooped;
     }
 
+    bool SoundImpl::PlayDirectly(int leftEarChannel, int rightEarChannel, CSND_DirectSoundModifiers* modifiers)
+    {
+        return cwavPlayAsDirectSound(&_cwav, leftEarChannel, rightEarChannel, 0, 0, modifiers);
+    }
+
     cwavStatus_t SoundImpl::Play(int leftEarChannel, int rightEarChannel)
     {
         return cwavPlay(&_cwav, leftEarChannel, rightEarChannel).playStatus;

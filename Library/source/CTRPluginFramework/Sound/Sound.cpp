@@ -141,6 +141,11 @@ namespace CTRPluginFramework
             return false;
     }
 
+    bool Sound::PlayDirectly(int leftEarChannel, int rightEarChannel, CSND_DirectSoundModifiers* modifier)
+    {
+        return PublicToImpl(_soundImpl)->PlayDirectly(leftEarChannel, rightEarChannel, modifier);
+    }
+
     Sound::CWAVStatus Sound::Play()
     {
         return Play(0);

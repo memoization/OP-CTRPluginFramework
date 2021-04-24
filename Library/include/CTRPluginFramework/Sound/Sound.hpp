@@ -119,6 +119,15 @@ namespace CTRPluginFramework
         bool IsLooped();
 
         /**
+         * \brief Plays the specified channels with a CSND direct sound (allows multiple modifiers).
+         * \param leftEarChannel Left ear channel to play, in the range [0, GetChannelAmount() - 1].
+         * \param rightEarChannel Right each channel to play (-1 to disable), in the range [0, GetChannelAmount() - 1].
+         * \param modifiers Apply modifiers to the direct sound, see CSND_DirectSoundModifiers
+         * \return Whether the operation was successful or not.
+        */
+        bool PlayDirectly(int leftEarChannel, int rightEarChannel, CSND_DirectSoundModifiers* modifiers);
+
+        /**
          * \brief Plays the first audio channel in mono from the BCWAV file.
          * \return Result from the CWAVStatus enum.
         */

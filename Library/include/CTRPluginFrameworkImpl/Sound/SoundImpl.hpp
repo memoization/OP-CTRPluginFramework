@@ -29,6 +29,8 @@ namespace CTRPluginFramework
 
         bool IsLooped();
 
+        bool PlayDirectly(int leftEarChannel, int rightEarChannel, CSND_DirectSoundModifiers* modifiers);
+
         cwavStatus_t Play(int leftEarChannel, int rightEarChannel);
 
         void Stop(int leftEarChannel, int rightEarChannel);
