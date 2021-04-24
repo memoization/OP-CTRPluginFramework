@@ -40,6 +40,9 @@ namespace CTRPluginFramework
     }
 
     PluginMenuHome::PluginMenuHome(std::string &name, bool showNoteBottom) :
+
+        _noteTB("", "", showNoteBottom ? IntRect(20, 46, 280, 124) : IntRect(40, 30, 320, 180)),
+
         _showStarredBtn(Button::Toggle | Button::Sysfont | Button::Rounded, "Favorite", IntRect(30, 70, 120, 30), Icon::DrawFavorite),
         _hidMapperBtn(Button::Sysfont | Button::Rounded, "Mapper", IntRect(165, 70, 120, 30), Icon::DrawController),
         _gameGuideBtn(Button::Sysfont | Button::Rounded, "Game Guide", IntRect(30, 105, 120, 30), Icon::DrawGuide),
@@ -47,13 +50,12 @@ namespace CTRPluginFramework
         _arBtn(Button::Sysfont | Button::Rounded, "ActionReplay", IntRect(30, 140, 120, 30)),
         _toolsBtn(Button::Sysfont | Button::Rounded, "Tools", showNoteBottom ? IntRect(99, 172, 120, 30) : IntRect(165, 140, 120, 30), Icon::DrawTools),
 
-        _AddFavoriteBtn(Button::Icon | Button::Toggle, IntRect(50, 30, 25, 25), Icon::DrawAddFavorite),
-        _InfoBtn(Button::Icon | Button::Toggle, IntRect(90, 30, 25, 25), Icon::DrawInfo),
-
        // _closeBtn(*this, nullptr, IntRect(275, 24, 20, 20), Icon::DrawClose),
         _keyboardBtn(Button::Icon, IntRect(130, 30, 25, 25), Icon::DrawKeyboard),
         _controllerBtn(Button::Icon, IntRect(170, 30, 25, 25), Icon::DrawGameController25),
-        _noteTB("", "", showNoteBottom ? IntRect(20, 46, 280, 124) : IntRect(40, 30, 320, 180))
+
+        _AddFavoriteBtn(Button::Icon | Button::Toggle, IntRect(50, 30, 25, 25), Icon::DrawAddFavorite),
+        _InfoBtn(Button::Icon | Button::Toggle, IntRect(90, 30, 25, 25), Icon::DrawInfo)
     {
         _root = _folder = new MenuFolderImpl(name);
         _starredConst = _starred = new MenuFolderImpl("Favorites");
@@ -126,7 +128,7 @@ namespace CTRPluginFramework
         // Process events
         if (_noteTB.IsOpen() && !ShowNoteBottom)
         {
-            for (int i = 0; i < eventList.size(); i++)
+            for (size_t i = 0; i < eventList.size(); i++)
                 if (_noteTB.ProcessEvent(eventList[i]) == false)
                 {
                     _InfoBtn.SetState(false);
@@ -135,7 +137,7 @@ namespace CTRPluginFramework
         }
         else
         {
-            for (int i = 0; i < eventList.size(); i++)
+            for (size_t i = 0; i < eventList.size(); i++)
                 _ProcessEvent(eventList[i]);
         }
 
@@ -224,7 +226,7 @@ namespace CTRPluginFramework
         // Check for the validity of _selector range
         MenuFolderImpl *folder = _starMode ? _starred : _folder;
 
-        if (_selector >= folder->ItemsCount())
+        if (_selector >= static_cast<int>(folder->ItemsCount()))
             _selector = 0;
 
     }
@@ -285,7 +287,7 @@ namespace CTRPluginFramework
             return;
 
         // We're already at the end
-        if (selector == folder.ItemsCount() - 1)
+        if (selector == static_cast<int>(folder.ItemsCount()) - 1)
         {
             // Else select first item
             selector = 0;
@@ -298,7 +300,7 @@ namespace CTRPluginFramework
         }
         // Else go down
         selector += step;
-        if (selector >= folder.ItemsCount())
+        if (selector >= static_cast<int>(folder.ItemsCount()))
             selector = folder.ItemsCount() - 1;
         // If entry is unselectable, scroll again
         if (IsUnselectableEntry(folder[selector]))
@@ -438,7 +440,7 @@ namespace CTRPluginFramework
 
         folder = _starMode ? _starred : _folder;
 
-        if (_selector >= folder->ItemsCount())
+        if (_selector >= static_cast<int>(folder->ItemsCount()))
             _selector = 0;
 
         /*
@@ -467,7 +469,7 @@ namespace CTRPluginFramework
         /*
         ** Update icon buttons state
         **************************/
-        if (folder->ItemsCount() > 0 && _selector < folder->ItemsCount())
+        if (folder->ItemsCount() > 0 && _selector < static_cast<int>(folder->ItemsCount()))
         {
             item = folder->_items[_selector];
 
@@ -777,7 +779,7 @@ namespace CTRPluginFramework
         MenuFolderImpl* folder = _starMode ? _starred : _folder;
 
 
-        if (_selector >= folder->ItemsCount())
+        if (_selector >= static_cast<int>(folder->ItemsCount()))
             return;
 
         MenuItem* item = folder->_items[_selector];
@@ -941,7 +943,7 @@ namespace CTRPluginFramework
     {
         MenuFolderImpl* folder = _starMode ? _starred : _folder;
 
-        if (_selector >= folder->ItemsCount())
+        if (_selector >= static_cast<int>(folder->ItemsCount()))
             return;
 
         MenuItem* item = folder->_items[_selector];
@@ -986,7 +988,7 @@ namespace CTRPluginFramework
                     }
                 }
             }
-            if (_selector >= folder->ItemsCount())
+            if (_selector >= static_cast<int>(folder->ItemsCount()))
                 _selector = std::max((int)folder->ItemsCount() - 1, 0);
         }
     }
@@ -1005,7 +1007,7 @@ namespace CTRPluginFramework
     {
         char buffer[100];
 
-        sprintf(buffer, "[%d.%d.%d]", version & 0xFF, (version >> 8) & 0xFF, version >> 16);
+        sprintf(buffer, "[%d.%d.%d]", static_cast<int>(version & 0xFF), static_cast<int>((version >> 8) & 0xFF), static_cast<int>(version >> 16));
         _versionStr.clear();
         _versionStr = buffer;
 

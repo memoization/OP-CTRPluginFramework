@@ -380,7 +380,7 @@ namespace CTRPluginFramework
             ProcessImpl::UpdateMemRegions();
         }
 
-    exit:
+    // exit
         svcCloseHandle(g_keepEvent);
         svcExitThread();
     }
