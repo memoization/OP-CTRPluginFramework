@@ -5,6 +5,7 @@
 #include "CTRPluginFrameworkImpl/Graphics/Font.hpp"
 #include "CTRPluginFrameworkImpl/System/Screenshot.hpp"
 #include "CTRPluginFrameworkImpl/System/HookManager.hpp"
+#include "CTRPluginFrameworkImpl/System/Services/Gsp.hpp"
 #include "csvc.h"
 #include "plgldr.h"
 
@@ -31,6 +32,7 @@ extern "C"
 }
 
 using CTRPluginFramework::Hook;
+using namespace CTRPluginFrameworkImpl::Services;
 
 namespace CTRPluginFramework
 {
@@ -258,7 +260,7 @@ namespace CTRPluginFramework
 
         // Check threads priorities
         settings.ThreadPriority = std::min(settings.ThreadPriority, (u32)0x3E);
-        GSP::InterruptReceiverThreadPriority = settings.ThreadPriority + 1;
+
         if (GSP::Initialize())
         {
             ScreenImpl::Top->Flash((Color&)Color::Yellow);
@@ -352,7 +354,7 @@ namespace CTRPluginFramework
             ProcessImpl::UpdateMemRegions();
         }
 
-    exit:
+    // exit
         svcCloseHandle(g_keepEvent);
         svcExitThread();
     }

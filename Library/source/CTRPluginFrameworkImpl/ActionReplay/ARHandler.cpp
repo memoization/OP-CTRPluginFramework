@@ -165,12 +165,12 @@ bool AlmostEqualRelative(float A, float B, float maxRelDiff = FLT_EPSILON);
 #define Cond16(operator) \
     if (conditionalMode == CondMode::ImmAgainstData) \
     { \
-        if ((code.Right & 0xFFFF) operator (currentData.value & 0xFFFF) & mask) \
+        if ((code.Right & 0xFFFF) operator ((currentData.value & 0xFFFF) & mask)) \
             continue; \
     } \
     else if (conditionalMode == CondMode::ImmAgainstStorage) \
     { \
-        if ((code.Right & 0xFFFF) operator (Storage[ActiveStorage] & 0xFFFF) & mask) \
+        if ((code.Right & 0xFFFF) operator ((Storage[ActiveStorage] & 0xFFFF) & mask)) \
             continue; \
     } \
     else if (conditionalMode == CondMode::DataAgainstVal) \
@@ -283,6 +283,8 @@ bool AlmostEqualRelative(float A, float B, float maxRelDiff = FLT_EPSILON);
                         continue;
                     }
                 }
+
+                loopCount += (code.Type >= 0xC0 && code.Type <= 0xC2);
                 loopCodes.push_back(code);
                 continue;
             }
@@ -858,7 +860,7 @@ bool AlmostEqualRelative(float A, float B, float maxRelDiff = FLT_EPSILON);
                 break;
             }
         }
-    error:
+    // error
         return false;
     }
 }

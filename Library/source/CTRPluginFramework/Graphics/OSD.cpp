@@ -6,9 +6,12 @@
 
 #include <algorithm>
 #include "CTRPluginFrameworkImpl/System/Screen.hpp"
+#include "CTRPluginFrameworkImpl/System/Services/Gsp.hpp"
 
 namespace CTRPluginFramework
 {
+    using namespace CTRPluginFrameworkImpl::Services;
+
     u8      *Screen::GetFramebuffer(u32 posX, u32 posY, bool useRightFb) const
     {
         if (useRightFb && (!IsTop || !Is3DEnabled))
@@ -35,14 +38,16 @@ namespace CTRPluginFramework
     u32     Screen::Draw(const std::string &str, u32 posX, u32 posY, const Color& foreground, const Color& background) const
     {
         Renderer::SetTarget(IsTop ? TOP : BOTTOM);
-        Renderer::DrawString(str.c_str(), posX, (int &)posY, foreground, background);
-        return (posY);
+        int newPosY = posY;
+        Renderer::DrawString(str.c_str(), posX, newPosY, foreground, background);
+        return (newPosY);
     }
 
     u32 Screen::DrawSysfont(const std::string &str, u32 posX, u32 posY, const Color &foreground) const
     {
         Renderer::SetTarget(IsTop ? TOP : BOTTOM);
-        Renderer::DrawSysString(str.c_str(), posX, (int &)posY, 400, foreground);
+        int newPosY = posY;
+        Renderer::DrawSysString(str.c_str(), posX, newPosY, 400, foreground);
         return (posY);
     }
 
@@ -65,6 +70,12 @@ namespace CTRPluginFramework
         pixel = PrivColor::FromFramebuffer(fb);
     }
 
+    void    Screen::Fade(const float fadeAmount)
+    {
+        ScreenImpl* scrImpl = IsTop ? ScreenImpl::Top : ScreenImpl::Bottom;
+        scrImpl->Fade(fadeAmount);
+    }
+
     int     OSD::Notify(const std::string &str, const Color &fg, const Color &bg)
     {
         OSDImpl::Lock();
@@ -84,10 +95,17 @@ namespace CTRPluginFramework
     void    OSD::Run(OSDCallback cb)
     {
         OSDImpl::Lock();
-        for (OSDCallback c : OSDImpl::Callbacks)
-            if (c == cb) goto exit;
-        OSDImpl::Callbacks.push_back(cb);
-    exit:
+
+        // If the callback is going to be added, make sure it's not in the trash bin
+        if (OSDImpl::CallbacksTrashBin.size())
+        {
+            auto it = std::find(OSDImpl::CallbacksTrashBin.begin(), OSDImpl::CallbacksTrashBin.end(), cb);
+            if (it != OSDImpl::CallbacksTrashBin.end()) OSDImpl::CallbacksTrashBin.erase(it);
+        }
+
+        if (std::find(OSDImpl::Callbacks.begin(), OSDImpl::Callbacks.end(), cb) == OSDImpl::Callbacks.end())
+            OSDImpl::Callbacks.push_back(cb);
+
         OSDImpl::Unlock();
     }
 
@@ -95,18 +113,8 @@ namespace CTRPluginFramework
     {
         OSDImpl::Lock();
 
-        bool add = true;
-
-        for (auto _cb : OSDImpl::CallbacksTrashBin)
-            if (cb == _cb) {
-                add = false;
-                break;
-            }
-
-        if (add)
-        {
+        if (std::find(OSDImpl::CallbacksTrashBin.begin(), OSDImpl::CallbacksTrashBin.end(), cb) == OSDImpl::CallbacksTrashBin.end())
             OSDImpl::CallbacksTrashBin.push_back(cb);
-        }
 
         OSDImpl::Unlock();
     }

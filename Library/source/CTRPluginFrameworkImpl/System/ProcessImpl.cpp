@@ -1,15 +1,16 @@
 #include <3ds.h>
 
 // Fix std::vector<MemInfo> == operator
-static bool      operator==(const MemInfo left, const MemInfo right)
+/*static bool      operator==(const MemInfo left, const MemInfo right)
 {
     return left.base_addr == right.base_addr && left.size == right.size;
-}
+}*/
 
 #include "CTRPluginFramework/System.hpp"
 #include "CTRPluginFrameworkImpl/System.hpp"
 #include "CTRPluginFrameworkImpl/Preferences.hpp"
 #include "CTRPluginFrameworkImpl/Graphics/OSDImpl.hpp"
+#include "CTRPluginFrameworkImpl/System/Services/Gsp.hpp"
 
 #include <cstdio>
 #include <cstring>
@@ -19,6 +20,8 @@ extern      Handle gspThreadEventHandle;
 
 namespace CTRPluginFramework
 {
+    using namespace CTRPluginFrameworkImpl::Services;
+
     Handle      ProcessImpl::ProcessHandle = 0;
     u32         ProcessImpl::IsPaused = 0;
     u32         ProcessImpl::Status = Running;
@@ -225,7 +228,7 @@ namespace CTRPluginFramework
 
         MemRegions.clear();
 
-        bool    regionPatched  = false;
+        //bool    regionPatched  = false;
 
         for (u32 addr = 0x00100000; addr < 0x40000000; )
         {
@@ -337,6 +340,61 @@ namespace CTRPluginFramework
         return region;
     }
 
+    void        ProcessImpl::GetFreeBlocks(std::vector<MemInfo> &blocks)
+    {
+        Lock lock(MemoryMutex);
+
+        blocks.clear();
+
+        for (u32 addr = 0x00100000; addr < 0x40000000; )
+        {
+            MemInfo     memInfo;
+            PageInfo    pageInfo;
+
+            if (R_SUCCEEDED(svcQueryProcessMemory(&memInfo, &pageInfo, ProcessHandle, addr)))
+            {
+                // If region is FREE, add it to the vector
+                if (memInfo.state == MEMSTATE_FREE)
+                {
+                    blocks.push_back(memInfo);
+                }
+
+                addr = memInfo.base_addr + memInfo.size;
+                continue;
+            }
+
+            addr += 0x1000;
+        }
+    }
+
+    u32         ProcessImpl::GetFreeMemRegion(const u32 size, const u32 searchStart)
+    {
+        Lock lock(MemoryMutex);
+        std::vector<MemInfo> freeBlocks;
+        GetFreeBlocks(freeBlocks);
+
+        // Round up to closest page size
+        u32 realSize = (size & ~0xFFF) + ((size & 0xFFF) ? 0x1000 : 0);
+
+        // Best fit algorithm
+        MemInfo bestFit;
+        bestFit.base_addr = 0;
+        bestFit.size = 0xFFFFFFFF;
+
+        for (auto block : freeBlocks)
+        {
+            if (block.size <= 0x1000 || searchStart >= block.base_addr + block.size) continue;
+            u32 realBlockStart = std::max(searchStart, block.base_addr);
+            u32 realBlockSize = (block.base_addr + block.size) - realBlockStart;
+            if (realBlockSize >= realSize && realBlockSize < bestFit.size)
+            {
+                bestFit.base_addr = realBlockStart;
+                bestFit.size = realBlockSize;
+            }
+        }
+        return bestFit.base_addr;
+    }
+
     void ProcessImpl::EnableExceptionHandlers()
     {
         if (MainThreadTls)
@@ -389,10 +447,9 @@ namespace CTRPluginFramework
         // Resume interrupt reciever and acquire screens
         // NOTE: NEEDS TO BE DISABLED IF THIS FUNCTION IS MADE TO RETURN EXECUTION
         GSP::ResumeInterruptReceiver();
-        ScreenImpl::AcquireFromGsp();
-
-        // Update OSD screens
-        OSDImpl::UpdateScreens();
+        if (!ScreenImpl::AcquireFromGsp(false))
+            // Update OSD screens
+            OSDImpl::UpdateScreens();
 
         // Update memregions, this layout is used by internal checks
         UpdateMemRegions(true);
@@ -400,11 +457,7 @@ namespace CTRPluginFramework
         Process::ExceptionCallbackState ret = Process::EXCB_LOOP;
 
         while (ret == Process::EXCB_LOOP)
-        {
-            Controller::Update();
-
             ret = Process::exceptionCallback(excep, regs);
-        }
 
         switch (ret)
         {

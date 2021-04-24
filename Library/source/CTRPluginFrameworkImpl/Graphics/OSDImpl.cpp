@@ -193,9 +193,7 @@ namespace CTRPluginFramework
 
     u32 GetBPP(GSPFormat format);
 
-    static void    MessColor(u32 startAddr, u32 stride, u32 format);
-
-    u32     OSDImpl::MainCallback(u32 isBottom, int arg2, void *leftFb, void *rightFb, int stride, int format, int arg7)
+    u32     OSDImpl::MainCallback(u32 isBottom, int nextBank, void *leftFb, void *rightFb, int stride, int format, int swap)
     {
         // Only call our OSD callback if left frame buffer is valid
         if (leftFb)
@@ -204,7 +202,7 @@ namespace CTRPluginFramework
         }
 
         if (ProcessImpl::Status == Running)
-            return HookContext::GetCurrent().OriginalFunction<u32>(isBottom, arg2, leftFb, rightFb, stride, format, arg7);
+            return HookContext::GetCurrent().OriginalFunction<u32>(isBottom, nextBank, leftFb, rightFb, stride, format, swap);
 
         return 0;
     }
@@ -351,18 +349,14 @@ namespace CTRPluginFramework
         if (CallbacksTrashBin.size())
         {
             Callbacks.erase(std::remove_if(Callbacks.begin(), Callbacks.end(),
-                            [](OSDCallback cb)
-                            {
-                                auto&   trashbin = CallbacksTrashBin;
-                                auto    foundIter = std::remove(trashbin.begin(), trashbin.end(), cb);
+                [](OSDCallback cb)
+                {
+                    auto&   trashbin = CallbacksTrashBin;
+                    auto    foundIter = std::find(trashbin.begin(), trashbin.end(), cb);
 
-                                if (foundIter == trashbin.end())
-                                    return false;
-
-                                trashbin.erase(foundIter);
-                                return true;
-                            }),
-                            Callbacks.end());
+                    return foundIter != trashbin.end();
+                }),
+                Callbacks.end());
 
             CallbacksTrashBin.clear();
         }
@@ -384,8 +378,8 @@ namespace CTRPluginFramework
             screen.BytesPerPixel = GetBPP((GSPFormat)format);
             screen.Format = (GSPFormat)format;
 
-            for (OSDCallback cb : Callbacks)
-                cb(screen);
+            for (size_t i = 0; i < Callbacks.size(); i++)
+                if (Callbacks[i]) Callbacks[i](screen);
         }
 
         Unlock();
@@ -554,10 +548,9 @@ namespace CTRPluginFramework
         OSDImpl::OSDHook.InitializeForMitm(found, u32(OSDImpl::MainCallback)).Enable();
     }
 
-    // TODO: remove this
-    static void    MessColor(u32 startAddr, u32 stride, u32 format)
+    /*static void    MessColor(u32 startAddr, u32 stride, u32 format)
     {
-        u32 endBuffer = startAddr + (stride * 400);
+        //u32 endBuffer = startAddr + (stride * 400);
         u32 bpp = GetBPP((GSPGPU_FramebufferFormat)format);
 
         PrivColor::SetFormat((GSPGPU_FramebufferFormat)format);
@@ -638,5 +631,5 @@ namespace CTRPluginFramework
                 }
             }
         }
-    }
+    }*/
 }

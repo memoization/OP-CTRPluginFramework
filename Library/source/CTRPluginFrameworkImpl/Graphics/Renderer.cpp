@@ -6,6 +6,7 @@
 #include "CTRPluginFramework/System/Touch.hpp"
 #include "CTRPluginFramework/System/Clock.hpp"
 #include "CTRPluginFrameworkImpl/Preferences.hpp"
+#include "CTRPluginFrameworkImpl/System/Services/Gsp.hpp"
 #include <cstdio>
 #include <cmath>
 
@@ -15,6 +16,8 @@
 
 namespace CTRPluginFramework
 {
+    using namespace CTRPluginFrameworkImpl::Services;
+
     thread_local RendererContext Renderer::_rendererContext;
 
     inline u32   GetFramebufferOffset(int posX, int posY, int bpp, int rowsize)
@@ -88,8 +91,8 @@ namespace CTRPluginFramework
     {
         ScreenImpl  *screen = GetContext()->screen;
 
-        int x = posX;
-        int y = posY;
+        //int x = posX;
+        //int y = posY;
         int w = width;
         int h = height;
 

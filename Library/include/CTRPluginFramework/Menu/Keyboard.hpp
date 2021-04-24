@@ -2,6 +2,7 @@
 #define CTRPLUGINFRAMEWORK_KEYBOARD_HPP
 
 #include "CTRPluginFramework/Graphics/CustomIcon.hpp"
+#include "CTRPluginFramework/System/Controller.hpp"
 #include "types.h"
 #include <string>
 #include <vector>
@@ -9,18 +10,24 @@
 
 namespace CTRPluginFramework
 {
-    class InputChangeEvent
+    class KeyboardEvent
     {
     public:
         enum EventType
         {
             CharacterAdded,
             CharacterRemoved,
-            InputWasCleared
+            InputWasCleared,
+            SelectionChanged,
+            KeyPressed,
+            KeyDown,
+            KeyReleased
         };
 
         EventType   type{};       ///< Type of the event
-        u32         codepoint{0};  ///< The codepoint of the character that thrown the event
+        u32         codepoint{0};  ///< The codepoint of the character that thrown the event (used for CharacterAdded and CharacterRemoved, 0 otherwise)
+        u32         selectedIndex{0}; ///< The entry index in a custom keyboard being selected (used for SelectionChanged, 0 otherwise)
+        Key         affectedKey{(Key)0}; //< Button affected not mapped to any keyboard feature (used for ButtonPressed, ButtonHold and ButtonReleased, 0 otherwise)
     };
 
     class KeyboardImpl;
@@ -39,7 +46,7 @@ namespace CTRPluginFramework
          * \param keyboard  A reference to the Keyboard object that called the callback
          * \event event     The event that caused the input to change
          */
-        using   OnInputChangeCallback = void(*)(Keyboard&, InputChangeEvent &event);
+        using   OnEventCallback = void(*)(Keyboard&, KeyboardEvent &event);
     public:
 
         /**
@@ -80,11 +87,11 @@ namespace CTRPluginFramework
 
         /**
          * \brief Define a callback that will be called when the user change the input \n
-         * Note that if a CompareCallback is set, CompareCallback is called before OnInputChange \n
-         * See OnInputChangeCallback's description for more infos
+         * Note that if a CompareCallback is set, CompareCallback is called before OnKeyboardEvent \n
+         * See OnEventCallback's description for more infos
          * \param callback
          */
-        void    OnInputChange(OnInputChangeCallback callback) const;
+        void    OnKeyboardEvent(OnEventCallback callback) const;
 
         /**
          * \brief Set the error flag and an error message \n
@@ -107,8 +114,8 @@ namespace CTRPluginFramework
         void    Populate(const std::vector<std::string> &input, bool resetScroll = false);
 
         /**
-         * \brief Populate a keyboard with the Icons contained in an std::vector
-         * \param input  A std::vector that contain a list of strings
+         * \brief Populate a keyboard with the CustomIcons contained in an std::vector
+         * \param input A std::vector that contains a list of CustomIcons (icon size must be 30x30 pixels, otherwise a red cross will be displayed)
          * \param resetScroll  Set to true to reset the scroll position if the list is the same size
          */
         void    Populate(const std::vector<CustomIcon>& input, bool resetScroll = false);
@@ -116,6 +123,7 @@ namespace CTRPluginFramework
         /**
          * \brief Open a keyboard which is populated with strings
          * \return -1 : user abort / not populated \n
+         * -2 : closed by event callback \n
          * >= 0 : index of the user choice in the vector
          */
         int     Open(void) const;
@@ -124,6 +132,7 @@ namespace CTRPluginFramework
          * \brief Open the keyboard and wait for user input
          * \param output Where to place the user's input
          * \return -1 : user abort / error \n
+         * -2 : closed by event callback \n
          * 0 : Success
          */
         int     Open(u8 &output) const;
@@ -133,6 +142,7 @@ namespace CTRPluginFramework
          * \param output Where to place the user's input
          * \param start The keyboard will start with this value as input
          * \return -1 : user abort / error \n
+         * -2 : closed by event callback \n
          * 0 : Success
          */
         int     Open(u8 &output, u8 start) const;
@@ -141,6 +151,7 @@ namespace CTRPluginFramework
         * \brief Open the keyboard and wait for user input
         * \param output Where to place the user's input
         * \return -1 : user abort / error \n
+        * -2 : closed by event callback \n
         * 0 : Success
         */
         int     Open(u16 &output) const;
@@ -150,6 +161,7 @@ namespace CTRPluginFramework
         * \param output Where to place the user's input
         * \param start The keyboard will start with this value as input
         * \return -1 : user abort / error \n
+        * -2 : closed by event callback \n
         * 0 : Success
         */
         int     Open(u16 &output, u16 start) const;
@@ -158,6 +170,7 @@ namespace CTRPluginFramework
         * \brief Open the keyboard and wait for user input
         * \param output Where to place the user's input
         * \return -1 : user abort / error \n
+        * -2 : closed by event callback \n
         * 0 : Success
         */
         int     Open(u32 &output) const;
@@ -167,6 +180,7 @@ namespace CTRPluginFramework
         * \param output Where to place the user's input
         * \param start The keyboard will start with this value as input
         * \return -1 : user abort / error \n
+        * -2 : closed by event callback \n
         * 0 : Success
         */
         int     Open(u32 &output, u32 start) const;
@@ -175,6 +189,7 @@ namespace CTRPluginFramework
         * \brief Open the keyboard and wait for user input
         * \param output Where to place the user's input
         * \return -1 : user abort / error \n
+        * -2 : closed by event callback \n
         * 0 : Success
         */
         int     Open(u64 &output) const;
@@ -184,6 +199,7 @@ namespace CTRPluginFramework
         * \param output Where to place the user's input
         * \param start The keyboard will start with this value as input
         * \return -1 : user abort / error \n
+        * -2 : closed by event callback \n
         * 0 : Success
         */
         int     Open(u64 &output, u64 start) const;
@@ -192,6 +208,7 @@ namespace CTRPluginFramework
         * \brief Open the keyboard and wait for user input
         * \param output Where to place the user's input
         * \return -1 : user abort / error \n
+        * -2 : closed by event callback \n
         * 0 : Success
         */
         int     Open(float &output) const;
@@ -201,6 +218,7 @@ namespace CTRPluginFramework
         * \param output Where to place the user's input
         * \param start The keyboard will start with this value as input
         * \return -1 : user abort / error \n
+        * -2 : closed by event callback \n
         * 0 : Success
         */
         int     Open(float &output, float start) const;
@@ -209,6 +227,7 @@ namespace CTRPluginFramework
         * \brief Open the keyboard and wait for user input
         * \param output Where to place the user's input
         * \return -1 : user abort / error \n
+        * -2 : closed by event callback \n
         * 0 : Success
         */
         int     Open(double &output) const;
@@ -218,6 +237,7 @@ namespace CTRPluginFramework
         * \param output Where to place the user's input
         * \param start The keyboard will start with this value as input
         * \return -1 : user abort / error \n
+        * -2 : closed by event callback \n
         * 0 : Success
         */
         int     Open(double &output, double start) const;
@@ -226,6 +246,7 @@ namespace CTRPluginFramework
         * \brief Open the keyboard and wait for user input
         * \param output Where to place the user's input
         * \return -1 : user abort / error \n
+        * -2 : closed by event callback \n
         * 0 : Success
         */
         int     Open(std::string &output) const;
@@ -235,13 +256,14 @@ namespace CTRPluginFramework
         * \param output Where to place the user's input
         * \param start The keyboard will start with this value as input
         * \return -1 : user abort / error \n
+        * -2 : closed by event callback \n
         * 0 : Success
         */
         int     Open(std::string &output, const std::string &start) const;
 
         /**
          * \brief Forcefully close the keyboard without any regard to the error flag \n
-         * (This can only be called from an OnInputChange callback)
+         * (This can only be called from an OnKeyboardEvent callback)
          */
         void    Close(void) const;
 

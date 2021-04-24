@@ -15,17 +15,20 @@
 namespace CTRPluginFramework
 {
     PluginMenuImpl  *PluginMenuImpl::_runningInstance = nullptr;
+    Mutex           PluginMenuImpl::_trashBinMutex;
 
     PluginMenuImpl::PluginMenuImpl(std::string &name, std::string &about, u32 menuType) :
-        _hexEditor(0x00100000),
+
+        OnFirstOpening(nullptr),
+        OnOpening(nullptr),
         _actionReplay{ new PluginMenuActionReplay() },
         _home(new PluginMenuHome(name, (menuType == 1))),
         _search(new PluginMenuSearch(_hexEditor)),
         _tools(new PluginMenuTools(about, _hexEditor)),
         _executeLoop(new PluginMenuExecuteLoop()),
         _guide(new GuideReader()),
-        _forceOpen(false),
-        OnFirstOpening(nullptr), OnOpening{ nullptr }
+        _hexEditor(0x00100000),
+        _forceOpen(false)
     {
         SyncOnFrame = false;
         _isOpen = false;
@@ -52,30 +55,26 @@ namespace CTRPluginFramework
 
     void    PluginMenuImpl::Callback(CallbackPointer callback)
     {
-        bool add = true;
-
-        for (CallbackPointer cb : _callbacks)
-            if (cb == callback)
-                add = false;
-
-        if (add)
+        // If the callback is going to be added, make sure it's not in the trash bin
         {
-            _callbacks.push_back(callback);
+            Lock    lock(_trashBinMutex);
+            if (_callbacksTrashBin.size())
+            {
+                auto it = std::find(_callbacksTrashBin.begin(), _callbacksTrashBin.end(), callback);
+                if (it != _callbacksTrashBin.end()) _callbacksTrashBin.erase(it);
+            }
         }
+
+        if (std::find(_callbacks.begin(), _callbacks.end(), callback) == _callbacks.end())
+            _callbacks.push_back(callback);
     }
 
     void    PluginMenuImpl::RemoveCallback(CallbackPointer callback)
     {
-        bool add = true;
+        Lock    lock(_trashBinMutex);
 
-        for (CallbackPointer cb : _callbacksTrashBin)
-            if (cb == callback)
-                add = false;
-
-        if (add)
-        {
+        if (std::find(_callbacksTrashBin.begin(), _callbacksTrashBin.end(), callback) == _callbacksTrashBin.end())
             _callbacksTrashBin.push_back(callback);
-        }
     }
 
     using KeyVector = std::vector<Key>;
@@ -122,7 +121,7 @@ namespace CTRPluginFramework
     private:
         KeyVector   _sequence;
         Clock       _timer;
-        int         _indexInSequence;
+        u32         _indexInSequence;
     };
 
     /*
@@ -143,7 +142,7 @@ namespace CTRPluginFramework
         PluginMenuTools         &tools = *_tools;
         PluginMenuSearch        &search = *_search;
         GuideReader             &guide = *_guide;
-        PluginMenuExecuteLoop   &executer = *_executeLoop;
+        //PluginMenuExecuteLoop   &executer = *_executeLoop;
 
         Time                    delta;
         std::vector<Event>      eventList;
@@ -209,7 +208,7 @@ namespace CTRPluginFramework
                     {
                         u32 key = Preferences::MenuHotkeys & (1u << i);
 
-                        if (key && event.key.code == key)
+                        if (key && static_cast<u32>(event.key.code) == key)
                         {
                             if (Controller::IsKeysDown(Preferences::MenuHotkeys ^ key))
                                 isHotkeysDown = true;
@@ -274,7 +273,7 @@ namespace CTRPluginFramework
                 }
                 /*
                 else if (mode == 1)
-                { /* Mapper *
+                { // Mapper
 
                 }
                 */
@@ -353,32 +352,27 @@ namespace CTRPluginFramework
                 }
 
                 // Remove callbacks in the trash bin
-                if (_callbacksTrashBin.size())
                 {
-                    _callbacks.erase(std::remove_if(_callbacks.begin(), _callbacks.end(),
-                                    [](CallbackPointer cb)
-                                    {
-                                        auto&   trashbin = _runningInstance->_callbacksTrashBin;
-                                        auto    foundIter = std::remove(trashbin.begin(), trashbin.end(), cb);
+                    Lock    lock(_trashBinMutex);
+                    if (_callbacksTrashBin.size())
+                    {
+                        _callbacks.erase(std::remove_if(_callbacks.begin(), _callbacks.end(),
+                            [](CallbackPointer cb)
+                        {
+                            auto&   trashbin = _runningInstance->_callbacksTrashBin;
+                            auto    foundIter = std::find(trashbin.begin(), trashbin.end(), cb);
 
-                                        if (foundIter == trashbin.end())
-                                            return false;
+                            return foundIter != trashbin.end();
+                        }),
+                            _callbacks.end());
 
-                                        trashbin.erase(foundIter);
-                                        return true;
-                                    }),
-                                     _callbacks.end());
-
-                    _callbacksTrashBin.clear();
+                        _callbacksTrashBin.clear();
+                    }
                 }
 
                 // Execute callbacks before cheats
-
-                for (int i = 0; i < _callbacks.size(); i++) {
-                    auto cb = _callbacks[i];
-                    if (cb) cb();
-                    if (i < _callbacks.size() && _callbacks[i] != cb) i--; // This callback removed itself
-                }
+                for (size_t i = 0; i < _callbacks.size(); i++)
+                    if (_callbacks[i]) _callbacks[i]();
 
                 // Execute activated cheats
                 PluginMenuExecuteLoop::ExecuteBuiltin();
@@ -470,7 +464,7 @@ namespace CTRPluginFramework
         u32     buffer[50];
         MenuFolderImpl      *folder = _runningInstance->_home->_root;
 
-        for (int count = 0; count < header.hotkeysCount; count++)
+        for (size_t count = 0; count < header.hotkeysCount; count++)
         {
             if (settings.Read(buffer, sizeof(u32) * 2) == 0)
             {
@@ -485,7 +479,7 @@ namespace CTRPluginFramework
 
                     if (entry->Hotkeys.Count() == buffer[1])
                     {
-                        for (int i = 0; i < buffer[1]; i++)
+                        for (u32 i = 0; i < buffer[1]; i++)
                         {
                             entry->Hotkeys[i] = buffer[2 + i];
                             if (callback != nullptr)
@@ -577,7 +571,7 @@ namespace CTRPluginFramework
                 hInfos.uid = item->Uid;
                 hInfos.count = entry->Hotkeys.Count();
 
-                for (int j = 0; j < hInfos.count; j++)
+                for (u32 j = 0; j < hInfos.count; j++)
                 {
                     Hotkey &hk = entry->Hotkeys[j];
 

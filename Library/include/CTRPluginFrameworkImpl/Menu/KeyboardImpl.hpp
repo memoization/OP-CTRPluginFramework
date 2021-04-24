@@ -26,7 +26,7 @@ namespace CTRPluginFramework
     {
         using   CompareCallback = bool (*)(const void *, std::string&);
         using   ConvertCallback = void *(*)(std::string&, bool);
-        using   OnInputChangeCallback = void(*)(Keyboard&, InputChangeEvent&);
+        using   OnEventCallback = void(*)(Keyboard&, KeyboardEvent&);
         using   KeyIter  = std::vector<TouchKey>::iterator;
         using   KeyStringIter  = std::vector<TouchKeyString>::iterator;
     public:
@@ -38,7 +38,7 @@ namespace CTRPluginFramework
         void        SetLayout(Layout layout);
         void        SetHexadecimal(bool isHex);
         bool        IsHexadecimal(void) const;
-        void        SetMaxInput(int max);
+        void        SetMaxInput(u32 max);
         void        CanAbort(bool canAbort);
         void        CanChangeLayout(bool canChange);
         std::string &GetInput(void);
@@ -48,7 +48,7 @@ namespace CTRPluginFramework
 
         void        SetConvertCallback(ConvertCallback callback);
         void        SetCompareCallback(CompareCallback callback);
-        void        OnInputChange(OnInputChangeCallback callback);
+        void        OnKeyboardEvent(OnEventCallback callback);
         void        ChangeSelectedEntry(int entry);
         void        Populate(const std::vector<std::string>& input, bool resetScroll);
         void        Populate(const std::vector<CustomIcon>& input, bool resetScroll);
@@ -88,6 +88,8 @@ namespace CTRPluginFramework
 
         bool    _CheckButtons(int &ret); //<- for string button
 		void    _HandleManualKeyPress(Key key);
+        void    _ClearKeyboardEvent();
+        void    _ChangeManualKey(int newVal);
 
         Keyboard                *_owner{nullptr};
 
@@ -108,7 +110,7 @@ namespace CTRPluginFramework
         bool                    _useSymbols{false};
         bool                    _useNintendo{false};
         float                   _offset{0.f};
-        int                     _max{0};
+        u32                     _max{0};
         u8                      _symbolsPage{0};
         u8                      _nintendoPage{0};
         Layout                  _layout{HEXADECIMAL};
@@ -119,8 +121,8 @@ namespace CTRPluginFramework
 
         CompareCallback         _compare{nullptr};
         ConvertCallback         _convert{nullptr};
-        OnInputChangeCallback   _onInputChange{nullptr};
-        InputChangeEvent        _inputChangeEvent{};
+        OnEventCallback   _onKeyboardEvent{nullptr};
+        KeyboardEvent        _KeyboardEvent{};
         std::vector<TouchKey>    *_keys{nullptr};
 
         static std::vector<TouchKey>    _DecimalKeys;
@@ -128,9 +130,10 @@ namespace CTRPluginFramework
         static std::vector<TouchKey>    _QwertyKeys;
 
         // Custom keyboard stuff
-		int						_manualKey{0};
-		bool					_manualScrollUpdate{false};
-		bool					_userSelectedKey{false};
+        int                     _manualKey{0};
+        int                     _prevManualKey{-2};
+        bool                    _manualScrollUpdate{false};
+        bool                    _userSelectedKey{false};
         bool                    _customKeyboard{false};
         bool                    _displayScrollbar{false};
         bool                    _isIconKeyboard{false};

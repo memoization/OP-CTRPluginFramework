@@ -1,66 +1,13 @@
 #ifndef CTRPLUGINFRAMEWORK_SCREENIMPL_HPP
 #define CTRPLUGINFRAMEWORK_SCREENIMPL_HPP
 
-#include "3ds.h"
+#include <3ds.h>
 #include "CTRPluginFrameworkImpl/Graphics/BMPImage.hpp"
+#include "CTRPluginFrameworkImpl/System/Services/Gsp.hpp"
 
 namespace CTRPluginFramework
 {
-    namespace GSP
-    {
-        enum
-        {
-            TOP_SCREEN = 0,
-            BOTTOM_SCREEN = 1
-        };
-
-        union  FrameBufferInfoHeader
-        {
-            s32     header;
-            struct
-            {
-                u8  screen;
-                u8  update;
-            };
-        };
-
-        struct FrameBufferInfo
-        {
-	        u32 active_framebuf;        ///< Active framebuffer. (0 = first, 1 = second)
-	        u32 *framebuf0_vaddr;       ///< Framebuffer virtual address, for the main screen this is the 3D left framebuffer.
-	        u32 *framebuf1_vaddr;       ///< For the main screen: 3D right framebuffer address.
-	        u32 framebuf_widthbytesize; ///< Value for 0x1EF00X90, controls framebuffer width.
-	        u32 format;                 ///< Framebuffer format, this u16 is written to the low u16 for LCD register 0x1EF00X70.
-	        u32 framebuf_dispselect;    ///< Value for 0x1EF00X78, controls which framebuffer is displayed.
-	        u32 unk;                    ///< Unknown.
-
-            void    FillFrameBufferFrom(FrameBufferInfo& src);
-        };
-
-        struct FrameBufferInfoShared
-        {
-            FrameBufferInfoHeader     header;
-            FrameBufferInfo           fbInfo[2];
-
-            void    FillFrameBuffersFrom(FrameBufferInfoShared& src);
-        };
-
-        extern u32  InterruptReceiverThreadPriority;
-
-        Result  Initialize(void);
-        void    Update(u32 threadId, Handle eventHandle, Handle sharedMemHandle);
-        void    PauseInterruptReceiver(void);
-        void    ResumeInterruptReceiver(void);
-        void    TriggerAllEvents(void);
-        void    WaitForVBlank(void);
-        void    WaitForVBlank1(void);
-        void    SwapBuffer(int screen);
-        // 0: Top, 1: Bottom, 3: Both
-        void    WaitBufferSwapped(int screen);
-
-        void    ImportFrameBufferInfo(FrameBufferInfoShared& dest, int screen);
-        void    SetFrameBufferInfo(FrameBufferInfoShared& src, int screen, bool convert);
-    }
+    using namespace CTRPluginFrameworkImpl::Services::GSP;
 
     enum
     {
@@ -101,12 +48,15 @@ namespace CTRPluginFramework
         // Switch displayed fb game <=> ctrpf
         static void                 SwitchFrameBuffers(bool game);
         static void                 ApplyFading(void);
-        static u32                  AcquireFromGsp(void);
+
+        // Return non zero on failure
+        static u32                  AcquireFromGsp(bool fade = true);
+        // Return non zero on failure
         static u32                  CheckGspFrameBuffersInfo(void);
 
         void                        Fade(const float fade);
         void                        Flush(void);
-		void						Invalidate(void);
+        void                        Invalidate(void);
 
         // Clear Framebuffer + apply fade effect
         void                        Clear(bool applyFlagForCurrent);
@@ -115,7 +65,9 @@ namespace CTRPluginFramework
         void                        Debug(void);
 
         // Fetch Game's FrameBufferInfo and swap to CTRPF FrameBufferInfo
-        u32                         Acquire(void);
+        // Return non zero on failure
+        u32                         Acquire(bool fade = true);
+        // Return non zero on failure
         u32                         ImportFromGsp(void);
 
         // Rewrite Game's FrameBufferInfo
@@ -135,6 +87,7 @@ namespace CTRPluginFramework
         u32                         GetRowSize(void) const;
         u32                         GetBytesPerPixel(void) const;
         u32                         GetFrameBufferSize(void) const;
+        u32                         GetCurrentBufferID(void) const;
 
         void                        GetFrameBufferInfos(int &rowstride, int &bpp, GSPGPU_FramebufferFormat &format) const;
 
@@ -146,9 +99,12 @@ namespace CTRPluginFramework
 
     private:
         friend class Renderer;
-        friend void                 KeepThreadMain(void *);
+        friend void  CTRPluginFrameworkImpl::Services::GSP::Update(u32 threadId, Handle eventHandle, Handle sharedMemHandle);
+        friend void  KeepThreadMain(void *);
 
         static void                 Initialize(void);
+        // Displays ctrpf' screens without setting internal state as "screen captured"
+        static void                 ApplyCtrpfScreens(void);
 
         u32                         _LCDSetup;  ///< Address of this screen LCD configuration
         u32                         _FillColor; ///< Address of this screen fill color register
@@ -165,8 +121,8 @@ namespace CTRPluginFramework
         bool                        _isTopScreen;
         bool                        _isGspAcquired{false};
         GSPGPU_FramebufferFormat    _format;
-        GSP::FrameBufferInfoShared  _frameBufferInfo{};
-        GSP::FrameBufferInfoShared  _gameFrameBufferInfo{};
+        FrameBufferInfoShared       _frameBufferInfo{};
+        FrameBufferInfoShared       _gameFrameBufferInfo{};
     };
 }
 
