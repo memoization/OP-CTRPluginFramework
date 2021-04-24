@@ -2,6 +2,7 @@
 #define CTRPLUGINFRAMEWORK_SOUND_SOUND_HPP
 
 #include "types.h"
+#include "3ds.h"
 #include <string>
 
 namespace CTRPluginFramework
