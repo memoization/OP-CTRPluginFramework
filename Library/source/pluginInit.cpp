@@ -457,17 +457,6 @@ namespace CTRPluginFramework
     #define BUTTON_X          (1 << 10)
     #define BUTTON_Y          (1 << 11)
 
-    static void flash(u32 color)
-    {
-        color |= 0x01000000;
-        for (u32 i = 0; i < 64; i++)
-        {
-            REG32(0x10202204) = color;
-            svcSleepThread(5000000);
-        }
-        REG32(0x10202204) = 0;
-    }
-
     extern "C"
     int   __entrypoint(int arg)
     {
