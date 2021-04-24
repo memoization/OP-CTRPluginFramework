@@ -132,13 +132,13 @@ namespace CTRPluginFramework
         FILE = 2
     };
     static Hook         g_FsTryOpenFileHook;
-    static u32          g_HookMode = NONE;
+    //static u32          g_HookMode = NONE;
     //static u32          g_returncode[4];
     static File         g_hookExportFile;
     u32                 g_FsTryOpenFileAddress = 0;
-    static LightLock    g_OpenFileLock;
+    //static LightLock    g_OpenFileLock;
 
-    static u32      FindNearestSTMFD(u32 addr)
+    /*static u32      FindNearestSTMFD(u32 addr)
     {
         for (u32 i = 0; i < 1024; i++)
         {
@@ -147,9 +147,9 @@ namespace CTRPluginFramework
                 return addr;
         }
         return (0);
-    }
+    }*/
 
-    static void      FindFunction(u32 &FsTryOpenFile)
+    /*static void      FindFunction(u32 &FsTryOpenFile)
     {
         const u8 tryOpenFilePat1[] = { 0x0D, 0x10, 0xA0, 0xE1, 0x00, 0xC0, 0x90, 0xE5, 0x04, 0x00, 0xA0, 0xE1, 0x3C, 0xFF, 0x2F, 0xE1 };
         const u8 tryOpenFilePat2[] = { 0x10, 0x10, 0x8D, 0xE2, 0x00, 0xC0, 0x90, 0xE5, 0x05, 0x00, 0xA0, 0xE1, 0x3C, 0xFF, 0x2F, 0xE1 };
@@ -166,10 +166,10 @@ namespace CTRPluginFramework
             }
             addr++;
         }
-    }
+    }*/
 
     // TODO: clean this whole code
-    static u32      FsTryOpenFileCallback(u32 a1, u16 *fileName, u32 mode);
+    /*static u32      FsTryOpenFileCallback(u32 a1, u16 *fileName, u32 mode);
     static bool     InitFsTryOpenFileHook(void)
     {
         static bool isInitialized = false;
@@ -177,12 +177,12 @@ namespace CTRPluginFramework
         if (isInitialized)
             return isInitialized;
 
-        /*auto  createReturncode = [](u32 address, u32 *buf)
+        auto  createReturncode = [](u32 address, u32 *buf)
         {
             Process::CopyMemory(buf, (void *)address, 8);
             buf[2] = 0xE51FF004;
             buf[3] = address + 8;
-        };*/
+        };
 
         // Hook on OpenFile
         u32     FsTryOpenFileAddress = 0;
@@ -253,9 +253,9 @@ namespace CTRPluginFramework
         LightLock_Unlock(&g_OpenFileLock);
 
         return HookContext::GetCurrent().OriginalFunction<u32>(a1, fileName, mode);
-    }
+    }*/
 
-    static void    _DisplayLoadedFiles(MenuEntryTools *entry)
+    /*static void    _DisplayLoadedFiles(MenuEntryTools *entry)
     {
         // If we must enable the hook
         if (entry->WasJustActivated())
@@ -280,9 +280,9 @@ namespace CTRPluginFramework
             if (g_HookMode == 0)
                 g_FsTryOpenFileHook.Disable();
         }
-    }
+    }*/
 
-    static void    _WriteLoadedFiles(MenuEntryTools *entry)
+    /*static void    _WriteLoadedFiles(MenuEntryTools *entry)
     {
         // If we must enable the hook
         if (entry->WasJustActivated())
@@ -328,7 +328,7 @@ namespace CTRPluginFramework
             if (g_HookMode == 0)
                 g_FsTryOpenFileHook.Disable();
         }
-    }
+    }*/
 
     static bool     ConfirmBeforeProceed(const std::string &task)
     {
@@ -492,7 +492,7 @@ namespace CTRPluginFramework
         Screenshot::UpdateFileCount();
     }
 
-    static void EditBacklight(MenuEntryTools *entry)
+    /*static void EditBacklight(MenuEntryTools *entry)
     {
         using LCDBacklight = Preferences::LCDBacklight;
 
@@ -552,7 +552,7 @@ namespace CTRPluginFramework
                 Preferences::Backlights[userchoice == 3].value = backlight;
             }
         }
-    }
+    }*/
 
     void    PluginMenuTools::InitMenu(void)
     {

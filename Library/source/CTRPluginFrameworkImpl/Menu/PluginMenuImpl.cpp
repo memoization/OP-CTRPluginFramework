@@ -141,7 +141,7 @@ namespace CTRPluginFramework
         PluginMenuHome          &home = *_home;
         PluginMenuTools         &tools = *_tools;
         PluginMenuSearch        &search = *_search;
-        GuideReader             &guide = *_guide;
+        //GuideReader             &guide = *_guide;
         //PluginMenuExecuteLoop   &executer = *_executeLoop;
 
         Time                    delta;
@@ -304,7 +304,7 @@ namespace CTRPluginFramework
                 // End frame
                 Renderer::EndFrame(shouldClose);
 
-            __skip:
+            //__skip:
                 if (OnFirstOpening != nullptr)
                 {
                     static u32 count = 0;
