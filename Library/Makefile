@@ -70,6 +70,7 @@ DEFINES	:=	-DCTRPF_VERSION_MAJOR="\"$(CTRPF_VERSION_MAJOR)\"" -DCTRPF_VERSION_MI
 			-DCTRPF_VERSION_BUILD="\"$(CTRPF_VERSION_BUILD)\"" -DCOMMIT_HASH="\"$(COMMIT)\"" -DCOMPILE_DATE="\"$(COMPILE_DATE)\""
 
 CFLAGS	:=	-Wall -Werror -Wno-psabi -mword-relocations \
+			-DCWAV_DIRECT_SOUND_IMPLEMENTED \
 			-ffunction-sections \
 			-fdata-sections \
 			$(ARCH) \
