@@ -154,7 +154,7 @@ libcwav-update: libcwav
 	@cd libcwav && git pull
 
 libcwav-build: libcwav-update
-	@cd libcwav && $(MAKE)
+	@cd libcwav && CFLAGS='-DCWAV_DISABLE_DSP' $(MAKE)
 
 lib:
 	@[ -d $@ ] || mkdir -p $@
