@@ -21,7 +21,7 @@ namespace CTRPluginFramework
         _cwav.dataBuffer = static_cast<void *>(::operator new(fileSize, std::nothrow));
         if (_cwav.dataBuffer == nullptr)
         {
-            _cwav.loadStatus = CWAV_FILE_TOO_LARGE;
+            _cwav.loadStatus = CWAV_FILE_READ_FAILED;
             return;
         }
 
