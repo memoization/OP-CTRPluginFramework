@@ -6,6 +6,27 @@
 
 namespace CTRPluginFramework
 {
+
+    struct DirectSoundModifiers
+    {
+        float speedMultiplier; ///< Sound speed multiplier.
+        float leftChannelVolume; ///< Volume for the left channel [0, 1].
+        float rightChannelVolume; ///< Volume for the right channel [0, 1].
+        bool ignoreVolumeSlider; ///< Ignore the volume slider.
+        bool forceSpeakerOutput; ///< Force playback through the speakers.
+        bool playOnSleep; ///< Allow playing the sound during sleep mode.
+
+        DirectSoundModifiers()
+        {
+            speedMultiplier = 1.f;
+            leftChannelVolume = 1.f;
+            rightChannelVolume = 1.f;
+            ignoreVolumeSlider = false;
+            forceSpeakerOutput = false;
+            playOnSleep = false;
+        }
+    };
+
     class Sound
     {
     public:
@@ -19,7 +40,7 @@ namespace CTRPluginFramework
 
             // Load status values.
             FILE_OPEN_FAILED = 3, ///< Failed to open the specified file.
-            FILE_TOO_LARGE = 4, ///< The file is too large to fit in the available memory.
+            FILE_READ_FAILED = 4, ///< The file is too large to fit in the available memory.
             UNKNOWN_FILE_FORMAT = 5, ///< The specified file is not a valid CWAV file.
             INVAID_INFO_BLOCK = 6, ///< The INFO block in the CWAV file is invalid or not supported.
             INVAID_DATA_BLOCK = 7, ///< The DATA block in the CWAV file is invalid or not supported.
@@ -138,6 +159,17 @@ namespace CTRPluginFramework
          * \return Result from the CWAVStatus enum.
         */
         CWAVStatus Play(int leftEarChannel, int rightEarChannel);
+
+        /**
+         * \brief Plays the specified channels with a CSND direct sound (allows multiple modifiers).
+         * \param leftEarChannel Left ear channel to play, in the range [0, GetChannelAmount() - 1].
+         * \param rightEarChannel Right each channel to play (-1 to disable), in the range [0, GetChannelAmount() - 1].
+         * \param directSoundChannel Direct sound channel to play the sound on, in the range [0, 3].
+         * \param priority Direct sound priority, lower value means higher priority, in the range [0, 31].
+         * \param modifiers Apply modifiers to the direct sound, see DirectSoundModifiers
+         * \return Whether the operation was successful or not.
+        */
+        bool PlayDirectly(int leftEarChannel, int rightEarChannel, u32 directSoundChannel, u32 priority, DirectSoundModifiers& modifiers);
 
         /**
          * \brief Stops all the playing channels.

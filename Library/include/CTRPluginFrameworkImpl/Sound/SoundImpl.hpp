@@ -2,6 +2,7 @@
 #define CTRPLUGINFRAMEWORK_SOUND_SOUND_IMPL_HPP
 
 #include "cwav.h"
+#include "../../CTRPluginFramework/Sound/Sound.hpp"
 #include <vector>
 #include <string>
 
@@ -30,6 +31,8 @@ namespace CTRPluginFramework
         bool IsLooped();
 
         cwavStatus_t Play(int leftEarChannel, int rightEarChannel);
+
+        bool PlayDirectly(int leftEarChannel, int rightEarChannel, u32 directSoundChannel, u32 priority, DirectSoundModifiers& modifiers);
 
         void Stop(int leftEarChannel, int rightEarChannel);
 

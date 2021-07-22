@@ -183,7 +183,7 @@ namespace CTRPluginFramework
         fsInit();
         hidInit();
         cfguInit();
-        csndInit();
+        ncsndInit(false);
         plgLdrInit();
 
         // Set cwav VA to PA function
@@ -320,7 +320,7 @@ namespace CTRPluginFramework
                     SoundEngineImpl::NotifyAptEvent(APT_HookType::APTHOOK_ONSUSPEND);
 
                     // Close csnd as it may be needed by other processes (4 sessions max.)
-                    csndExit();
+                    ncsndExit();
 
                     // Un-map hook memory
                     HookManager::Lock();
@@ -338,7 +338,7 @@ namespace CTRPluginFramework
                     HookManager::Unlock();
 
                     // Init csnd again.
-                    csndInit();
+                    ncsndInit(false);
 
                     SoundEngineImpl::NotifyAptEvent(APT_HookType::APTHOOK_ONRESTORE);
 
@@ -358,7 +358,7 @@ namespace CTRPluginFramework
                     PluginMenuImpl::ForceExit();
 
                     // Close some handles
-                    csndExit();
+                    ncsndExit();
                     hidExit();
                     cfguExit();
                     fsExit();

@@ -85,8 +85,8 @@ ASFLAGS	:=	$(G) $(ARCH) $(INCLUDE) -Os -Wl,$(WL)--gc-sections
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBS	:= -lctru -lm -lcwav
-LIBDIRS	:= $(CTRULIB) $(CURDIR)/libcwav
+LIBS	:= -lctru -lm -lcwav -lncsnd
+LIBDIRS	:= $(CTRULIB) $(CURDIR)/libcwav $(CURDIR)/libcwav/libncsnd
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -148,12 +148,13 @@ install: dist
 	@echo "CTRPF was successfully installed in $(DESTDIR)$(DEVKITPRO)/libctrpf"
 
 libcwav:
-	@git clone https://github.com/mariohackandglitch/libcwav.git $@
+	@git clone --recursive https://github.com/mariohackandglitch/libcwav.git $@
 
 libcwav-update: libcwav
 	@cd libcwav && git pull
 
 libcwav-build: libcwav-update
+	@cd libcwav/libncsnd && $(MAKE)
 	@cd libcwav && CFLAGS='-DCWAV_DISABLE_DSP' $(MAKE)
 
 lib:
@@ -172,10 +173,12 @@ lib/libctrpf.a : libcwav-build lib release
 	--no-print-directory -C release	-f $(CURDIR)/Makefile
 	@rm release/PluginMenuTools.o # Force update of revision, date etc
 	@cp $(CURDIR)/libcwav/lib/libcwav.a lib/libcwav.a
+	@cp $(CURDIR)/libcwav/libncsnd/lib/libncsnd.a lib/libncsnd.a
 	@mv $@ $@tmp
-	@$(AR) -M <<< $$'create $@ \naddlib $@tmp \naddlib lib/libcwav.a\nsave\nend'
+	@$(AR) -M <<< $$'create $@ \naddlib $@tmp \naddlib lib/libcwav.a\naddlib lib/libncsnd.a\nsave\nend'
 	@rm $@tmp
 	@rm lib/libcwav.a
+	@rm lib/libncsnd.a
 
 lib/libctrpfd.a : SHELL := /bin/bash
 lib/libctrpfd.a : libcwav-build lib debug
@@ -183,10 +186,12 @@ lib/libctrpfd.a : libcwav-build lib debug
 	DEPSDIR=$(CURDIR)/debug --no-print-directory -C debug -f $(CURDIR)/Makefile
 	@rm debug/PluginMenuTools.o # Force update of revision, date etc.
 	@cp $(CURDIR)/libcwav/lib/libcwav.a lib/libcwav.a
+	@cp $(CURDIR)/libcwav/libncsnd/lib/libncsnd.a lib/libncsnd.a
 	@mv $@ $@tmp
-	@$(AR) -M <<< $$'create $@ \naddlib $@tmp \naddlib lib/libcwav.a\nsave\nend'
+	@$(AR) -M <<< $$'create $@ \naddlib $@tmp \naddlib lib/libcwav.a\naddlib lib/libncsnd.a\nsave\nend'
 	@rm $@tmp
 	@rm lib/libcwav.a
+	@rm lib/libncsnd.a
 
 #---------------------------------------------------------------------------------
 clean:

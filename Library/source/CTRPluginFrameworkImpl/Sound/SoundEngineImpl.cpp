@@ -22,7 +22,7 @@ namespace CTRPluginFramework
 
     void SoundEngineImpl::NotifyAptEvent(APT_HookType event)
     {
-        cwavNotifyAptEvent(event);
+        ncsndNotifyAptEvent(event);
     }
 
     void SoundEngineImpl::SetVaToPaConvFunction(vaToPaCallback_t function)

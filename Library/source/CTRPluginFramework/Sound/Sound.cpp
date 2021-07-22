@@ -159,6 +159,14 @@ namespace CTRPluginFramework
             return CWAVStatus::NOT_ALLOCATED;
     }
 
+    bool Sound::PlayDirectly(int leftEarChannel, int rightEarChannel, u32 directSoundChannel, u32 priority, DirectSoundModifiers& modifiers)
+    {
+        if (_soundImpl)
+            return PublicToImpl(_soundImpl)->PlayDirectly(leftEarChannel, rightEarChannel, directSoundChannel, priority, modifiers);
+        else
+            return false;
+    }
+
     void Sound::Stop()
     {
         Stop(-1);

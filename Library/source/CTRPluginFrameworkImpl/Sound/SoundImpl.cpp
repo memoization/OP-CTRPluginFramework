@@ -77,6 +77,20 @@ namespace CTRPluginFramework
         return cwavPlay(&_cwav, leftEarChannel, rightEarChannel).playStatus;
     }
 
+    bool SoundImpl::PlayDirectly(int leftEarChannel, int rightEarChannel, u32 directSoundChannel, u32 priority, DirectSoundModifiers& modifiers)
+    {
+        ncsndDirectSoundModifiers mod;
+        mod.speedMultiplier = modifiers.speedMultiplier;
+        mod.channelVolumes[0] = modifiers.leftChannelVolume * NCSND_DIRECTSOUND_MAX_VOLUME;
+        mod.channelVolumes[1] = modifiers.rightChannelVolume * NCSND_DIRECTSOUND_MAX_VOLUME;
+        mod.unknown1 = 1.f;
+        mod.ignoreVolumeSlider = modifiers.ignoreVolumeSlider ? 1 : 0;
+        mod.forceSpeakerOutput = modifiers.forceSpeakerOutput ? 1 : 0;
+        mod.playOnSleep = modifiers.playOnSleep ? 1 : 0;
+
+        return cwavPlayAsDirectSound(&_cwav, leftEarChannel, rightEarChannel, directSoundChannel, priority, &mod);
+    }
+
     void SoundImpl::Stop(int leftEarChannel, int rightEarChannel)
     {
         cwavStop(&_cwav, leftEarChannel, rightEarChannel);
