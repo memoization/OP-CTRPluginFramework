@@ -79,16 +79,16 @@ namespace CTRPluginFramework
 
     bool SoundImpl::PlayDirectly(int leftEarChannel, int rightEarChannel, u32 directSoundChannel, u32 priority, DirectSoundModifiers& modifiers)
     {
-        ncsndDirectSoundModifiers mod;
-        mod.speedMultiplier = modifiers.speedMultiplier;
-        mod.channelVolumes[0] = modifiers.leftChannelVolume * NCSND_DIRECTSOUND_MAX_VOLUME;
-        mod.channelVolumes[1] = modifiers.rightChannelVolume * NCSND_DIRECTSOUND_MAX_VOLUME;
-        mod.unknown1 = 1.f;
-        mod.ignoreVolumeSlider = modifiers.ignoreVolumeSlider ? 1 : 0;
-        mod.forceSpeakerOutput = modifiers.forceSpeakerOutput ? 1 : 0;
-        mod.playOnSleep = modifiers.playOnSleep ? 1 : 0;
+        ncsndDirectSound dirSound;
+        ncsndInitializeDirectSound(&dirSound);
+        dirSound.soundModifiers.speedMultiplier = modifiers.speedMultiplier;
+        dirSound.soundModifiers.channelVolumes[0] *= modifiers.leftChannelVolume;
+        dirSound.soundModifiers.channelVolumes[1] *= modifiers.rightChannelVolume;
+        dirSound.soundModifiers.ignoreVolumeSlider = modifiers.ignoreVolumeSlider ? 1 : 0;
+        dirSound.soundModifiers.forceSpeakerOutput = modifiers.forceSpeakerOutput ? 1 : 0;
+        dirSound.soundModifiers.playOnSleep = modifiers.playOnSleep ? 1 : 0;
 
-        return cwavPlayAsDirectSound(&_cwav, leftEarChannel, rightEarChannel, directSoundChannel, priority, &mod);
+        return cwavPlayAsDirectSound(&_cwav, leftEarChannel, rightEarChannel, directSoundChannel, priority, &dirSound.soundModifiers);
     }
 
     void SoundImpl::Stop(int leftEarChannel, int rightEarChannel)
