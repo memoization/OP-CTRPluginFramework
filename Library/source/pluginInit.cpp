@@ -213,6 +213,7 @@ namespace CTRPluginFramework
         settings.AllowSearchEngine = true;
         settings.WaitTimeToBoot = Seconds(5.f);
         settings.TryLoadSDSounds = true;
+        settings.CachedDrawMode = false;
 
         // Set default theme
         FwkSettings::SetThemeDefault();
