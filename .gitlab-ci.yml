@@ -43,7 +43,7 @@ build:
     - job: prep
 
 deploy-hourly:
-    image: python3
+    image: python:3
     stage: deploy
     extends:
     - .vars-global
@@ -60,7 +60,7 @@ deploy-hourly:
         artifacts: true
 
 deploy-hourly-merge_requests:
-    image: python3
+    image: python:3
     stage: deploy
     extends:
     - .vars-global
