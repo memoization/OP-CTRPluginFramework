@@ -127,7 +127,11 @@ namespace Services
                 {
                     addr = Utils::Search(0x00100000, Process::GetTextSize(), gspgpuRegisterInterruptPattern2);
                     if (!addr)
+                    {
+                        fond = 0;
                         break;
+                    }
+                        
 
                     u32 *a = (u32 *)addr;
                     for (u32 i = 0; i < 20; ++i)
