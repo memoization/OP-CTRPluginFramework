@@ -127,7 +127,7 @@ namespace Services
                 {
                     addr = Utils::Search(0x00100000, Process::GetTextSize(), gspgpuRegisterInterruptPattern2);
                     if (!addr)
-                        return -1;
+                        break;
 
                     u32 *a = (u32 *)addr;
                     for (u32 i = 0; i < 20; ++i)
@@ -139,12 +139,17 @@ namespace Services
                         }
                     }
                 }
-                if (!found)
-                    return -1;
-
-                hook.Initialize(addr + 0x28, (u32)GSPGPU__RegisterInterruptHook).SetFlags(USE_LR_TO_RETURN);
-                hook.Enable();
             }
+
+            if (!found)
+            {
+                addr = Utils::Search(0x00100000, Process::GetTextSize(), gspgpuRegisterInterruptPattern2);
+                if (!addr)
+                    return -1;
+            }
+
+            hook.Initialize(addr + 0x28, (u32)GSPGPU__RegisterInterruptHook).SetFlags(USE_LR_TO_RETURN);
+            hook.Enable();
 
             svcCreateEvent(&WakeEvent, RESET_ONESHOT);
             LightEvent_Init(&VBlank0Event, RESET_STICKY);
