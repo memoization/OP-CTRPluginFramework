@@ -120,6 +120,7 @@ namespace Services
             {
                 hook.Initialize(addr + 0x2C, (u32)GSPGPU__RegisterInterruptHook).SetFlags(USE_LR_TO_RETURN);
                 hook.Enable();
+                found = 1;
             }
             else
             {
