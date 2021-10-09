@@ -129,7 +129,7 @@ namespace Services
                     addr = Utils::Search(0x00100000, Process::GetTextSize(), gspgpuRegisterInterruptPattern2);
                     if (!addr)
                     {
-                        fond = 0;
+                        found = 0;
                         break;
                     }
                         
