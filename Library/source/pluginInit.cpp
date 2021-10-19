@@ -393,9 +393,9 @@ namespace CTRPluginFramework
         Font::Initialize();
         {
             // If /cheats/ doesn't exists, create it
-            const char *dirpath = "/cheats";
+            /*const char *dirpath = "/cheats";
             if (!Directory::IsExists(dirpath))
-                Directory::Create(dirpath);
+                Directory::Create(dirpath);*/
         }
 
         // Set AR file path
@@ -408,8 +408,8 @@ namespace CTRPluginFramework
         {
             // If /Screenshots/ doesn't exists, create it
             const char *dirpath = "/Screenshots";
-            if (!Directory::IsExists(dirpath))
-                Directory::Create(dirpath);
+            /*if (!Directory::IsExists(dirpath))
+                Directory::Create(dirpath);*/
 
             // Set default screenshot path
             Screenshot::Path = dirpath;
