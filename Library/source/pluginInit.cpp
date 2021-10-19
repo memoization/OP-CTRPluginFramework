@@ -6,6 +6,7 @@
 #include "CTRPluginFrameworkImpl/System/Screenshot.hpp"
 #include "CTRPluginFrameworkImpl/System/HookManager.hpp"
 #include "CTRPluginFrameworkImpl/System/Services/Gsp.hpp"
+#include "CTRPluginFrameworkImpl/Sound.hpp"
 #include "csvc.h"
 #include "plgldr.h"
 
@@ -105,7 +106,7 @@ void     OnLoadCro(void)
 namespace CTRPluginFramework
 {
     void WEAK_SYMBOL    PatchProcess(FwkSettings& settings) {}
-    void WEAK_SYMBOL    DebugFromStart(void);
+    void WEAK_SYMBOL    EarlyCallback(u32* savedInstructions);
     void WEAK_SYMBOL    OnProcessExit(void) {}
     void WEAK_SYMBOL    OnPluginToSwap(void) {}
     void WEAK_SYMBOL    OnPluginFromSwap(void) {}
@@ -182,7 +183,12 @@ namespace CTRPluginFramework
         fsInit();
         hidInit();
         cfguInit();
+        ncsndInit(false);
         plgLdrInit();
+
+        // Set cwav VA to PA function
+        SoundEngineImpl::Initializelibcwav();
+        SoundEngineImpl::SetVaToPaConvFunction([](const void* addr) {return svcConvertVAToPA(addr, false);});
 
         // Initialize Kernel stuff
         Kernel::Initialize();
@@ -206,6 +212,8 @@ namespace CTRPluginFramework
         settings.AllowActionReplay = true;
         settings.AllowSearchEngine = true;
         settings.WaitTimeToBoot = Seconds(5.f);
+        settings.TryLoadSDSounds = true;
+        settings.CachedDrawMode = false;
 
         // Set default theme
         FwkSettings::SetThemeDefault();
@@ -252,6 +260,9 @@ namespace CTRPluginFramework
         // Patch process before it starts & let the dev init some settings
         PatchProcess(settings);
 
+        // Init menu sounds.
+        SoundEngineImpl::InitializeMenuSounds();
+
         // Load settings
         Preferences::LoadSettings();
 
@@ -293,17 +304,24 @@ namespace CTRPluginFramework
 
                 if (event == PLG_SLEEP_ENTRY)
                 {
+                    SoundEngineImpl::NotifyAptEvent(APT_HookType::APTHOOK_ONSLEEP);
                     SystemImpl::AptStatus |= BIT(6);
                     PLGLDR__Reply(event);
                 }
                 else if (event == PLG_SLEEP_EXIT)
                 {
                     SystemImpl::WakeUpFromSleep();
+                    SoundEngineImpl::NotifyAptEvent(APT_HookType::APTHOOK_ONWAKEUP);
                     PLGLDR__Reply(event);
                 }
                 else if (event == PLG_ABOUT_TO_SWAP)
                 {
                     OnPluginToSwap();
+
+                    SoundEngineImpl::NotifyAptEvent(APT_HookType::APTHOOK_ONSUSPEND);
+
+                    // Close csnd as it may be needed by other processes (4 sessions max.)
+                    ncsndExit();
 
                     // Un-map hook memory
                     HookManager::Lock();
@@ -320,11 +338,19 @@ namespace CTRPluginFramework
                     HookManager::RecoverFromUnmapMemory();
                     HookManager::Unlock();
 
+                    // Init csnd again.
+                    ncsndInit(false);
+
+                    SoundEngineImpl::NotifyAptEvent(APT_HookType::APTHOOK_ONRESTORE);
+
                     OnPluginFromSwap();
                 }
                 else if (event == PLG_ABOUT_TO_EXIT)
                 {
                     OnProcessExit();
+
+                    SoundEngineImpl::NotifyAptEvent(APT_HookType::APTHOOK_ONEXIT);
+                    SoundEngineImpl::ClearMenuSounds();
 
                     SystemImpl::AptStatus |= BIT(3);
                     Scheduler::Exit();
@@ -333,6 +359,7 @@ namespace CTRPluginFramework
                     PluginMenuImpl::ForceExit();
 
                     // Close some handles
+                    ncsndExit();
                     hidExit();
                     cfguExit();
                     fsExit();
@@ -457,45 +484,12 @@ namespace CTRPluginFramework
     #define BUTTON_X          (1 << 10)
     #define BUTTON_Y          (1 << 11)
 
-    static void flash(u32 color)
-    {
-        color |= 0x01000000;
-        for (u32 i = 0; i < 64; i++)
-        {
-            REG32(0x10202204) = color;
-            svcSleepThread(5000000);
-        }
-        REG32(0x10202204) = 0;
-    }
-
-    void WEAK_SYMBOL __WaitForDebug()
-    {
-        // A little debug routine to wait for debugger to connect
-        u32 debug = 0;
-
-        for (u32 i = 0; i < 200; ++i)
-        {
-            debug |= HID_PAD & BUTTON_Y;
-            Sleep(Milliseconds(1));
-        }
-
-        if (DebugFromStart || debug)
-        {
-            flash(0xFF0000);
-            u32 stall = 0;
-            do
-            {
-                Sleep(Milliseconds(100));
-                stall = HID_PAD & BUTTON_X;
-            } while (!stall);
-        }
-    }
-
     extern "C"
     int   __entrypoint(int arg)
     {
-        if (__WaitForDebug)
-            __WaitForDebug();
+        // Call early callback, with pointer to the 2 saved instructions
+        if (EarlyCallback)
+            EarlyCallback((u32*)arg);
 
         // Set ProcessImpl::MainThreadTls
         ProcessImpl::MainThreadTls = (u32)getThreadLocalStorage();

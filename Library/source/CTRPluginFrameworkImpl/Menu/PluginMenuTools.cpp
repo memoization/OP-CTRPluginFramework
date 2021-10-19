@@ -673,6 +673,8 @@ namespace CTRPluginFramework
         if (_abouttb.IsOpen())
         {
             _abouttb.ProcessEvent(event);
+            if (!_abouttb.IsOpen())
+                SoundEngine::PlayMenuSound(SoundEngine::Event::CANCEL);
             return;
         }
 

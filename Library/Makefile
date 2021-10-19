@@ -35,6 +35,7 @@ SOURCES		:=	source \
 				source/CTRPluginFramework \
 				source/CTRPluginFramework/Graphics \
 				source/CTRPluginFramework/Menu \
+				source/CTRPluginFramework/Sound \
 				source/CTRPluginFramework/System \
 				source/CTRPluginFramework/Utils \
 				source/CTRPluginFrameworkImpl \
@@ -44,6 +45,7 @@ SOURCES		:=	source \
 				source/CTRPluginFrameworkImpl/Graphics/Icons \
 				source/CTRPluginFrameworkImpl/Menu \
 				source/CTRPluginFrameworkImpl/Search \
+				source/CTRPluginFrameworkImpl/Sound \
 				source/CTRPluginFrameworkImpl/System \
 				source/CTRPluginFrameworkImpl/System/Services \
 				source/ctrulibExtension \
@@ -67,9 +69,11 @@ ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 DEFINES	:=	-DCTRPF_VERSION_MAJOR="\"$(CTRPF_VERSION_MAJOR)\"" -DCTRPF_VERSION_MINOR="\"$(CTRPF_VERSION_MINOR)\"" \
 			-DCTRPF_VERSION_BUILD="\"$(CTRPF_VERSION_BUILD)\"" -DCOMMIT_HASH="\"$(COMMIT)\"" -DCOMPILE_DATE="\"$(COMPILE_DATE)\""
 
+GCC11_FALSEPOSITIVES := -Wno-array-bounds -Wno-stringop-overflow -Wno-stringop-overread
 CFLAGS	:=	-Wall -Werror -Wno-psabi -mword-relocations \
 			-ffunction-sections \
 			-fdata-sections \
+			$(GCC11_FALSEPOSITIVES) \
 			$(ARCH) \
 			$(BUILD_CFLAGS) $(G)
 
@@ -83,8 +87,8 @@ ASFLAGS	:=	$(G) $(ARCH) $(INCLUDE) -Os -Wl,$(WL)--gc-sections
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBS	:= -lctru -lm
-LIBDIRS	:= $(CTRULIB)
+LIBS	:= -lctru -lm -lcwav -lncsnd
+LIBDIRS	:= $(CTRULIB) $(CURDIR)/libcwav $(CURDIR)/libcwav/libncsnd
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -145,6 +149,16 @@ install: dist
 	@bzip2 -cd libctrpf-$(CTRPF_REVISION).tar.bz2 | tar -xf - -C $(DESTDIR)$(DEVKITPRO)/libctrpf
 	@echo "CTRPF was successfully installed in $(DESTDIR)$(DEVKITPRO)/libctrpf"
 
+libcwav:
+	@git clone --recursive https://github.com/mariohackandglitch/libcwav.git $@
+
+libcwav-update: libcwav
+	@cd libcwav && git pull
+
+libcwav-build: libcwav-update
+	@cd libcwav/libncsnd && $(MAKE)
+	@cd libcwav && CFLAGS='-DCWAV_DISABLE_DSP' $(MAKE)
+
 lib:
 	@[ -d $@ ] || mkdir -p $@
 
@@ -154,21 +168,37 @@ release:
 debug:
 	@[ -d $@ ] || mkdir -p $@
 
-lib/libctrpf.a : lib release
+lib/libctrpf.a : SHELL := /bin/bash
+lib/libctrpf.a : libcwav-build lib release
 	@$(MAKE) BUILD=release OUTPUT=$(CURDIR)/$@ WL=--strip-discarded,--strip-debug, \
 	BUILD_CFLAGS="-DNDEBUG=1 -O2 -fomit-frame-pointer" DEPSDIR=$(CURDIR)/release \
 	--no-print-directory -C release	-f $(CURDIR)/Makefile
 	@rm release/PluginMenuTools.o # Force update of revision, date etc
+	@cp $(CURDIR)/libcwav/lib/libcwav.a lib/libcwav.a
+	@cp $(CURDIR)/libcwav/libncsnd/lib/libncsnd.a lib/libncsnd.a
+	@mv $@ $@tmp
+	@$(AR) -M <<< $$'create $@ \naddlib $@tmp \naddlib lib/libcwav.a\naddlib lib/libncsnd.a\nsave\nend'
+	@rm $@tmp
+	@rm lib/libcwav.a
+	@rm lib/libncsnd.a
 
-lib/libctrpfd.a : lib debug
+lib/libctrpfd.a : SHELL := /bin/bash
+lib/libctrpfd.a : libcwav-build lib debug
 	@$(MAKE) BUILD=debug OUTPUT=$(CURDIR)/$@ BUILD_CFLAGS="-DDEBUG=1" G=-g \
 	DEPSDIR=$(CURDIR)/debug --no-print-directory -C debug -f $(CURDIR)/Makefile
 	@rm debug/PluginMenuTools.o # Force update of revision, date etc.
+	@cp $(CURDIR)/libcwav/lib/libcwav.a lib/libcwav.a
+	@cp $(CURDIR)/libcwav/libncsnd/lib/libncsnd.a lib/libncsnd.a
+	@mv $@ $@tmp
+	@$(AR) -M <<< $$'create $@ \naddlib $@tmp \naddlib lib/libcwav.a\naddlib lib/libncsnd.a\nsave\nend'
+	@rm $@tmp
+	@rm lib/libcwav.a
+	@rm lib/libncsnd.a
 
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr release debug lib docs
+	@rm -fr release debug lib docs libcwav
 
 #---------------------------------------------------------------------------------
 else
