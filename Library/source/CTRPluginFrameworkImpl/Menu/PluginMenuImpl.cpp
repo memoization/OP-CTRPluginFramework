@@ -246,9 +246,6 @@ namespace CTRPluginFramework
                             closedManager.Clear();
                             _wasOpened = true;
 
-                            while (Touch::IsDown())
-                                Controller::Update();
-
                             // Refresh HexEditor data
                             _hexEditor.Refresh();
                         }

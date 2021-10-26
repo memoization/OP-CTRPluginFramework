@@ -21,8 +21,6 @@ namespace CTRPluginFramework
 
     bool    EventManager::PollEvent(Event &event)
     {
-        if (!_startTime.HasTimePassed(Milliseconds(50)))
-            return (false);
         if (PopEvent(event, false))
             return (true);
         return (false);
@@ -30,8 +28,6 @@ namespace CTRPluginFramework
 
     bool    EventManager::WaitEvent(Event &event)
     {
-        while (!_startTime.HasTimePassed(Milliseconds(50)))
-            Sleep(Milliseconds(10));
         if (PopEvent(event, true))
             return (true);
         return (false);
@@ -76,7 +72,8 @@ namespace CTRPluginFramework
 
     void    EventManager::PushEvent(const Event &event)
     {
-        _eventsQueue.push(event);
+        if (_startTime.HasTimePassed(Milliseconds(50)))
+            _eventsQueue.push(event);
     }
 
     void    EventManager::ProcessEvents(void)
