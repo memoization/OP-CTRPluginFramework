@@ -92,7 +92,7 @@ namespace CTRPluginFramework
         }
 
         Event               event;
-        EventManager        manager;
+        EventManager        manager(EventManager::EventGroups::GROUP_KEYS);
 
         // Wait until keys are released
         do
