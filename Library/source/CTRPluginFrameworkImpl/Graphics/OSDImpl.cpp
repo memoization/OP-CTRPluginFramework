@@ -344,8 +344,8 @@ namespace CTRPluginFramework
             // As a hacky solution, we actually draw to the FB that's currently
             // being displayed. This causes some artifacts such as flickering
             // but is better than nothing. /shrug
-            previousFBAddr[isBottom][swap][0] = addr;
-            previousFBAddr[isBottom][swap][1] = addrB;
+            previousFBAddr[isBottom][swap ? 1 : 0][0] = addr;
+            previousFBAddr[isBottom][swap ? 1 : 0][1] = addrB;
 
             addr = previousFBAddr[isBottom][swap ? 0 : 1][0];
             addrB = previousFBAddr[isBottom][swap ? 0 : 1][1];
