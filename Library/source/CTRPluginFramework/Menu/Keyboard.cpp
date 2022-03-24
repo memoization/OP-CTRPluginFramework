@@ -299,6 +299,9 @@ namespace CTRPluginFramework
 
     int Keyboard::Open(void) const
     {
+        if (SystemImpl::IsSleeping())
+            return (-2);
+
         if (!_isPopulated)
             return (-1);
 
@@ -313,6 +316,9 @@ namespace CTRPluginFramework
 
     int Keyboard::Open(u8 &output) const
     {
+        if (SystemImpl::IsSleeping())
+            return (-2);
+
         if (_isPopulated)
         {
             _keyboard->Clear();
@@ -330,7 +336,7 @@ namespace CTRPluginFramework
 
         int ret = _keyboard->Run();
 
-        if (ret != -1)
+        if (ret >= 0)
         {
             std::string &input = _keyboard->GetInput();
             output = *(static_cast<u8 *>(ConvertToU8(input, _keyboard->IsHexadecimal())));
@@ -340,6 +346,9 @@ namespace CTRPluginFramework
 
     int Keyboard::Open(u8 &output, u8 start) const
     {
+        if (SystemImpl::IsSleeping())
+            return (-2);
+
         if (_isPopulated)
         {
             _keyboard->Clear();
@@ -361,7 +370,7 @@ namespace CTRPluginFramework
 
         int ret = _keyboard->Run();
 
-        if (ret != -1)
+        if (ret >= 0)
         {
             output = *(static_cast<u8 *>(ConvertToU8(input, _keyboard->IsHexadecimal())));
         }
@@ -374,6 +383,9 @@ namespace CTRPluginFramework
 
     int Keyboard::Open(u16 &output) const
     {
+        if (SystemImpl::IsSleeping())
+            return (-2);
+
         if (_isPopulated)
         {
             _keyboard->Clear();
@@ -391,7 +403,7 @@ namespace CTRPluginFramework
 
         int ret = _keyboard->Run();
 
-        if (ret != -1)
+        if (ret >= 0)
         {
             std::string &input = _keyboard->GetInput();
             output = *(static_cast<u16 *>(ConvertToU16(input, _keyboard->IsHexadecimal())));
@@ -401,6 +413,9 @@ namespace CTRPluginFramework
 
     int Keyboard::Open(u16 &output, u16 start) const
     {
+        if (SystemImpl::IsSleeping())
+            return (-2);
+
         if (_isPopulated)
         {
             _keyboard->Clear();
@@ -422,7 +437,7 @@ namespace CTRPluginFramework
 
         int ret = _keyboard->Run();
 
-        if (ret != -1)
+        if (ret >= 0)
         {
             output = *(static_cast<u16 *>(ConvertToU16(input, _keyboard->IsHexadecimal())));
         }
@@ -435,6 +450,9 @@ namespace CTRPluginFramework
 
     int Keyboard::Open(u32 &output) const
     {
+        if (SystemImpl::IsSleeping())
+            return (-2);
+
         if (_isPopulated)
         {
             _keyboard->Clear();
@@ -452,7 +470,7 @@ namespace CTRPluginFramework
 
         int ret = _keyboard->Run();
 
-        if (ret != -1)
+        if (ret >= 0)
         {
             std::string &input = _keyboard->GetInput();
             output = *(static_cast<u32 *>(ConvertToU32(input, _keyboard->IsHexadecimal())));
@@ -462,6 +480,9 @@ namespace CTRPluginFramework
 
     int Keyboard::Open(u32 &output, u32 start) const
     {
+        if (SystemImpl::IsSleeping())
+            return (-2);
+
         if (_isPopulated)
         {
             _keyboard->Clear();
@@ -483,7 +504,7 @@ namespace CTRPluginFramework
 
         int ret = _keyboard->Run();
 
-        if (ret != -1)
+        if (ret >= 0)
         {
             output = *(static_cast<u32 *>(ConvertToU32(input, _keyboard->IsHexadecimal())));
         }
@@ -496,6 +517,9 @@ namespace CTRPluginFramework
 
     int Keyboard::Open(u64 &output) const
     {
+        if (SystemImpl::IsSleeping())
+            return (-2);
+
         if (_isPopulated)
         {
             _keyboard->Clear();
@@ -513,7 +537,7 @@ namespace CTRPluginFramework
 
         int ret = _keyboard->Run();
 
-        if (ret != -1)
+        if (ret >= 0)
         {
             std::string &input = _keyboard->GetInput();
             output = *(static_cast<u64 *>(ConvertToU64(input, _keyboard->IsHexadecimal())));
@@ -523,6 +547,9 @@ namespace CTRPluginFramework
 
     int Keyboard::Open(u64 &output, u64 start) const
     {
+        if (SystemImpl::IsSleeping())
+            return (-2);
+
         if (_isPopulated)
         {
             _keyboard->Clear();
@@ -544,7 +571,7 @@ namespace CTRPluginFramework
 
         int ret = _keyboard->Run();
 
-        if (ret != -1)
+        if (ret >= 0)
         {
             output = *(static_cast<u64 *>(ConvertToU64(input, _keyboard->IsHexadecimal())));
         }
@@ -557,6 +584,9 @@ namespace CTRPluginFramework
 
     int Keyboard::Open(float &output) const
     {
+        if (SystemImpl::IsSleeping())
+            return (-2);
+
         if (_isPopulated)
         {
             _keyboard->Clear();
@@ -569,7 +599,7 @@ namespace CTRPluginFramework
 
         int ret = _keyboard->Run();
 
-        if (ret != -1)
+        if (ret >= 0)
         {
             std::string &input = _keyboard->GetInput();
             output = *(static_cast<float *>(ConvertToFloat(input, _keyboard->IsHexadecimal())));
@@ -579,6 +609,9 @@ namespace CTRPluginFramework
 
     int Keyboard::Open(float &output, float start) const
     {
+        if (SystemImpl::IsSleeping())
+            return (-2);
+
         if (_isPopulated)
         {
             _keyboard->Clear();
@@ -594,7 +627,7 @@ namespace CTRPluginFramework
 
         int ret = _keyboard->Run();
 
-        if (ret != -1)
+        if (ret >= 0)
         {
             output = *(static_cast<float *>(ConvertToFloat(input, _keyboard->IsHexadecimal())));
         }
@@ -607,6 +640,9 @@ namespace CTRPluginFramework
 
     int Keyboard::Open(double &output) const
     {
+        if (SystemImpl::IsSleeping())
+            return (-2);
+
         if (_isPopulated)
         {
             _keyboard->Clear();
@@ -618,7 +654,7 @@ namespace CTRPluginFramework
 
         int ret = _keyboard->Run();
 
-        if (ret != -1)
+        if (ret >= 0)
         {
             std::string &input = _keyboard->GetInput();
             output = *(static_cast<double *>(ConvertToDouble(input, _keyboard->IsHexadecimal())));
@@ -628,6 +664,9 @@ namespace CTRPluginFramework
 
     int Keyboard::Open(double &output, double start) const
     {
+        if (SystemImpl::IsSleeping())
+            return (-2);
+
         if (_isPopulated)
         {
             _keyboard->Clear();
@@ -643,7 +682,7 @@ namespace CTRPluginFramework
 
         int ret = _keyboard->Run();
 
-        if (ret != -1)
+        if (ret >= 0)
         {
             output = *(static_cast<double *>(ConvertToDouble(input, _keyboard->IsHexadecimal())));
         }
@@ -656,6 +695,9 @@ namespace CTRPluginFramework
 
     int Keyboard::Open(std::string &output) const
     {
+        if (SystemImpl::IsSleeping())
+            return (-2);
+
         if (_isPopulated)
         {
             _keyboard->Clear();
@@ -667,7 +709,7 @@ namespace CTRPluginFramework
 
         int ret = _keyboard->Run();
 
-        if (ret != -1)
+        if (ret >= 0)
         {
             output = _keyboard->GetInput();
         }
@@ -676,6 +718,9 @@ namespace CTRPluginFramework
 
     int Keyboard::Open(std::string &output, const std::string &start) const
     {
+        if (SystemImpl::IsSleeping())
+            return (-2);
+
         if (_isPopulated)
         {
             _keyboard->Clear();
@@ -689,7 +734,7 @@ namespace CTRPluginFramework
 
         int ret = _keyboard->Run();
 
-        if (ret != -1)
+        if (ret >= 0)
         {
             output = _keyboard->GetInput();
         }
