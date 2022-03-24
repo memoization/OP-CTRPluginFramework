@@ -443,7 +443,7 @@ namespace CTRPluginFramework
         else
             _mustRelease = false;
 
-        int                 ret = -2;
+        int                 ret = -1;
         Event               event;
         EventManager        manager(EventManager::EventGroups::GROUP_KEYS | EventManager::EventGroups::GROUP_TOUCH);
         Clock               clock;
