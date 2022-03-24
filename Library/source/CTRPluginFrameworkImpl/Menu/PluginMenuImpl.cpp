@@ -130,7 +130,8 @@ namespace CTRPluginFramework
     int    PluginMenuImpl::Run(void)
     {
         Event                   event;
-        EventManager            manager;
+        EventManager            closedManager(EventManager::EventGroups::GROUP_KEYS);
+        EventManager            openManager(EventManager::EventGroups::GROUP_KEYS | EventManager::EventGroups::GROUP_TOUCH_AND_SWIPE);
         Clock                   clock;
         Clock                   inputClock;
         int                     mode = 0;
@@ -195,7 +196,7 @@ namespace CTRPluginFramework
         {
             // Check Event
             eventList.clear();
-            while (manager.PollEvent(event) || _forceOpen)
+            while ((_isOpen && openManager.PollEvent(event)) || (!_isOpen && closedManager.PollEvent(event)) || _forceOpen)
             {
                 bool isHotkeysDown = false;
 
@@ -203,17 +204,8 @@ namespace CTRPluginFramework
                 if (event.type == Event::KeyPressed && inputClock.HasTimePassed(Milliseconds(500))
                     && (!Preferences::IsEnabled(Preferences::UseFloatingBtn) || _isOpen) && Controller::GetKeysDown() != SystemImpl::RosalinaHotkey)
                 {
-                    // Check that MenuHotkeys are pressed
-                    for (int i = 0; i < 16; i++)
-                    {
-                        u32 key = Preferences::MenuHotkeys & (1u << i);
-
-                        if (key && static_cast<u32>(event.key.code) == key)
-                        {
-                            if (Controller::IsKeysDown(Preferences::MenuHotkeys ^ key))
-                                isHotkeysDown = true;
-                        }
-                    }
+                    if (Controller::IsKeysPressed(Preferences::MenuHotkeys))
+                        isHotkeysDown = true;
                 }
 
                 // If MenuHotkeys are pressed
@@ -224,6 +216,7 @@ namespace CTRPluginFramework
                         SoundEngine::PlayMenuSound(SoundEngine::Event::CANCEL);
                         ProcessImpl::Play(true);
                         _isOpen = false;
+                        openManager.Clear();
 
                         // Save settings
                         Preferences::WriteSettings();
@@ -241,10 +234,8 @@ namespace CTRPluginFramework
                             ProcessImpl::Pause(true);
 
                             _aboutToOpen = _isOpen = true;
+                            closedManager.Clear();
                             _wasOpened = true;
-
-                            while (Touch::IsDown())
-                                Controller::Update();
 
                             // Refresh HexEditor data
                             _hexEditor.Refresh();
@@ -329,6 +320,7 @@ namespace CTRPluginFramework
                         SoundEngine::PlayMenuSound(SoundEngine::Event::CANCEL);
                     ProcessImpl::Play(true);
                     _isOpen = false;
+                    openManager.Clear();
                     shouldClose = false;
 
                     // Save settings
@@ -356,6 +348,7 @@ namespace CTRPluginFramework
                 }
 
                 // Remove callbacks in the trash bin
+                if (_callbacksTrashBin.size())
                 {
                     Lock    lock(_trashBinMutex);
                     if (_callbacksTrashBin.size())

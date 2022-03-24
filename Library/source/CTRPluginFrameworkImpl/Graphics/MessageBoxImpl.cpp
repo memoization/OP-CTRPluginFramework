@@ -83,6 +83,9 @@ namespace CTRPluginFramework
     bool    MessageBoxImpl::operator()(void)
     {
         bool mustReleaseGame = false;
+        bool sleepExit = false;
+
+        _exitKey = 0;
 
         // Check if game is paused
         if (!ProcessImpl::IsPaused)
@@ -92,18 +95,8 @@ namespace CTRPluginFramework
         }
 
         Event               event;
-        EventManager        manager;
+        EventManager        manager(EventManager::EventGroups::GROUP_KEYS);
 
-        // Wait until keys are released
-        do
-        {
-            Controller::Update();
-        }
-        while (Controller::GetKeysDown());
-
-        // Eat key released events
-        Controller::Update();
-        while (manager.PollEvent(event));
 
         // Clear screens
         for (int i = 0; i < 2; ++i)
@@ -127,7 +120,9 @@ namespace CTRPluginFramework
                 _textbox.ProcessEvent(event);
             }
 
-            if (_exit)
+            sleepExit = SystemImpl::IsSleeping();
+
+            if (_exit || sleepExit)
                 break;
 
             // Draw box
@@ -141,21 +136,19 @@ namespace CTRPluginFramework
         {
             Controller::Update();
         }
-        while (Controller::GetKeysDown());
-
-        // Eat key released events
-        Controller::Update();
-        while (manager.PollEvent(event));
+        while (Controller::GetKeysDown() & _exitKey);
 
         // Release game if we paused it in this function
         PluginMenu *menu = PluginMenu::GetRunningInstance();
 
-        if (menu && !menu->IsOpen())
+        if (menu && !menu->IsOpen() && !sleepExit)
             ScreenImpl::Top->Clear(true);
 
         if (mustReleaseGame)
             ProcessImpl::Play(false);
 
+        if (sleepExit)
+            return false;
         return _cursor == 0;
     }
 
@@ -190,6 +183,7 @@ namespace CTRPluginFramework
                     else
                         SoundEngine::PlayMenuSound(SoundEngine::Event::CANCEL);
                     _exit = true;
+                    _exitKey |= Key::A;
                     break;
                 }
                 case Key::B:
@@ -197,6 +191,7 @@ namespace CTRPluginFramework
                     SoundEngine::PlayMenuSound(SoundEngine::Event::CANCEL);
                     _cursor = 1;
                     _exit = true;
+                    _exitKey |= Key::B;
                     break;
                 }
                 default:
