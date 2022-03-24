@@ -280,6 +280,11 @@ namespace CTRPluginFramework
         _keyboard->ChangeSelectedEntry(entry);
     }
 
+    int Keyboard::GetLastSelectedEntry()
+    {
+        return _keyboard->GetSelectedEntry();
+    }
+
     void Keyboard::ChangeEntrySound(int entry, SoundEngine::Event soundEvent)
     {
         _keyboard->ChangeEntrySound(entry, soundEvent);

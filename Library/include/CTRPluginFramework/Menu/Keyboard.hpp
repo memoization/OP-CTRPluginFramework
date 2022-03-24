@@ -108,6 +108,13 @@ namespace CTRPluginFramework
         void	ChangeSelectedEntry(int entry);
 
         /**
+         * @brief Gets the last selected entry before the keyboard was closed
+         *
+         * @return Last selected entry, or -1 if none was selected.
+         */
+        int     GetLastSelectedEntry();
+
+        /**
          * \brief Sets the sound event to play when the entry is activated
          * \param entry Entry index to change the sound event
          * \param soundEvent Event to set for the given entry.
