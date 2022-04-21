@@ -663,7 +663,7 @@ namespace CTRPluginFramework
 
     bool    PluginMenuImpl::GetHexEditorState() const
     {
-        return _hexEditorState
+        return _hexEditorState;
     }
 
     void    PluginMenuImpl::ShowWelcomeMessage(bool showMsg)
