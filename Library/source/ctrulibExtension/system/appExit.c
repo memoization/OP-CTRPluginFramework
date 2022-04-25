@@ -1,9 +1,11 @@
 #include <3ds.h>
 
+void hidExitFake();
+
 void    __appExit(void)
 {
 	// Exit services
-	hidExit();
+	hidExitFake();
     cfguExit();
     fsExit();
     amExit();
