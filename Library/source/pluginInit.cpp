@@ -105,7 +105,7 @@ void     OnLoadCro(void)
 Result     OnSharedMemMap(Handle handle, void* sharedMem, MemPerm myPerm, MemPerm otherPerm)
 {
     Result res = svcMapMemoryBlock(handle, (u32)sharedMem, myPerm, otherPerm);
-    if (R_SUCCEEDED(res))
+    if (R_SUCCEEDED(res) && sharedMem && CTRPluginFramework::FwkSettings::Get().UseGameHidMemory)
     {
         u64 firstSysTick = reinterpret_cast<vu64*>(sharedMem)[0];
         u32 arrayIndex = reinterpret_cast<vu32*>(sharedMem)[4];
@@ -242,7 +242,6 @@ namespace CTRPluginFramework
         settings.AllowSearchEngine = true;
         settings.WaitTimeToBoot = Seconds(5.f);
         settings.TryLoadSDSounds = true;
-        settings.CachedDrawMode = false;
 
         // Set default theme
         FwkSettings::SetThemeDefault();
@@ -301,9 +300,6 @@ namespace CTRPluginFramework
                     }
                 }
             } while (svcMapMemoryBlockAddr);
-
-            if (!g_onSharedMemMapHook.IsEnabled())
-                abort();
         }
 
         // Init sdmc & paths
@@ -314,6 +310,17 @@ namespace CTRPluginFramework
 
         // Patch process before it starts & let the dev init some settings
         PatchProcess(settings);
+
+        // Init hid properly depending on the settings
+        if (settings.UseGameHidMemory)
+        {
+            // Check the svcMapMemoryBlock hook was installed properly
+            if (!g_onSharedMemMapHook.IsEnabled())
+                abort();
+        } else {
+            hidExitFake();
+            hidInit();
+        }
 
         // Init menu sounds.
         SoundEngineImpl::InitializeMenuSounds();
@@ -416,7 +423,10 @@ namespace CTRPluginFramework
 
                     // Close some handles
                     ncsndExit();
-                    hidExitFake();
+                    if (settings.UseGameHidMemory)
+                        hidExitFake();
+                    else
+                        hidExit();
                     cfguExit();
                     fsExit();
                     amExit();
