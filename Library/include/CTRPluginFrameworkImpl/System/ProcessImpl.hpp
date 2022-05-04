@@ -63,6 +63,7 @@ namespace CTRPluginFramework
         static void     Initialize(void);
 
         static bool     PatchProcess(u32 addr, u8 *patch, u32 length, u8 *original);
+        static bool     PatchFSAccess(bool patch = false);
         static void     GetHandleTable(KProcessHandleTable &table, std::vector<HandleDescriptor> &handleDescriptors);
         static void     GetGameThreads(std::vector<KThread *> &threads);
         static void     LockGameThreads(void);
