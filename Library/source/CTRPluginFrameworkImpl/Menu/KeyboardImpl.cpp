@@ -447,6 +447,7 @@ namespace CTRPluginFramework
         Event               event;
         EventManager        manager(EventManager::EventGroups::GROUP_KEYS | EventManager::EventGroups::GROUP_TOUCH);
         Clock               clock;
+        bool                wasKeysLocked = false;
 
         // Construct keyboard
         if (!_customKeyboard)
@@ -454,6 +455,14 @@ namespace CTRPluginFramework
             if (_layout == QWERTY) _Qwerty();
             else if (_layout == DECIMAL) _Decimal();
             else if (_layout == HEXADECIMAL) _Hexadecimal();
+
+            // unlock enter and clear button if hex editor blocked them
+            if((!_keys->at(15).IsEnabled() || !_keys->at(16).IsEnabled()) && _mustRelease && (_layout == DECIMAL || _layout == HEXADECIMAL))
+            {
+                _keys->at(15).Enable(true);
+                _keys->at(16).Enable(true);
+                wasKeysLocked = true;
+            }
         }
 
         // Check start input
@@ -542,6 +551,14 @@ namespace CTRPluginFramework
         }
 
     exit:
+        // lock enter and clear button back for the hex editor
+        if(wasKeysLocked)
+        {
+            _keys->at(15).Enable(false);
+            _keys->at(16).Enable(false);
+            wasKeysLocked = false;
+        }
+
         PluginMenu *menu = PluginMenu::GetRunningInstance();
         if (menu && !menu->IsOpen() && ret != SLEEP_ABORT)
             ScreenImpl::Clean();
@@ -579,6 +596,13 @@ namespace CTRPluginFramework
             if (posY < 120)
                 posY += 48;
             Renderer::DrawSysStringReturn(reinterpret_cast<const u8 *>(_error.c_str()), posX, posY, maxX, red, maxY);
+        }
+        if (_onKeyboardEvent != nullptr && _owner != nullptr) {
+            Render::Interface interface = Renderer::GetInterface();
+            _ClearKeyboardEvent();
+            _KeyboardEvent.type = KeyboardEvent::EventType::FrameTop;
+            _KeyboardEvent.renderInterface = &interface;
+            _onKeyboardEvent(*_owner, _KeyboardEvent);
         }
     }
 
@@ -733,6 +757,13 @@ namespace CTRPluginFramework
             Renderer::DrawLine(posX, posY + 1, 1, sbThumb, _scrollCursorSize - 2);
             Renderer::DrawLine(posX + 1, posY, 1, sbThumb, _scrollCursorSize);
             Renderer::DrawLine(posX + 2, posY + 1, 1, sbThumb, _scrollCursorSize - 2);
+        }
+        if (_onKeyboardEvent != nullptr && _owner != nullptr) {
+            Render::Interface interface = Renderer::GetInterface();
+            _ClearKeyboardEvent();
+            _KeyboardEvent.type = KeyboardEvent::EventType::FrameBottom;
+            _KeyboardEvent.renderInterface = &interface;
+            _onKeyboardEvent(*_owner, _KeyboardEvent);
         }
     }
 
@@ -1927,6 +1958,9 @@ namespace CTRPluginFramework
                 else if (ret == KEY_SPACE && (!_max || Utils::GetSize(_userInput) < _max))
                 {
                     _userInput.insert(_cursorPositionInString, " ");
+                    _ClearKeyboardEvent();
+                    _KeyboardEvent.type = KeyboardEvent::CharacterAdded;
+                    _KeyboardEvent.codepoint = ' ';
                     _ScrollUp();
                     return (true);
                 }
@@ -2240,9 +2274,10 @@ namespace CTRPluginFramework
 
     void KeyboardImpl::_ClearKeyboardEvent()
     {
-        _KeyboardEvent.selectedIndex = 0;
         _KeyboardEvent.codepoint = 0;
+        _KeyboardEvent.selectedIndex = 0;
         _KeyboardEvent.affectedKey = (Key)0;
+        _KeyboardEvent.renderInterface = nullptr;
     }
 
     void    KeyboardImpl::_ChangeManualKey(int newVal, bool playSound)

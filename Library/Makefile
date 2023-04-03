@@ -8,12 +8,12 @@ endif
 
 include $(DEVKITARM)/3ds_rules
 
-export CTRPF_REVISION		:=	$(shell git describe --always --tags --match [0-9]* --abbrev=8 | sed 's/-[0-9]*-g/-/')
+export CTRPF_REVISION		:=	$(shell printf "%s.r%s" "$$(git describe --abbrev=0)" "$$(git rev-list --count HEAD)")
 export CTRPF_VERSION_MAJOR	:=	$(shell git describe --always --tags | cut -f1 -d- | cut -f1 -d.)
 export CTRPF_VERSION_MINOR	:=	$(shell git describe --always --tags | cut -f1 -d- | cut -f2 -d.)
 export CTRPF_VERSION_BUILD	:=	$(shell git describe --always --tags | cut -f1 -d- | cut -f3 -d.)
 export COMMIT			:=	$(shell git rev-parse --short=8 HEAD)
-export COMPILE_DATE 	:=  $(shell date)
+export COMPILE_DATE 	:=  $(shell date -u +"%Y-%m-%dT%H:%M:%S%Z")
 
 #ifeq ($(strip $(CTRPF_REVISION)),)
 #	export CTRPF_REVISION			:=	v0.0.0-0
@@ -79,7 +79,7 @@ CFLAGS	:=	-Wall -Werror -Wno-psabi -mword-relocations \
 
 CFLAGS	+=	$(INCLUDE) -D__3DS__ $(DEFINES)
 
-CXXFLAGS 	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
+CXXFLAGS 	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++20
 
 ASFLAGS	:=	$(G) $(ARCH) $(INCLUDE) -Os -Wl,$(WL)--gc-sections
 

@@ -4,9 +4,14 @@
 #include "CTRPluginFrameworkImpl/System/Scheduler.hpp"
 #include "CTRPluginFrameworkImpl/Graphics/OSDImpl.hpp"
 
+extern "C" {
+    bool _g_isCitra = false;
+}
+
 namespace CTRPluginFramework
 {
     bool    SystemImpl::IsNew3DS = false;
+    bool    SystemImpl::IsCitra = false;
     u32     SystemImpl::CFWVersion = 0;
     u32     SystemImpl::RosalinaHotkey = 0;
     u32     SystemImpl::AptStatus = 0;
@@ -46,6 +51,14 @@ namespace CTRPluginFramework
 
         // Get System's language
         CFGU_GetSystemLanguage(&Language);
+    }
+
+    void     SystemImpl::CheckCitra(void)
+    {
+        s64 output = 0;
+        svcGetSystemInfo(&output, 0x20000, 0);
+        IsCitra = output;
+        _g_isCitra = output;
     }
 
     bool    SystemImpl::WantsToSleep(void)
