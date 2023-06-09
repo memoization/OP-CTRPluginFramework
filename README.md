@@ -1,13 +1,10 @@
 # CTRPluginFramework
-
 **CTRPluginFramework** is a framework to build plugins for Nintendo 3DS games in *3GX* format.
 
 ## Building
-
 The latest version of devkitARM and libctru is needed to build the framework. You can run `make dist-bin` in the `Library` folder to generate a *tar* file containing the library and include files.
 
 ## Installing & Updating
-
 The installation and updating is done through `devkitpro-pacman`.
 
 ### Adding package database
@@ -61,5 +58,4 @@ The following steps are required to remove **CTRPluginFramwork**.
 1. Open a command prompt and run `dkp-pacman -R libctrpf` to remove the package.
 
 ## License
-
 See the [LICENSE file](LICENSE.txt).
