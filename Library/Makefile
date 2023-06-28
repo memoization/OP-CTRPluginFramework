@@ -15,7 +15,7 @@ export CTRPF_VERSION_BUILD	:=	$(shell git describe --always --tags | cut -f1 -d-
 export COMMIT			:=	$(shell git rev-parse --short=8 HEAD)
 export COMPILE_DATE 	:=  $(shell date -u +"%Y-%m-%dT%H:%M:%S%Z")
 
-ENABLE_LINK_TIME_OPTIMIZATIONS = 0
+ENABLE_LINK_TIME_OPTIMIZATIONS = 1
 
 #ifeq ($(strip $(CTRPF_REVISION)),)
 #	export CTRPF_REVISION			:=	v0.0.0-0
@@ -84,8 +84,8 @@ CFLAGS	+=	$(INCLUDE) -D__3DS__ $(DEFINES)
 ASFLAGS	:=	$(G) $(ARCH) $(INCLUDE) -Os -Wl,$(WL)--gc-sections
 
 ifneq ($(ENABLE_LINK_TIME_OPTIMIZATIONS), 0)
-	CFLAGS += -flto=auto
-	ASFLAGS += -flto=auto
+	CFLAGS += -flto=auto -ffat-lto-objects
+	ASFLAGS += -flto=auto -ffat-lto-objects
 endif
 
 CXXFLAGS 	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++20
