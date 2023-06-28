@@ -15,6 +15,8 @@ export CTRPF_VERSION_BUILD	:=	$(shell git describe --always --tags | cut -f1 -d-
 export COMMIT			:=	$(shell git rev-parse --short=8 HEAD)
 export COMPILE_DATE 	:=  $(shell date -u +"%Y-%m-%dT%H:%M:%S%Z")
 
+ENABLE_LINK_TIME_OPTIMIZATIONS = 0
+
 #ifeq ($(strip $(CTRPF_REVISION)),)
 #	export CTRPF_REVISION			:=	v0.0.0-0
 #	export CTRPF_VERSION_MAJOR	:=	0
@@ -79,9 +81,14 @@ CFLAGS	:=	-Wall -Werror -Wno-psabi -mword-relocations \
 
 CFLAGS	+=	$(INCLUDE) -D__3DS__ $(DEFINES)
 
-CXXFLAGS 	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++20
+ASFLAGS	:=	$(G) $(ARCH) $(INCLUDE) -Os -Wl,$(WL)--gc-sections
 
-ASFLAGS	:=	$(G) $(ARCH) $(INCLUDE) -Os -flto=auto -Wl,$(WL)--gc-sections
+ifneq ($(ENABLE_LINK_TIME_OPTIMIZATIONS), 0)
+	CFLAGS += -flto=auto
+	ASFLAGS += -flto=auto
+endif
+
+CXXFLAGS 	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++20
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -171,7 +178,7 @@ debug:
 lib/libctrpf.a : SHELL := /bin/bash
 lib/libctrpf.a : libcwav-build lib release
 	@$(MAKE) BUILD=release OUTPUT=$(CURDIR)/$@ WL=--strip-discarded,--strip-debug, \
-	BUILD_CFLAGS="-DNDEBUG=1 -Os -flto=auto -fomit-frame-pointer" DEPSDIR=$(CURDIR)/release \
+	BUILD_CFLAGS="-DNDEBUG=1 -Os -fomit-frame-pointer" DEPSDIR=$(CURDIR)/release \
 	--no-print-directory -C release	-f $(CURDIR)/Makefile
 	@rm release/PluginMenuTools.o # Force update of revision, date etc
 	@cp $(CURDIR)/libcwav/lib/libcwav.a lib/libcwav.a
