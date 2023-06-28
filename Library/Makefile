@@ -84,8 +84,8 @@ CFLAGS	+=	$(INCLUDE) -D__3DS__ $(DEFINES)
 ASFLAGS	:=	$(G) $(ARCH) $(INCLUDE) -Os -Wl,$(WL)--gc-sections
 
 ifneq ($(ENABLE_LINK_TIME_OPTIMIZATIONS), 0)
-	CFLAGS += -flto=auto
-	ASFLAGS += -flto=auto
+	CFLAGS += -flto=auto -ffat-lto-objects
+	ASFLAGS += -flto=auto -ffat-lto-objects
 endif
 
 CXXFLAGS 	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++20
