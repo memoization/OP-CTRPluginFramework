@@ -15,7 +15,7 @@ export CTRPF_VERSION_BUILD	:=	$(shell git describe --always --tags | cut -f1 -d-
 export COMMIT			:=	$(shell git rev-parse --short=8 HEAD)
 export COMPILE_DATE 	:=  $(shell date -u +"%Y-%m-%dT%H:%M:%S%Z")
 
-ENABLE_LINK_TIME_OPTIMIZATIONS = 1
+ENABLE_LINK_TIME_OPTIMIZATIONS = 0
 
 #ifeq ($(strip $(CTRPF_REVISION)),)
 #	export CTRPF_REVISION			:=	v0.0.0-0
