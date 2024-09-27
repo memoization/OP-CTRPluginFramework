@@ -45,7 +45,7 @@ namespace CTRPluginFramework
 
         svcGetProcessInfo(&textTotalRoundedSize, processHandle, 0x10002);
         svcGetProcessInfo(&startAddress, processHandle, 0x10005);
-        if(R_FAILED(svcMapProcessMemoryEx(CUR_PROCESS_HANDLE, 0x14000000, processHandle, (u32)startAddress, textTotalRoundedSize)))
+        if(R_FAILED(svcMapProcessMemoryEx(CUR_PROCESS_HANDLE, 0x14000000, processHandle, (u32)startAddress, textTotalRoundedSize, static_cast<MapExFlags>(0))))
             goto exit;
 
         found = (u32 *)Utils::Search<u32>(0x14000000, (u32)textTotalRoundedSize, pattern);
