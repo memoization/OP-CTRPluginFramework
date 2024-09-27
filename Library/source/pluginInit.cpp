@@ -414,7 +414,7 @@ namespace CTRPluginFramework
 
                     // Re-map hook memory
                     svcMapProcessMemoryEx(CUR_PROCESS_HANDLE, 0x1E80000, CUR_PROCESS_HANDLE,
-                        __ctru_heap + __ctru_heap_size, 0x2000);
+                        __ctru_heap + __ctru_heap_size, 0x2000, static_cast<MapExFlags>(0));
 
                     HookManager::RecoverFromUnmapMemory();
                     HookManager::Unlock();
