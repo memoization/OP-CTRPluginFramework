@@ -209,5 +209,7 @@ namespace CTRPluginFramework
         {
             IsForced = NeedToPauseFrame = false;
         }
+
+        IsFramePaused = false;
     }
 }
