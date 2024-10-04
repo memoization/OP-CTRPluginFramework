@@ -145,6 +145,14 @@ namespace CTRPluginFramework
             Flags = header.flags;
             memcpy(reinterpret_cast<void*>(Backlights), &header.lcdbacklights, sizeof(Backlights));
         }
+        // No file, set some default
+        else
+        {
+            Preferences::Set(Preferences::AutoLoadCheats);
+            Preferences::Set(Preferences::AutoSaveCheats);
+            Preferences::Set(Preferences::AutoLoadFavorites);
+            Preferences::Set(Preferences::AutoSaveFavorites);
+        }
 
         // Check for hotkeys to be valid
         if (MenuHotkeys == 0)
