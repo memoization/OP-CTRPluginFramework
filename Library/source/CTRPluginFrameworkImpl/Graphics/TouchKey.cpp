@@ -8,6 +8,7 @@ namespace CTRPluginFramework
     {
         _character = tk._character;
         _glyph = tk._glyph;
+        _displayContent = tk._displayContent;
         _content = tk._content;
         _icon = tk._icon;
         _uiProperties = tk._uiProperties;
@@ -23,6 +24,7 @@ namespace CTRPluginFramework
     TouchKey::TouchKey(int character, IntRect ui, bool isEnabled)
     {
         _character = character;
+        _displayContent = nullptr;
         _content = nullptr;
         _icon = nullptr;
         _uiProperties = ui;
@@ -45,6 +47,7 @@ namespace CTRPluginFramework
     TouchKey::TouchKey(const std::string &str, IntRect ui, int value, bool isEnabled)
     {
         _character = value;
+        _displayContent = nullptr;
         _content = new KeyContent(str);
         _icon = nullptr;
         _uiProperties = ui;
@@ -62,6 +65,7 @@ namespace CTRPluginFramework
     TouchKey::TouchKey(int value, IconCallback icon, IntRect ui, bool isEnabled)
     {
         _character = value;
+        _displayContent = nullptr;
         _content = nullptr;
         _icon = icon;
         _uiProperties = ui;
@@ -74,6 +78,24 @@ namespace CTRPluginFramework
         // Icon drawing infos
         _posX = ((_uiProperties.size.x - 15) >> 1) + _uiProperties.leftTop.x;
         _posY = ((_uiProperties.size.y - 15) >> 1) + _uiProperties.leftTop.y;
+    }
+
+    TouchKey::TouchKey(const std::string &character, const std::string &value, IntRect ui, bool isEnabled)
+    {
+        _character = 0x12345678;
+        _displayContent = new KeyContent(character);
+        _content = new KeyContent(value);
+        _icon = nullptr;
+        _uiProperties = ui;
+        _enabled = isEnabled;
+        _acceptSoundEvent = SoundEngine::Event::DESELECT;
+
+        _isPressed = false;
+        _execute = false;
+
+        // String drawing infos
+        _posX = ((ui.size.x - static_cast<int>(_displayContent->width)) >> 1) + ui.leftTop.x;
+        _posY = ((ui.size.y - 16) >> 1) + ui.leftTop.y;
     }
 
     TouchKey::~TouchKey()
@@ -103,7 +125,7 @@ namespace CTRPluginFramework
     void    TouchKey::DrawCharacter(const Color &color)
     {
         // If not a string
-        if (_content == nullptr)
+        if (_content == nullptr && _displayContent == nullptr)
         {
             if (_glyph == nullptr)
                 return;
@@ -115,9 +137,19 @@ namespace CTRPluginFramework
         {
             int posX = _posX;
 
-            for (Glyph *glyph : _content->glyphs)
+            if (_displayContent != nullptr)
             {
-                posX = Renderer::DrawGlyph(glyph, posX, _posY, color);
+                for (Glyph *glyph : _displayContent->glyphs)
+                {
+                    posX = Renderer::DrawGlyph(glyph, posX, _posY, color);
+                }
+            }
+            else
+            {
+                for (Glyph *glyph : _content->glyphs)
+                {
+                    posX = Renderer::DrawGlyph(glyph, posX, _posY, color);
+                }
             }
         }
     }

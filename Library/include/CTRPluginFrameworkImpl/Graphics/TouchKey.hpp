@@ -44,6 +44,8 @@ namespace CTRPluginFramework
         TouchKey(const std::string &str, IntRect ui, int value = 0x12345678, bool enabled = true);
         // Key with Icon
         TouchKey(int value, IconCallback, IntRect ui, bool enabled = true);
+        // Key with display character and separate value
+        TouchKey(const std::string &character, const std::string &value, IntRect ui, bool enabled = true);
 
         ~TouchKey();
 
@@ -71,6 +73,7 @@ namespace CTRPluginFramework
     private:
         int             _character{0};
         Glyph         * _glyph{nullptr};
+        KeyContent    * _displayContent{nullptr};
         KeyContent    * _content{nullptr};
         IconCallback    _icon{nullptr};
         IntRect         _uiProperties;
