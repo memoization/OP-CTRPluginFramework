@@ -14,6 +14,7 @@ namespace CTRPluginFramework
     #define USER_VALID  0
     #define USER_ABORT  -1
     #define SLEEP_ABORT -2
+    #define NO_RESPONSE -3
     #define KEY_ENTER 0xA
     #define KEY_BACKSPACE 0x8
     #define KEY_SYMBOLS -2
@@ -27,6 +28,8 @@ namespace CTRPluginFramework
     std::vector<TouchKey>    KeyboardImpl::_DecimalKeys;
     std::vector<TouchKey>    KeyboardImpl::_HexaDecimalKeys;
     std::vector<TouchKey>    KeyboardImpl::_QwertyKeys;
+    Event               persistEvent;
+    EventManager        persistentEventManager(EventManager::EventGroups::GROUP_KEYS | EventManager::EventGroups::GROUP_TOUCH);
 
     KeyboardImpl::KeyboardImpl(const std::string &text)
     {
@@ -131,6 +134,11 @@ namespace CTRPluginFramework
       //      iter->Clear();
         for (TouchKeyString *tks : _strKeys)
             delete tks;
+    }
+
+    void    KeyboardImpl::SetTitle(const std::string &titleText)
+    {
+        _text = titleText;
     }
 
     void    KeyboardImpl::SetLayout(Layout layout)
@@ -428,6 +436,129 @@ namespace CTRPluginFramework
         _strKeys.clear();
     }
 
+    int     KeyboardImpl::Step(void)
+    {
+        _isOpen = true;
+        _userAbort = false;
+        _askForExit = false;
+
+        int                 ret = NO_RESPONSE;
+        Clock               clock;
+        bool                wasKeysLocked = false;
+
+        // Construct keyboard
+        if (!_customKeyboard)
+        {
+            if (_layout == QWERTY) _Qwerty();
+            else if (_layout == DECIMAL) _Decimal();
+            else if (_layout == HEXADECIMAL) _Hexadecimal();
+
+            // unlock enter and clear button if hex editor blocked them
+            if((!_keys->at(15).IsEnabled() || !_keys->at(16).IsEnabled()) && _mustRelease && (_layout == DECIMAL || _layout == HEXADECIMAL))
+            {
+                _keys->at(15).Enable(true);
+                _keys->at(16).Enable(true);
+                wasKeysLocked = true;
+            }
+        }
+
+        // Check start input
+        _errorMessage = !_CheckInput();
+
+        // Set cursor
+        if (_showCursor)
+        {
+            _cursorPositionInString = _userInput.size();
+            _ScrollUp();
+        }
+
+        while (persistentEventManager.PollEvent(persistEvent))
+        {
+            _ProcessEvent(persistEvent);
+            if (_userAbort)
+            {
+                ret = USER_ABORT;
+                _isOpen = false;
+            }
+        }
+
+        // Update current keys
+        _Update(clock.Restart().AsSeconds());
+
+        if (_isOpen)
+        {
+            _RenderBottom(true);
+        }
+
+        // if it's a standard keyboard
+        if (!_customKeyboard)
+        {
+            // Check keys
+            bool inputChanged = _CheckKeys();
+
+            if (_errorMessage && inputChanged)
+                _errorMessage = false;
+
+            if (inputChanged)
+            {
+                _errorMessage = !_CheckInput();
+                if (_onKeyboardEvent != nullptr && _owner != nullptr)
+                    _onKeyboardEvent(*_owner, _KeyboardEvent);
+            }
+
+            // If user try to exit the keyboard
+            if (_askForExit)
+            {
+                // If input is invalid, user can't exit
+                if (_errorMessage)
+                    _askForExit = false;
+                else
+                {
+                    // Check input
+                    _errorMessage = !_CheckInput();
+                    if (!_errorMessage)
+                    {
+                        // input is valid, exit
+                        _isOpen = false;
+                        ret = 0;
+                    }
+                }
+            }
+        }
+        else
+        {
+            int  choice = -1;
+            bool isSelected = _CheckButtons(choice);
+
+            if (isSelected)
+            {
+                ret = choice;
+                _isOpen = false;
+            }
+        }
+        if (SystemImpl::IsSleeping()) {
+            ret = SLEEP_ABORT;
+            _isOpen = false;
+        }
+
+        if (!_isOpen && (ret == -1 || ret == 0))
+        {
+            // lock enter and clear button back for the hex editor
+            if(wasKeysLocked)
+            {
+                _keys->at(15).Enable(false);
+                _keys->at(16).Enable(false);
+                wasKeysLocked = false;
+            }
+
+            PluginMenu *menu = PluginMenu::GetRunningInstance();
+            if (menu && !menu->IsOpen())
+                ScreenImpl::Clean();
+        }
+
+        return ret;
+    }
+
     int     KeyboardImpl::Run(void)
     {
         _isOpen = true;
@@ -606,7 +737,7 @@ namespace CTRPluginFramework
         }
     }
 
-    void    KeyboardImpl::_RenderBottom(void)
+    void    KeyboardImpl::_RenderBottom(bool showKeyboardHint)
     {
         static IntRect  background(20, 20, 280, 200);
         static IntRect  background2(22, 22, 276, 196);
@@ -623,8 +754,16 @@ namespace CTRPluginFramework
             int     posY = 20;
             int     posX = 25;
 
+            int     hintY = 200;
+            int     hintX = 25;
+
             // Clean background
             Renderer::DrawRect(background, theme.Background);
+
+            if (showKeyboardHint)
+            {
+                Renderer::DrawSysString(_text.c_str(), hintX, hintY, 300, theme.Input);
+            }
 
             // Draw input
             Renderer::DrawSysString(_userInput.c_str(), posX, posY, 300, theme.Input, _offset);
@@ -773,7 +912,7 @@ namespace CTRPluginFramework
         bool inputPassedTime = inputClock.HasTimePassed(Milliseconds(200));
         bool keyPressIntended = false;
 
-        if (event.type == Event::KeyPressed)
+        if (event.type == Event::KeyDown)
         {
             if (event.key.code == Key::B)
             {
@@ -819,7 +958,7 @@ namespace CTRPluginFramework
             }
         }
 
-        if (event.type == Event::KeyDown)
+        if (event.type == Event::KeyPressed)
         {
             if (_showCursor && inputPassedTime)
             {
@@ -1240,7 +1379,8 @@ namespace CTRPluginFramework
         _QwertyKeys.emplace_back('/', pos); pos.leftTop.x += 25;
         _QwertyKeys.emplace_back('7', pos); pos.leftTop.x += 25;
         _QwertyKeys.emplace_back('8', pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back('9', pos);
+        _QwertyKeys.emplace_back('9', pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u00A1" /* ¡ */, pos);
 
         pos.leftTop.x = 20;
         pos.leftTop.y = 156;
@@ -1320,31 +1460,30 @@ namespace CTRPluginFramework
         IntRect pos(20, 36, 25, 40);
 
         /*page 1*/
-        _QwertyKeys.emplace_back("\uE000" /* A */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE001" /* B */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE002" /* X */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE003" /* Y */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE004" /* L */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE005" /* R */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE054" /* ZL */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE055" /* ZR */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE006" /* DPAD */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE041" /* DPAD Wii*/, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("SF", "\uE020", pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("C", "\uE021", pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("N", "\uE022", pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("64", "\uE023", pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("GB", "\uE024", pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("A", "\uE025", pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("GC", "\uE026", pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("SN", "\uE031", pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\uE008", "\uE030", pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("ES", "\uE032", pos); pos.leftTop.x += 25;
         _QwertyKeys.emplace_back(KEY_BACKSPACE, Icon::DrawClearSymbol, pos);
 
         pos.leftTop.x = 20;
         pos.leftTop.y = 76;
-
-        _QwertyKeys.emplace_back("\uE04C" /* a */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE04D" /* b */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE04E" /* x */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE04F" /* y */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE052" /* l */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE053" /* r */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE050" /* L Stick */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE051" /* R Stick */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE042" /* A Wii */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE043" /* B Wii */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("DS", "\uE033", pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u2116" /* No. */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\uE073" /* Home */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\uE067" /* Wii */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u221A" /* ✔ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u300F" /* 』 */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u300E" /* 『 */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u2026" /* … */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u3012" /* 〒 */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u203B" /* ※ */, pos); pos.leftTop.x += 25;
         _QwertyKeys.emplace_back(KEY_ENTER, Icon::DrawEnterKey, pos);
         _QwertyKeys.back().SetAcceptSoundEvent(SoundEngine::Event::ACCEPT);
 
@@ -1352,15 +1491,16 @@ namespace CTRPluginFramework
         pos.leftTop.y = 116;
 
         _QwertyKeys.emplace_back("\u2192", pos, KEY_NINTENDO_PAGE); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE040" /* Power */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE044" /* Home */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE045" /* + */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE046" /* - */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE047" /* 1 */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE048" /* 2 */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE049" /* Stick */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE04A" /* C */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE04B" /* Z */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u30ED" /* ロ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u3010" /* 【 */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u3011" /* 】 */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u2234" /* ∴ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u00A6" /* ¦ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u25BC" /* ▼ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u25B2" /* ▲ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u25C6" /* ◆ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u25CF" /* ● */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u2605" /* ★ */, pos); pos.leftTop.x += 25;
 
         pos.leftTop.x = 20;
         pos.leftTop.y = 156;
@@ -1377,31 +1517,31 @@ namespace CTRPluginFramework
         pos.leftTop.y = 36;
 
         /*page 2*/
-        _QwertyKeys.emplace_back("\uE079" /* DPAD UP */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE07B" /* DPAD DOWN */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE07C" /* DPAD LEFT */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE07D" /* DPAD RIGHT */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE07E" /* DPAD UP&DOWN */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE07F" /* DPAD LEFT&RIGHT */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE077" /* Wii Stick */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE078" /* Wii Power */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE056" /* Enter */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE057" /* Space*/, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u2202" /* ∂ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u00C6" /* Æ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u0152" /* Œ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u03B2" /* β */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u03BB" /* λ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u03BE" /* ξ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u03C6" /* φ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u0394" /* Δ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u0413" /* Г */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u039B" /* Λ */, pos); pos.leftTop.x += 25;
         _QwertyKeys.emplace_back(KEY_BACKSPACE, Icon::DrawClearSymbol, pos);
 
         pos.leftTop.x = 20;
         pos.leftTop.y = 76;
 
-        _QwertyKeys.emplace_back("\uE007" /* Clock */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE008" /* Happy */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE009" /* Angry */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE00A" /* Sad */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE00B" /* ExpressionLess */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE00C" /* Sun */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE00D" /* Cloud */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE00E" /* Umbrella */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE00F" /* Snowman */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE06B" /* ? */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u039E" /* Ξ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u03A3" /* E */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u03A6" /* Φ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u03A8" /* Ψ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u03A9" /* Ω */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u03C5" /* υ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u03C9" /* ω */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u25CB" /* ○ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u25C7" /* ◇ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u25A1" /* □ */, pos); pos.leftTop.x += 25;
         _QwertyKeys.emplace_back(KEY_ENTER, Icon::DrawEnterKey, pos);
         _QwertyKeys.back().SetAcceptSoundEvent(SoundEngine::Event::ACCEPT);
 
@@ -1409,15 +1549,16 @@ namespace CTRPluginFramework
         pos.leftTop.y = 116;
 
         _QwertyKeys.emplace_back("\u2190", pos, KEY_NINTENDO_PAGE); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE015" /*  */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE016" /*  */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE017" /*  */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE018" /*  */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE019" /* Arrow Right */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE01A" /* Arrow Left */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE01B" /* Arrow Up */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE01C" /* Arow Down */, pos); pos.leftTop.x += 25;
-        _QwertyKeys.emplace_back("\uE01E" /* Camera */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u25B3" /* △ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u2606" /* ☆ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u25CE" /* ◎ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u266D" /* ♪ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u266A" /* ♭ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u2192" /* → */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u2190" /* ← */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u2191" /* ↑ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u2193" /* ↓ */, pos); pos.leftTop.x += 25;
+        _QwertyKeys.emplace_back("\u221E" /* ∞ */, pos); pos.leftTop.x += 25;
 
         pos.leftTop.x = 20;
         pos.leftTop.y = 156;

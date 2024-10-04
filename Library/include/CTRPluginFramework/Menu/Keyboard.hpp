@@ -269,6 +269,18 @@ namespace CTRPluginFramework
         * -2 : closed by sleep event \n
         * 0 : Success
         */
+
+        void     InitPersistentKeyboard(const std::string &title) const;
+        int     OpenPersist(std::string &output) const;
+
+        /**
+        * \brief Open the keyboard and wait for user input while keeping the process running
+        * \param output Where to place the user's input
+        * \param start The keyboard will start with this value as input
+        * \return -1 : user abort / error \n
+        * -2 : closed by sleep event \n
+        * 0 : Success
+        */
         int     Open(std::string &output) const;
 
         /**

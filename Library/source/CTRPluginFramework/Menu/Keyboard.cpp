@@ -697,6 +697,33 @@ namespace CTRPluginFramework
     /*
     ** string
     **********/
+    void Keyboard::InitPersistentKeyboard(const std::string &title) const
+    {
+        if (_isPopulated)
+        {
+            _keyboard->Clear();
+            _isPopulated = false;
+        }
+
+        _keyboard->CanAbort(true);
+        _keyboard->SetLayout(QWERTY);
+        _keyboard->SetTitle(title);
+        _keyboard->DisplayTopScreen = DisplayTopScreen;
+    }
+
+    int Keyboard::OpenPersist(std::string &output) const
+    {
+        if (SystemImpl::IsSleeping())
+            return (-2);
+
+        int ret = _keyboard->Step();
+
+        if (ret >= 0)
+        {
+            output = _keyboard->GetInput();
+        }
+        return (ret);
+    }
 
     int Keyboard::Open(std::string &output) const
     {

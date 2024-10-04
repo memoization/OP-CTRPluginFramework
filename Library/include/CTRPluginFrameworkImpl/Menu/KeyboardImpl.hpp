@@ -36,6 +36,7 @@ namespace CTRPluginFramework
         explicit KeyboardImpl(Keyboard *kb, const std::string &text = "");
         ~KeyboardImpl(void);
 
+        void        SetTitle(const std::string &titleText);
         void        SetLayout(Layout layout);
         void        SetHexadecimal(bool isHex);
         bool        IsHexadecimal(void) const;
@@ -58,6 +59,7 @@ namespace CTRPluginFramework
         void        Clear(void);
 
         int         Run(void);
+        int         Step(void);
         void        Close(void);
         bool        operator()(int &out);
 
@@ -68,7 +70,7 @@ namespace CTRPluginFramework
         friend class ARCodeEditor;
 
         void    _RenderTop(void);
-        void    _RenderBottom(void);
+        void    _RenderBottom(bool showKeyboardHint = false);
         void    _ProcessEvent(Event &event);
 		void	_UpdateScroll(float delta, bool ignoreTouch);
 		void    _Update(float delta);
