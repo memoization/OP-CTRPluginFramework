@@ -72,6 +72,7 @@ namespace CTRPluginFramework
         static const Color  Red;
         static const Color  Lime;
         static const Color  Blue;
+        static const Color  InfoBlue;
         static const Color  Yellow;
         static const Color  Cyan;
         static const Color  Magenta;
