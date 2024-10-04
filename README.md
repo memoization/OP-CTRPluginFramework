@@ -1,5 +1,5 @@
 # OP🔥 CTRPluginFramework
-**OP-CTRPluginFramework** is a fork off of ThePixellizerOSS's [CTRPluginFramework](https://gitlab.com/thepixellizeross/ctrpluginframework) project with various quality of life improvments and fitting changes for [OP-MK7-Plugin](https://github.com/memoization/OP-MK7-Plugin).
+**OP-CTRPluginFramework** is a fork off of ThePixellizerOSS's [CTRPluginFramework](https://gitlab.com/thepixellizeross/ctrpluginframework) project with various quality of life improvements and fitting changes for [OP-MK7-Plugin](https://github.com/memoization/OP-MK7-Plugin).
 
 **Key Improvements:**
 - Save and load enabled cheat arguments
