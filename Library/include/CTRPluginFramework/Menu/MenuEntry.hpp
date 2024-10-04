@@ -27,8 +27,10 @@ namespace CTRPluginFramework
         explicit MenuEntry(const std::string &name, const std::string &note = "");
         MenuEntry(const std::string &name, FuncPointer gameFunc, const std::string &note = "");
         MenuEntry(const std::string &name, FuncPointer gameFunc, FuncPointer menuFunc, const std::string &note = "");
+        MenuEntry(const std::string &name, FuncPointer gameFunc, FuncPointer menuFunc, FuncPointer disableFunc, FuncPointer enableFunc, const std::string &note = "");
         MenuEntry(int radioGroup, const std::string &name, FuncPointer gameFunc, const std::string &note = "");
         MenuEntry(int radioGroup, const std::string &name, FuncPointer gameFunc, FuncPointer menuFunc, const std::string &note = "");
+        MenuEntry(int radioGroup, const std::string &name, FuncPointer gameFunc, FuncPointer menuFunc, FuncPointer disableFunc, FuncPointer enableFunc, const std::string &note = "");
         ~MenuEntry();
 
         /**

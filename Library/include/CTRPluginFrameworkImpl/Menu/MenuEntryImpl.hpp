@@ -45,6 +45,8 @@ namespace CTRPluginFramework
         // Public members
         FuncPointer     GameFunc;
         FuncPointer     MenuFunc;
+        FuncPointer     DisabledFunc;
+        FuncPointer     EnabledFunc;
 
         virtual std::string &GetNote(void) override;
 

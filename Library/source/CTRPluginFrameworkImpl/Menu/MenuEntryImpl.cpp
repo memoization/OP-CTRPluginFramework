@@ -13,6 +13,8 @@ namespace CTRPluginFramework
         this->note = note;
         this->GameFunc = nullptr;
         this->MenuFunc = nullptr;
+        this->DisabledFunc = nullptr;
+        this->EnabledFunc = nullptr;
         this->_arg = nullptr;
         this->_executeIndex = -1;
         this->_flags.state = false;
@@ -30,6 +32,8 @@ namespace CTRPluginFramework
         this->note = note;
         this->GameFunc = func;
         this->MenuFunc = nullptr;
+        this->DisabledFunc = nullptr;
+        this->EnabledFunc = nullptr;
         this->_arg = nullptr;
         this->_executeIndex = -1;
         this->_flags.state = false;
@@ -113,10 +117,21 @@ namespace CTRPluginFramework
         // Disable if currently enabled
         if (_flags.state)
         {
+            if (DisabledFunc != nullptr)
+            {
+                DisabledFunc(_owner);
+            }
+
             _flags.state = false;
             _flags.justChanged = false;
             return (false);
         }
+
+        if (!_flags.state && EnabledFunc != nullptr)
+        {
+            EnabledFunc(_owner);
+        }
+
         // Else enable
         _flags.state = true;
         _flags.justChanged = true;
