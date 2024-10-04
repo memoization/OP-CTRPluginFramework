@@ -1,8 +1,15 @@
-# CTRPluginFramework
-**CTRPluginFramework** is a framework to build plugins for Nintendo 3DS games in *3GX* format.
+# OP🔥 CTRPluginFramework
+**OP-CTRPluginFramework** is a fork off of ThePixellizerOSS's [CTRPluginFramework](https://gitlab.com/thepixellizeross/ctrpluginframework) project with various quality of life improvments and fitting changes for [OP-MK7-Plugin](https://github.com/memoization/OP-MK7-Plugin).
+
+**Key Improvements:**
+- Save and load enabled cheat arguments
+- Colored menu entry text for enabled cheats and settings
+- Clean up the bottom screen plugin home page -- disabled buttons that had no functional feature
+- Moved *About* button to the plugin home page
+- Auto load settings enabled by default for first time plugin load
 
 ## Building
-The latest version of devkitARM and libctru is needed to build the framework. You can run `make dist-bin` in the `Library` folder to generate a *tar* file containing the library and include files.
+The latest version of devkitARM and libctru is needed to build the framework. You can run `make dist-bin` (or execute the `build.bat` file) in the `Library` folder to generate a *tar* file containing the library and include files.
 
 ## Installing & Updating
 The installation and updating is done through `(dkp-)pacman`.
