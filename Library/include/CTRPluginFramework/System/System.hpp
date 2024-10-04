@@ -68,6 +68,16 @@ namespace CTRPluginFramework
         * \brief Causes a system hardware reboot. Does not return.
         */
         static void     Reboot(void) NORETURN;
+
+        /**
+        * \brief Toggles wireless connectivity. Does not return.
+        */
+        static void     ToggleWireless(bool enabled);
+
+        /**
+        * \brief Reset wireless stack. Does not return.
+        */
+        static void     ResetWireless();
     };
 }
 

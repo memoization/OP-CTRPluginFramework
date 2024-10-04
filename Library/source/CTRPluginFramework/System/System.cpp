@@ -1,5 +1,6 @@
 #include "types.h"
 #include <3ds.h>
+#include "csvc.h"
 #include "CTRPluginFramework/System/System.hpp"
 #include "CTRPluginFrameworkImpl/System/SystemImpl.hpp"
 
@@ -42,6 +43,12 @@ namespace CTRPluginFramework
     /// Retrieves the revision version from a packed system version.
 #define GET_VERSION_REVISION(version) (((version)>> 8)&0xFF)
 
+    static inline bool isServiceUsable(const char *name)
+    {
+        bool r;
+        return R_SUCCEEDED(srvIsServiceRegistered(&r, name)) && r;
+    }
+
     bool    System::CfwIsLuma3DS(const u8 major, const u8 minor, const u8 revision)
     {
         if (SystemImpl::CFWVersion == 0 || !major)
@@ -54,6 +61,29 @@ namespace CTRPluginFramework
         if (_major < major) return (false);
         if (_minor < minor) return (false);
         return (_revision >= revision);
+    }
+
+    void System::ToggleWireless(bool enabled)
+    {
+        if (isServiceUsable("nwm::EXT"))
+        {
+            nwmExtInit();
+            NWMEXT_ControlWirelessEnabled(enabled);
+            nwmExtExit();
+        }
+    }
+
+    void System::ResetWireless()
+    {
+        if(R_FAILED(acInit()))
+            return;
+
+        acuConfig config = {0};
+        Handle connectEvent = 0;
+        svcCreateEvent(&connectEvent, RESET_ONESHOT);
+        ACU_ConnectAsync(&config, connectEvent);
+        acExit();
+        svcCloseHandle(connectEvent);
     }
 
     void    System::Reboot(void)
