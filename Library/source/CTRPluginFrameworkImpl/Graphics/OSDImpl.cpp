@@ -147,7 +147,7 @@ namespace CTRPluginFramework
             Notifications.erase(std::remove_if(Notifications.begin(), Notifications.end(),
                 [](OSDMessage *message)
                 {
-                    bool remove = message->drawn && message->time.HasTimePassed(Seconds(5.f));
+                    bool remove = message->drawn && message->time.HasTimePassed(Seconds(2.5f));
                     if (remove)
                         delete message;
                     return remove;
