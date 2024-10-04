@@ -340,12 +340,13 @@ namespace CTRPluginFramework
 
                 input += units;
                 units = encode_utf16(buf, code);
-                size -= units;
-                if (!size)
-                    *out = 0;
-                else
+                if (size < static_cast<u32>(units)) {
+                    break;
+                } else {
+                    size -= units;
                     while (units--)
                         *out++ = *buf++;
+                }
             } while (size && code > 0);
         }
         else
@@ -363,13 +364,13 @@ namespace CTRPluginFramework
                     return (false);
 
                 input += units;
-                size -= 4;
-                if (!size)
-                    *out = 0;
-                else
+                if (size < static_cast<u32>(units))
+                    break;
+                else {
+                    size -= 4;
                     while (units--)
                         *out++ = code;
-
+                }
             } while (size && code > 0);
         }
 
@@ -482,7 +483,7 @@ namespace CTRPluginFramework
 
             return (ConvertString(out, in, size, outFmt));
         }
-
+        else
         {
             u32 size = (input.size() + 1) * 4;
             const u8 *in = reinterpret_cast<const u8 *>(input.c_str());
@@ -501,6 +502,10 @@ namespace CTRPluginFramework
         {
             u8 *p = reinterpret_cast<u8 *>(address);
 
+            for (u32 i = 0; i < size; ++i) {
+                p[i] = 0;
+            }
+
             for (char c : input)
             {
                 size--;
@@ -518,9 +523,13 @@ namespace CTRPluginFramework
             const u8 *in = reinterpret_cast<const u8 *>(input.c_str());
             u16 *out = reinterpret_cast<u16 *>(address);
 
+            for (u32 i = 0; i < size; ++i) {
+                out[i] = 0;
+            }
+
             return (ConvertString(out, in, size, outFmt));
         }
-
+        else
         {
             const u8 *in = reinterpret_cast<const u8 *>(input.c_str());
             u32 *out = reinterpret_cast<u32 *>(address);
