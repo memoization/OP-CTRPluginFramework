@@ -23,7 +23,7 @@ namespace CTRPluginFramework
         OnOpening(nullptr),
         OnClosing(nullptr),
         _actionReplay{ new PluginMenuActionReplay() },
-        _home(new PluginMenuHome(name, (menuType == 1))),
+        _home(new PluginMenuHome(name, about, (menuType == 1))),
         _search(new PluginMenuSearch(_hexEditor)),
         _tools(new PluginMenuTools(about, _hexEditor)),
         _executeLoop(new PluginMenuExecuteLoop()),

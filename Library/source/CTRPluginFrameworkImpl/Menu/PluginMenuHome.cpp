@@ -10,16 +10,18 @@
 namespace CTRPluginFramework
 {
 
-    PluginMenuHome::PluginMenuHome(std::string &name, bool showNoteBottom) :
-
+    PluginMenuHome::PluginMenuHome(std::string &name, std::string &about, bool showNoteBottom) :
+        _about(about),
         _noteTB("", "", showNoteBottom ? IntRect(20, 46, 280, 124) : IntRect(40, 30, 320, 180)),
+        _aboutTB("About", _about, IntRect(40, 30, 320, 180)),
 
-        _showStarredBtn(Button::Toggle | Button::Sysfont | Button::Rounded, "Favorite", IntRect(30, 70, 120, 30), Icon::DrawFavorite),
-        _hidMapperBtn(Button::Sysfont | Button::Rounded, "Mapper", IntRect(165, 70, 120, 30), Icon::DrawController),
-        _gameGuideBtn(Button::Sysfont | Button::Rounded, "Game Guide", IntRect(30, 105, 120, 30), Icon::DrawGuide),
-        _searchBtn(Button::Sysfont | Button::Rounded, "Search", IntRect(165, 105, 120, 30), Icon::DrawSearch),
-        _arBtn(Button::Sysfont | Button::Rounded, "Action Replay", IntRect(30, 140, 120, 30)),
-        _toolsBtn(Button::Sysfont | Button::Rounded, "Tools", showNoteBottom ? IntRect(99, 172, 120, 30) : IntRect(165, 140, 120, 30), Icon::DrawTools),
+        _showStarredBtn(Button::Toggle | Button::Sysfont | Button::Rounded, "Favorites", IntRect(30, 70, 120, 30), Icon::DrawFavorite),
+        //_hidMapperBtn(Button::Sysfont | Button::Rounded, "Mapper", IntRect(165, 70, 120, 30), Icon::DrawController),
+        //_gameGuideBtn(Button::Sysfont | Button::Rounded, "Game Guide", IntRect(30, 105, 120, 30), Icon::DrawGuide),
+        _searchBtn(Button::Sysfont | Button::Rounded, "Search", IntRect(165, 70, 120, 30), Icon::DrawSearch),
+        _arBtn(Button::Sysfont | Button::Rounded, "Action Replay", IntRect(30, 105, 120, 30)),
+        _toolsBtn(Button::Sysfont | Button::Rounded, "Tools", IntRect(165, 105, 120, 30), Icon::DrawTools),
+        _aboutBtn(Button::Sysfont | Button::Rounded, "About", IntRect(97, 140, 120, 30)),
 
        // _closeBtn(*this, nullptr, IntRect(275, 24, 20, 20), Icon::DrawClose),
         _keyboardBtn(Button::Icon, IntRect(130, 30, 25, 25), Icon::DrawKeyboard),
@@ -52,7 +54,7 @@ namespace CTRPluginFramework
 
 
         // Temporary disable unused buttons
-        _hidMapperBtn.Lock();
+        //_hidMapperBtn.Lock();
 
         // Are the buttons locked ?
         if (!Preferences::Settings.AllowActionReplay)
@@ -74,6 +76,8 @@ namespace CTRPluginFramework
                 Renderer::SetTarget(TOP);
                 if (home->_noteTB.IsOpen())
                     home->_noteTB.Draw();
+                else if (home->_aboutTB.IsOpen())
+                    home->_aboutTB.Draw();
                 else
                     home->_RenderTop();
             }
@@ -94,6 +98,11 @@ namespace CTRPluginFramework
                     break;
                 }
         }
+        else if (_aboutTB.IsOpen())
+        {
+            for (size_t i = 0; i < eventList.size(); i++)
+                _aboutTB.ProcessEvent(eventList[i]);
+        }
         else
         {
             for (size_t i = 0; i < eventList.size(); i++)
@@ -106,13 +115,14 @@ namespace CTRPluginFramework
             // Check all buttons
             if (_showStarredBtn()) _showStarredBtn_OnClick();
             // _hidMapperBtn();
-            if (_gameGuideBtn()) _gameGuideBtn_OnClick();
+            //if (_gameGuideBtn()) _gameGuideBtn_OnClick();
             if (_searchBtn()) _searchBtn_OnClick();
             if (_arBtn()) _actionReplayBtn_OnClick();
             if (_AddFavoriteBtn()) _StarItem();
             if (_InfoBtn()) _InfoBtn_OnClick();
             if (_keyboardBtn()) _keyboardBtn_OnClick();
             if (_controllerBtn()) _controllerBtn_OnClick();
+            if (_aboutBtn()) _aboutBtn_OnClick();
         }
 
         // Update UI
@@ -475,6 +485,7 @@ namespace CTRPluginFramework
     {
         const Color &selected = Preferences::Settings.MenuSelectedItemColor;
         const Color &unselected = Preferences::Settings.MenuUnselectedItemColor;
+        const Color &enabledColor = Preferences::Settings.MenuEnabledItemColor;
         const Color &maintext = Preferences::Settings.MainTextColor;
 
         int posY = 25;
@@ -531,7 +542,7 @@ namespace CTRPluginFramework
                 MenuEntryImpl   *entry = reinterpret_cast<MenuEntryImpl *>(item);
 
                 if (entry->GameFunc != nullptr)
-                    Renderer::DrawSysCheckBox(name, posX, posY, 350, fg, entry->IsActivated(), offset);
+                    Renderer::DrawSysCheckBox(name, posX, posY, 350, entry->IsActivated() ? enabledColor : fg, entry->IsActivated(), offset);
                 else
                 {
                     if (entry->MenuFunc != nullptr && !entry->_flags.isUnselectable)
@@ -577,14 +588,15 @@ namespace CTRPluginFramework
         else
         {
             _showStarredBtn.Draw();
-            _hidMapperBtn.Draw();
-            _gameGuideBtn.Draw();
+            //_hidMapperBtn.Draw();
+            //_gameGuideBtn.Draw();
             _searchBtn.Draw();
             _arBtn.Draw();
             _AddFavoriteBtn.Draw();
             _InfoBtn.Draw();
             _keyboardBtn.Draw();
             _controllerBtn.Draw();
+            _aboutBtn.Draw();
         }
         _toolsBtn.Draw();
     }
@@ -701,13 +713,14 @@ namespace CTRPluginFramework
             // Update buttons
             _showStarredBtn.Update(isTouched, touchPos);
             //_hidMapperBtn.Update(isTouched, touchPos);
-            _gameGuideBtn.Update(isTouched, touchPos);
+            //_gameGuideBtn.Update(isTouched, touchPos);
             _searchBtn.Update(isTouched, touchPos);
             _arBtn.Update(isTouched, touchPos);
             _AddFavoriteBtn.Update(isTouched, touchPos);
             _InfoBtn.Update(isTouched, touchPos);
             _keyboardBtn.Update(isTouched, touchPos);
             _controllerBtn.Update(isTouched, touchPos);
+            _aboutBtn.Update(isTouched, touchPos);
         }
         _toolsBtn.Update(isTouched, touchPos);
 
@@ -856,10 +869,10 @@ namespace CTRPluginFramework
         _mode = 4;
     }
 
-    void    PluginMenuHome::_gameGuideBtn_OnClick(void)
-    {
-        _mode = 2;
-    }
+    // void    PluginMenuHome::_gameGuideBtn_OnClick(void)
+    // {
+    //     _mode = 2;
+    // }
 
     void    PluginMenuHome::_searchBtn_OnClick(void)
     {
@@ -869,6 +882,14 @@ namespace CTRPluginFramework
     void    PluginMenuHome::_toolsBtn_OnClick(void)
     {
         _mode = 5;
+    }
+
+    void    PluginMenuHome::_aboutBtn_OnClick(void)
+    {
+        if (_aboutTB.IsOpen())
+            _aboutTB.Close();
+        else
+            _aboutTB.Open();
     }
 
     void    PluginMenuHome::_InfoBtn_OnClick(void)

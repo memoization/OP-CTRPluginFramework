@@ -49,7 +49,7 @@ namespace CTRPluginFramework
     static int  g_mode = NORMAL;
 
     // DO NOT REMOVE THIS COPYRIGHT NOTICE
-    static const char g_ctrpfText[] = "Powered by CTRPluginFramework";
+    static const char* g_ctrpfText = ((Color::White << "Powered by ") + (Color::Orange << "OP") + (Color::White << " CTRPluginFramework")).c_str();
     static const char g_copyrightText[] = "Copyright (c) The Pixellizer Group";
     static u32 g_textXpos[2] = { 0 };
 
@@ -549,7 +549,7 @@ namespace CTRPluginFramework
     void    PluginMenuTools::InitMenu(void)
     {
         // Main menu
-        _mainMenu.Append(new MenuEntryTools("About", [] { g_mode = ABOUT; }, Icon::DrawAbout));
+        //_mainMenu.Append(new MenuEntryTools("About", [] { g_mode = ABOUT; }, Icon::DrawAbout));
 
         _hexEditorEntry = new MenuEntryTools("Hex Editor", [] { g_mode = HEXEDITOR; }, Icon::DrawGrid);
         _mainMenu.Append(_hexEditorEntry);
@@ -581,8 +581,8 @@ namespace CTRPluginFramework
 
         _settingsMenu.Append(new MenuEntryTools("Auto-save enabled cheats", [] { Preferences::Toggle(Preferences::AutoSaveCheats); }, true, Preferences::IsEnabled(Preferences::AutoSaveCheats)));
         _settingsMenu.Append(new MenuEntryTools("Auto-save favorites", [] { Preferences::Toggle(Preferences::AutoSaveFavorites); }, true, Preferences::IsEnabled(Preferences::AutoSaveFavorites)));
-        _settingsMenu.Append(new MenuEntryTools("Auto-load enabled cheats at starts", [] { Preferences::Toggle(Preferences::AutoLoadCheats); }, true, Preferences::IsEnabled(Preferences::AutoLoadCheats)));
-        _settingsMenu.Append(new MenuEntryTools("Auto-load favorites at starts", [] { Preferences::Toggle(Preferences::AutoLoadFavorites); }, true, Preferences::IsEnabled(Preferences::AutoSaveFavorites)));
+        _settingsMenu.Append(new MenuEntryTools("Auto-load enabled cheats at startup", [] { Preferences::Toggle(Preferences::AutoLoadCheats); }, true, Preferences::IsEnabled(Preferences::AutoLoadCheats)));
+        _settingsMenu.Append(new MenuEntryTools("Auto-load favorites at startup", [] { Preferences::Toggle(Preferences::AutoLoadFavorites); }, true, Preferences::IsEnabled(Preferences::AutoSaveFavorites)));
         _settingsMenu.Append(new MenuEntryTools("Load enabled cheats now", [] { Preferences::LoadSavedEnabledCheats(); }, nullptr));
         _settingsMenu.Append(new MenuEntryTools("Load favorites now", [] { Preferences::LoadSavedFavorites(); }, nullptr));
 

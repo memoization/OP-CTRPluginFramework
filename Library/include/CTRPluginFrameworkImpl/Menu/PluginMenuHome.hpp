@@ -16,7 +16,7 @@ namespace CTRPluginFramework
     {
         using EventList = std::vector<Event>;
     public:
-        PluginMenuHome(std::string &name, bool ShowNoteBottom);
+        PluginMenuHome(std::string &name, std::string &about, bool ShowNoteBottom);
         ~PluginMenuHome(){}
 
         // Return true if the Close Button is pressed, else false
@@ -54,6 +54,7 @@ namespace CTRPluginFramework
         void    _gameGuideBtn_OnClick(void); // 2
         void    _searchBtn_OnClick(void); // 3
         void    _toolsBtn_OnClick(void);  // 5
+        void    _aboutBtn_OnClick(void); // 6
         void    _InfoBtn_OnClick(void); // note
 
         // Members
@@ -73,16 +74,19 @@ namespace CTRPluginFramework
         bool                _showVersion;
         int                 _versionPosX;
         std::string         _versionStr;
+        std::string         _about;
 
         TextBox             _noteTB;
+        TextBox             _aboutTB;
 
         // Mode buttons
         Button              _showStarredBtn;
-        Button              _hidMapperBtn;
-        Button              _gameGuideBtn;
+        //Button              _hidMapperBtn;
+        //Button              _gameGuideBtn;
         Button              _searchBtn;
         Button              _arBtn;
         Button              _toolsBtn;
+        Button              _aboutBtn;
 
         Button              _keyboardBtn;
         Button              _controllerBtn;
