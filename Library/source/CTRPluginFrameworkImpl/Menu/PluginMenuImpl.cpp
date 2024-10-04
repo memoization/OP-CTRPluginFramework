@@ -409,20 +409,46 @@ namespace CTRPluginFramework
             return;
 
         std::vector<u32>    uids;
+        static std::vector<u32> cheatArgs;
         MenuFolderImpl      *folder = _runningInstance->_home->_folder;
 
         uids.resize(header.enabledCheatsCount);
+        cheatArgs.resize(header.enabledCheatsCount);
 
         settings.Seek(header.enabledCheatsOffset, File::SET);
 
         if (settings.Read(uids.data(), sizeof(u32) * header.enabledCheatsCount) == 0)
         {
+            std::vector<MenuEntryImpl *>  items;
+
+            // Enable saved entries
             for (u32 &uid : uids)
             {
                 MenuItem *item = folder->GetItem(uid);
 
                 if (item != nullptr && item->IsEntry())
-                    reinterpret_cast<MenuEntryImpl *>(item)->Enable();
+                {
+                    MenuEntryImpl *menuEntry = reinterpret_cast<MenuEntryImpl *>(item);
+                    menuEntry->Enable();
+
+                    items.push_back(menuEntry);
+                }
+            }
+
+            // Set each menu entry's saved argument
+            settings.Seek(header.cheatArgsOffset, File::SET);
+
+            if (settings.Read(cheatArgs.data(), sizeof(u32) * header.enabledCheatsCount) == 0)
+            {
+                for (std::size_t c = 0; c < items.size(); c++)
+                {
+                    MenuEntryImpl *menuEntry = items[c];
+
+                    if (menuEntry != nullptr && menuEntry->IsEntry())
+                    {
+                         menuEntry->SetArg(static_cast<void*>(&cheatArgs[c]));
+                    }
+                }
             }
         }
     }

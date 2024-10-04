@@ -15,7 +15,7 @@ namespace CTRPluginFramework
         #define SETTINGS_VERSION11 SYSTEM_VERSION(1, 1, 0)
         #define SETTINGS_VERSION12 SYSTEM_VERSION(1, 2, 0)
 
-        #define SETTINGS_VERSION SETTINGS_VERSION11
+        #define SETTINGS_VERSION SETTINGS_VERSION12
     public:
         enum
         {
@@ -53,7 +53,7 @@ namespace CTRPluginFramework
             u64     hotkeysOffset;
         } PACKED; */
 
-        struct HeaderV11
+        struct HeaderV12
         {
             u8      sig[8];
             u32     version;
@@ -68,10 +68,11 @@ namespace CTRPluginFramework
             u64     favoritesOffset;
             u32     hotkeysCount;
             u64     hotkeysOffset;
+            u64     cheatArgsOffset;
             u32     reserved[100];
         } PACKED;
 
-        using Header = HeaderV11;
+        using Header = HeaderV12;
 
         struct EnabledCheats
         {

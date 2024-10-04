@@ -11,7 +11,6 @@ namespace CTRPluginFramework
 
     PluginMenuExecuteLoop *PluginMenuExecuteLoop::_firstInstance = nullptr;
 
-
     PluginMenuExecuteLoop::PluginMenuExecuteLoop(void)
     {
         _firstInstance = this;
@@ -25,6 +24,7 @@ namespace CTRPluginFramework
         Lock    lock(_firstInstance->_mutex);
 
         std::vector<u32>    uids;
+        std::vector<u32>    cheatArgs;
         std::vector<MenuEntryImpl *>  &items = _firstInstance->_builtinEnabledList;
         u32     count = items.size();
         u32     index = 0;
@@ -34,6 +34,7 @@ namespace CTRPluginFramework
         while (count)
         {
             uids.clear();
+            cheatArgs.clear();
             u32 nb = count > 1000 ? 1000 : count;
 
             for (; index < items.size(); ++index)
@@ -41,10 +42,28 @@ namespace CTRPluginFramework
                 MenuEntryImpl *e = items[index];
 
                 if (e != nullptr && e->IsEntry() && e->IsActivated())
+                {
                     uids.push_back(e->Uid);
+
+                    if (e->GetArg() != nullptr)
+                    {
+                        cheatArgs.push_back(*static_cast<u32*>(e->GetArg()));
+                    }
+                    else
+                    {
+                        cheatArgs.push_back(0);
+                    }
+                }
             }
 
+            // Write enabled cheat uids to file
             if (file.Write(uids.data(), sizeof(u32) * uids.size()) != 0)
+                goto error;
+
+            // Write enabled cheat args to file
+            header.cheatArgsOffset = file.Tell();
+
+            if (file.Write(cheatArgs.data(), sizeof(u32) * cheatArgs.size()) != 0)
                 goto error;
 
             written += uids.size();
