@@ -237,9 +237,10 @@ namespace CTRPluginFramework
         settings.ThreadPriority = 0x30;
         settings.AllowActionReplay = true;
         settings.AllowSearchEngine = true;
-        settings.WaitTimeToBoot = Seconds(5.f);
+        settings.WaitTimeToBoot = Seconds(7.f);
         settings.AreN3DSButtonsAvailable = true;
-        settings.TryLoadSDSounds = true;
+        settings.TryLoadSDSounds = false;
+		settings.UseGameHidMemory = true;
 
         // Set default theme
         FwkSettings::SetThemeDefault();
