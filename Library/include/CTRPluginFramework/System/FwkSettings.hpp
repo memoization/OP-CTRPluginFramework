@@ -44,10 +44,12 @@ namespace CTRPluginFramework
         Color   MainTextColor;  ///< The color of all texts within the plugin | Default: Blank
         Color   WindowTitleColor; ///< The color of all window's titles | Default: Blank
         Color   MenuSelectedItemColor; ///< The color of the text for the selected item | Default: Blank
+        Color   MenuEnabledItemColor; ///< The color of the text for an enabled item | Default: Orange
         Color   MenuUnselectedItemColor; ///< The color of the text for the items not selected | Default: Silver
         Color   BackgroundMainColor; ///< The color of the background | Default: Black
         Color   BackgroundSecondaryColor; ///< The color of the background 2 | Default: black/grey (RGB: 15,  15, 15)
         Color   BackgroundBorderColor; ///< The color of the border around the window | Default: Blank
+        Color   SelectorFlareColor; ///< The color of the flare under the entry selector | Default: Orange
         float   CursorFadeValue; ///< The value to be used to draw the cursor (Shade: [-1.0f - 0f], Tint: [0.f - 1.f]) | Default: 0.2f
 
         // Keyboard colors

@@ -17,8 +17,10 @@ namespace CTRPluginFramework
         // UI Colors
         settings.MenuSelectedItemColor = settings.BackgroundBorderColor = settings.WindowTitleColor = settings.MainTextColor = Color::White;
         settings.MenuUnselectedItemColor = Color::Silver;
+        settings.MenuEnabledItemColor = Color::Orange;
         settings.BackgroundMainColor = Color::Black;
         settings.BackgroundSecondaryColor = Color::BlackGrey;
+        settings.SelectorFlareColor = Color::Orange;
         settings.CursorFadeValue = 0.2f;
 
         // Keyboard colors

@@ -120,6 +120,7 @@ namespace CTRPluginFramework
         //const Color &text = Preferences::Settings.MainTextColor;
         const Color &selected = Preferences::Settings.MenuSelectedItemColor;
         const Color &unselected = Preferences::Settings.MenuUnselectedItemColor;
+        const Color &enabledColor = Preferences::Settings.MenuEnabledItemColor;
 
         int   posY = 25;
         int   posX = 40;
@@ -173,6 +174,7 @@ namespace CTRPluginFramework
                 const Color &c = i == _selector ? selected : unselected;
                 MenuItem *item = _folder->_items[i];
                 float offset = 0.f;
+                bool entryEnabled = item->AsMenuEntryImpl().IsActivated();
 
                 if (i == _selector)
                 {
@@ -183,7 +185,7 @@ namespace CTRPluginFramework
                 // MenuEntryImpl
                 if (item->_type == MenuType::Entry)
                 {
-                    Renderer::DrawSysCheckBox(item->name.c_str(), posX, posY, XMAX, c, item->AsMenuEntryImpl().IsActivated());
+                    Renderer::DrawSysCheckBox(item->name.c_str(), posX, posY, XMAX, entryEnabled ? enabledColor : c, entryEnabled);
                     //Renderer::DrawSysString(item->name.c_str(), posX + 20, posY, XMAX, c);
                 }
                 // MenuEntryTools
@@ -193,7 +195,7 @@ namespace CTRPluginFramework
 
                     if (e->UseCheckBox)
                     {
-                        Renderer::DrawSysCheckBox(item->name.c_str(), posX, posY, XMAX, c, e->IsActivated());
+                        Renderer::DrawSysCheckBox(item->name.c_str(), posX, posY, XMAX, e->IsActivated() ? enabledColor : c, e->IsActivated());
                     }
                     else
                     {
@@ -212,7 +214,7 @@ namespace CTRPluginFramework
                 // MenuEntryActionReplay
                 else if (item->_type == MenuType::ActionReplay)
                 {
-                    Renderer::DrawSysCheckBox(item->name.c_str(), posX, posY, XMAX, c, item->AsMenuEntryImpl().IsActivated(), offset);
+                    Renderer::DrawSysCheckBox(item->name.c_str(), posX, posY, XMAX, entryEnabled ? enabledColor : c, entryEnabled, offset);
                 }
                 // MenuFolderImpl
                 else

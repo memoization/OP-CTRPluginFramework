@@ -104,6 +104,7 @@ namespace CTRPluginFramework
         screen->GetFrameBufferInfos(rowstride, bpp, fmt);
 
         float fade = Preferences::Settings.CursorFadeValue;
+        Color selectorFlareColor = Preferences::Settings.SelectorFlareColor;
 
         // Draw Rectangle
         while (--w >= 0)
@@ -126,11 +127,11 @@ namespace CTRPluginFramework
         int j = 0;
         float fading = 0.0f;
 
-        Color l(255, 255, 255);
+        Color l = selectorFlareColor;
         posY += height;
         u8 *dst = screen->GetLeftFrameBuffer(posX + (width - tier), posY);
         u8 *rtier = dst;
-        Color black(60, 60, 60);
+        Color black(80,80,80);
         // Right tier
         for (int i = tier; i > 0; --i)
         {
@@ -148,7 +149,7 @@ namespace CTRPluginFramework
 
         }
 
-        l = Color(255, 255, 255);
+        l = selectorFlareColor;
         // Middle tier
         for (int i = 0; i < tier; ++i)
         {
