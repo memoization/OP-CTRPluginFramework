@@ -3,7 +3,7 @@
 
 **Key Improvements:**
 - Save and load enabled cheat arguments
-- Colored menu entry text for enabled cheats and settings
+- Colored menu item text for enabled cheats and settings
 - Clean up the bottom screen plugin home page -- disabled buttons that had no functional feature
 - Moved *About* button to the plugin home page
 - Auto load settings enabled by default for first time plugin load
@@ -68,7 +68,7 @@ Any updates to **CTRPluginFramework**, alongside other packages can be done with
     - Replace `dkp-pacman` with `pacman` in the case of a system pacman installation (eg. Arch).
 
 ## Uninstalling
-The following steps are required to remove **CTRPluginFramwork**.
+The following steps are required to remove **CTRPluginFramework**.
 
 #### Windows
 1. Navigate to `C:/devkitPro/msys2` and run `msys2_shell.bat`.
