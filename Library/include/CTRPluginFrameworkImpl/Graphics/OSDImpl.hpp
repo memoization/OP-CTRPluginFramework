@@ -48,6 +48,9 @@ namespace CTRPluginFramework
         static bool    Draw(void);
         static s32      DrawNotif_TaskFunc(void *arg);
 
+        static void    ShowIcon(int iconType, int posX, int posY, int sizeX, int sizeY, bool isTop);
+        static void    HideIcon(int iconType, int posX, int posY, int sizeX, int sizeY, bool isTop);
+
         static void    Lock(void);
         static bool    TryLock(void);
         static void    Unlock(void);

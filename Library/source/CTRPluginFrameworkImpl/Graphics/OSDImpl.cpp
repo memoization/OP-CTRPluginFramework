@@ -51,6 +51,28 @@ namespace CTRPluginFramework
     Task        OSDImpl::DrawNotifTask1(OSDImpl::DrawNotif_TaskFunc, nullptr, Task::AppCores);
     Task        OSDImpl::DrawNotifTask2(OSDImpl::DrawNotif_TaskFunc, nullptr, Task::AppCores);
 
+    struct DrawIconType
+	{
+		int iconType;
+		int posX;
+        int posY;
+        int sizeX;
+        int sizeY;
+        bool isTop;
+
+        bool operator==(const DrawIconType& other) const
+        {
+            return iconType == other.iconType &&
+                posX == other.posX &&
+                posY == other.posY &&
+                sizeX == other.sizeX &&
+                sizeY == other.sizeY &&
+                isTop == other.isTop;
+        }
+	};
+
+    std::vector<DrawIconType> iconPool;
+
     static const Time  g_second = Seconds(1.f);
 
     struct FpsCounter
@@ -129,6 +151,37 @@ namespace CTRPluginFramework
         foreground = fg;
         background = bg;
         time = Clock();
+    }
+
+
+    void    OSDImpl::ShowIcon(int iconType, int posX, int posY, int sizeX, int sizeY, bool isTop)
+    {
+        DrawIconType newIcon = {iconType, posX, posY, sizeX, sizeY, isTop};
+
+        for (const auto& icon : iconPool)
+        {
+            if (icon == newIcon)
+            {
+                return;
+            }
+        }
+
+        iconPool.push_back(newIcon);
+    }
+
+    void    OSDImpl::HideIcon(int iconType, int posX, int posY, int sizeX, int sizeY, bool isTop)
+    {
+        DrawIconType iconToRemove = {iconType, posX, posY, sizeX, sizeY, isTop};
+
+        // Iterate through the pool to find the matching icon
+        for (auto it = iconPool.begin(); it != iconPool.end(); ++it)
+        {
+            if (*it == iconToRemove)
+            {
+                iconPool.erase(it); // Remove the matching icon
+                return;
+            }
+        }
     }
 
     void    OSDImpl::Update(void)
@@ -259,6 +312,15 @@ namespace CTRPluginFramework
         if (DrawSaveIcon)
             Icon::DrawSave(10, 10);
 
+        // Draw any icon type for top
+        for (const auto& icon : iconPool)
+        {
+            if (icon.isTop)
+            {
+                Icon::DrawIcon(icon.iconType, icon.posX, icon.posY, icon.sizeX, icon.sizeY);
+            }
+        }
+
         // Signal a new frame to all threads waiting for it
        // Controller::Update();code
         OSDImpl::Update();
@@ -273,6 +335,15 @@ namespace CTRPluginFramework
         // Floating button
         if (Preferences::IsEnabled(Preferences::UseFloatingBtn))
             FloatingBtn.Draw();
+
+        // Draw any icon type for bottom
+        for (const auto& icon : iconPool)
+        {
+            if (!icon.isTop)
+            {
+                Icon::DrawIcon(icon.iconType, icon.posX, icon.posY, icon.sizeX, icon.sizeY);
+            }
+        }
 
         // Touch cursor and / or position
         if (Touch::IsDown())

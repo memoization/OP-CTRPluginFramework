@@ -10,6 +10,9 @@ namespace CTRPluginFramework
     class Icon
     {
     public:
+
+        static int      DrawIcon(int icon, int posX, int posY, int sizeX, int sizeY);
+
         /*
         ** About
         ** 15px * 15px
@@ -234,7 +237,8 @@ namespace CTRPluginFramework
         static int        DrawCustomIcon(const CustomIcon& icon, int posX, int posY);
 
     private:
-        static int      DrawImg(u8 *img, int posX, int posY, int sizeX, int sizeY);
+        static int      DrawImg(u8 *img, int posX, int posY, int originalX, int originalY);
+        static int      DrawImg(u8 *img, int posX, int posY, int originalX, int originalY, int scaledX, int scaledY);
 
     };
 }

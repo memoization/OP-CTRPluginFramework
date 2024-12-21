@@ -6,6 +6,13 @@
 
 namespace CTRPluginFramework
 {
+    struct BuiltinIcon
+    {
+        unsigned char* icon;
+        int sizeX;
+        int sizeY;
+    };
+
     extern "C" unsigned char *About15;
     extern "C" unsigned char *AddFavorite25;
     extern "C" unsigned char *AddFavoriteFilled25;
@@ -60,6 +67,62 @@ namespace CTRPluginFramework
     extern "C" unsigned char *UserManualFilled15;
     extern "C" unsigned char *DefaultKeyboardCustomIcon;
 
+    BuiltinIcon IconMap[54] = {
+        {About15, 15, 15},
+        {AddFavorite25, 25, 25},
+        {AddFavoriteFilled25, 25, 25},
+        {CheckedCheckbox, 15, 15},
+        {UnCheckedCheckbox, 15, 15},
+        {CapsLockOn15, 15, 15},
+        {CapsLockOnFilled15, 15, 15},
+        {CentreofGravity15, 15, 15},
+        {ClearSymbol15, 15, 15},
+        {ClearSymbolFilled15, 15, 15},
+        {Clipboard25, 25, 25},
+        {ClipboardFilled25, 25, 25},
+        {CloseWindow20, 20, 20},
+        {CloseWindowFilled20, 20, 20},
+        {Controller15, 15, 15},
+        {Cut25, 25, 25},
+        {CutFilled25, 25, 25},
+        {Duplicate25, 25, 25},
+        {DuplicateFilled25, 25, 25},
+        {Edit25, 25, 25},
+        {EditFilled25, 25, 25},
+        {EnterKey15, 15, 15},
+        {EnterKeyFilled15, 15, 15},
+        {FolderFilled, 15, 15},
+        {File15, 15, 15},
+        {GameController15, 15, 15},
+        {GameController25, 25, 25},
+        {GameControllerFilled25, 25, 25},
+        {Grid15, 15, 15},
+        {Happy15, 15, 15},
+        {HappyFilled15, 15, 15},
+        {Info25, 25, 25},
+        {InfoFilled25, 25, 25},
+        {HandCursor15, 15, 15},
+        {Maintenance15, 15, 15},
+        {More15, 15, 15},
+        {Keyboard25, 25, 25},
+        {KeyboardFilled25, 25, 25},
+        {Plus25, 25, 25},
+        {PlusFilled25, 25, 25},
+        {RAM15, 15, 15},
+        {Rocket40, 40, 40},
+        {Restart15, 15, 15},
+        {Save25, 25, 25},
+        {Search15, 15, 15},
+        {Settings15, 15, 15},
+        {Shutdown15, 15, 15},
+        {Star15, 15, 15},
+        {Trash25, 25, 25},
+        {TrashFilled25, 25, 25},
+        {Unsplash15, 15, 15},
+        {UserManualFilled15, 15, 15},
+        {DefaultKeyboardCustomIcon, 30, 30}
+    };
+
     CustomIcon Icon::DefaultCustomIcon{(CustomIcon::Pixel*) DefaultKeyboardCustomIcon, 30, 30, true};
 
     #define RGBA8 GSP_RGBA8_OES
@@ -72,63 +135,117 @@ namespace CTRPluginFramework
         u8 r;
     };
 
-    inline int Icon::DrawImg(u8 *img, int posX, int posY, int sizeX, int sizeY)
+    BuiltinIcon GetIcon(int icon) {
+        int iconCount = sizeof(IconMap) / sizeof(IconMap[0]);
+
+        if (icon < 0 || icon >= iconCount)
+        {
+            return {nullptr, 0, 0};
+        }
+
+        return IconMap[icon];
+    }
+
+    inline int Icon::DrawImg(u8 *img, int posX, int posY, int originalX, int originalY)
     {
+        return DrawImg(img, posX, posY, originalX, originalY, 0, 0);
+    }
+
+    inline int Icon::DrawImg(u8 *img, int posX, int posY, int originalX, int originalY, int scaledX, int scaledY)
+    {
+        if (scaledX == 0) scaledX = originalX;
+        if (scaledY == 0) scaledY = originalY;
+
         u8      *framebuf = nullptr;
         u8      *imgb = img;
         u32     target = Renderer::GetContext()->target;
         int     rowstride;
         int     bpp;
         bool    is3d = false;
+        bool    avoidScaling = (originalX == scaledX && originalY == scaledY);
         Color   px;
 
-        posY += sizeY;
+        posY += scaledY;
         GSPGPU_FramebufferFormat fmt;
+
         // Get target infos
         switch (target)
         {
             case Target::TOP:
-            {
                 framebuf = ScreenImpl::Top->GetLeftFrameBuffer(posX, posY);
                 ScreenImpl::Top->GetFrameBufferInfos(rowstride, bpp, fmt);
                 break;
-            }
             case Target::BOTTOM:
-            {
                 framebuf = ScreenImpl::Bottom->GetLeftFrameBuffer(posX, posY);
                 ScreenImpl::Bottom->GetFrameBufferInfos(rowstride, bpp, fmt);
                 break;
-            }
             default:
                 return (posX);
         }
+
     again3D:
         if (framebuf == nullptr)
             return (posX);
 
-        // Draw
-        for (int x = 0; x < sizeX; x++)
+        // No scaling
+        if (avoidScaling)
         {
-            u8 *dst = framebuf + rowstride * x;
-            int y = 0;
-            while (y++ < sizeY)
+            for (int x = 0; x < originalX; x++)
             {
-                Pixel *pix = (Pixel *)img;
-                px.a = pix->a;
-                px.r = pix->r;
-                px.g = pix->g;
-                px.b = pix->b;
-
-                // Skip pixels with less than 10% visibility
-                if (px.a > 25)
+                u8 *dst = framebuf + rowstride * x;
+                int y = 0;
+                while (y++ < originalY)
                 {
-                    Color &&bg = PrivColor::FromFramebuffer(dst);
-                    Color &&blended = bg.Blend(px, Color::BlendMode::Alpha);
-                    dst = PrivColor::ToFramebuffer(dst, blended);
+                    Pixel *pix = (Pixel *)img;
+                    px.a = pix->a;
+                    px.r = pix->r;
+                    px.g = pix->g;
+                    px.b = pix->b;
+
+                    // Skip pixels with less than 10% visibility
+                    if (px.a > 25)
+                    {
+                        Color &&bg = PrivColor::FromFramebuffer(dst);
+                        Color &&blended = bg.Blend(px, Color::BlendMode::Alpha);
+                        dst = PrivColor::ToFramebuffer(dst, blended);
+                    }
+                    else
+                        dst += bpp;
+                    img += 4;
                 }
-                else
-                    dst += bpp;
-                img += 4;
+            }
+        }
+        // Scaling required
+        else
+        {
+            float scaleXRatio = static_cast<float>(scaledX) / originalX;
+            float scaleYRatio = static_cast<float>(scaledY) / originalY;
+
+            for (int x = 0; x < scaledX; x++)
+            {
+                for (int y = 0; y < scaledY; y++)
+                {
+                    // Map (x, y) in target size to corresponding pixel in original image
+                    int origX = static_cast<int>(x / scaleXRatio);
+                    int origY = static_cast<int>(y / scaleYRatio);
+
+                    u8 *origPixel = imgb + (origY * originalX + origX) * 4; // Original image layout
+                    Pixel *pix = (Pixel *)origPixel;
+
+                    px.a = pix->a;
+                    px.r = pix->r;
+                    px.g = pix->g;
+                    px.b = pix->b;
+
+                    // Skip pixels with less than 10% visibility
+                    if (px.a > 25)
+                    {
+                        u8 *dst = framebuf + rowstride * y + x * bpp;
+                        Color &&bg = PrivColor::FromFramebuffer(dst);
+                        Color &&blended = bg.Blend(px, Color::BlendMode::Alpha);
+                        PrivColor::ToFramebuffer(dst, blended);
+                    }
+                }
             }
         }
 
@@ -140,7 +257,19 @@ namespace CTRPluginFramework
             goto again3D;
         }
 
-        return (posX + sizeX);
+        return (posX + scaledX);
+    }
+
+    int     Icon::DrawIcon(int icon, int posX, int posY, int sizeX, int sizeY)
+    {
+        BuiltinIcon iconData = GetIcon(icon);
+
+        if (iconData.icon)
+        {
+            return (DrawImg(iconData.icon, posX, posY, iconData.sizeX, iconData.sizeY, sizeX, sizeY));
+        }
+
+        return 0;
     }
 
     /*

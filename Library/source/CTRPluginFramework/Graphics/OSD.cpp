@@ -159,4 +159,24 @@ namespace CTRPluginFramework
     {
         OSDImpl::Unlock();
     }
+
+    void OSD::ShowIcon(OSD::IconType iconType, int posX, int posY, bool isTop)
+    {
+        OSDImpl::ShowIcon((int)iconType, posX, posY, 0, 0, isTop);
+    }
+
+    void OSD::ShowIcon(OSD::IconType iconType, int posX, int posY, int sizeX, int sizeY, bool isTop)
+    {
+        OSDImpl::ShowIcon((int)iconType, posX, posY, sizeX, sizeY, isTop);
+    }
+
+    void OSD::HideIcon(OSD::IconType iconType, int posX, int posY, bool isTop)
+    {
+        OSDImpl::HideIcon((int)iconType, posX, posY, 0, 0, isTop);
+    }
+
+    void OSD::HideIcon(OSD::IconType iconType, int posX, int posY, int sizeX, int sizeY, bool isTop)
+    {
+        OSDImpl::HideIcon((int)iconType, posX, posY, sizeX, sizeY, isTop);
+    }
 }

@@ -92,6 +92,62 @@ namespace CTRPluginFramework
     class OSD
     {
     public:
+        enum IconType
+        {
+            About,
+            AddFavorite,
+            AddFavoriteFilled,
+            CheckedCheckbox,
+            UnCheckedCheckbox,
+            CapsLockOn,
+            CapsLockOnFilled,
+            CentreOfGravity,
+            ClearSymbol,
+            ClearSymbolFilled,
+            Clipboard,
+            ClipboardFilled,
+            CloseWindow,
+            CloseWindowFilled,
+            Controller,
+            Cut,
+            CutFilled,
+            Duplicate,
+            DuplicateFilled,
+            Edit,
+            EditFilled,
+            EnterKey,
+            EnterKeyFilled,
+            FolderFilled,
+            File,
+            GameController,
+            GameControllerAlt,
+            GameControllerFilled,
+            Grid,
+            Happy,
+            HappyFilled,
+            Info,
+            InfoFilled,
+            HandCursor,
+            Maintenance,
+            More,
+            Keyboard,
+            KeyboardFilled,
+            Plus,
+            PlusFilled,
+            RAM,
+            Rocket,
+            Restart,
+            Save,
+            Search,
+            Settings,
+            Shutdown,
+            Star,
+            Trash,
+            TrashFilled,
+            Unsplash,
+            UserManualFilled,
+            DefaultKeyboardCustomIcon
+        };
 
         /**
          * \brief Send a notification on the top screen, a notification duration is 2.5 seconds\n
@@ -127,6 +183,26 @@ namespace CTRPluginFramework
         static const Screen&    GetTopScreen(void);
         static const Screen&    GetBottomScreen(void);
         static void             SwapBuffers(void);
+
+        /**
+         * \brief Add a built-in icon to render
+         * \param iconType Type of icon (see OSD.hpp)
+         * \param posX X position of the icon to be render at
+         * \param posY Y position of the icon to be render at
+         * \param sizeX X size of the icon to be rendered (0 for original X)
+         * \param sizeY Y size of the icon to be rendered (0 for original Y)
+         * \param isTop Render at top or bottom screen
+         */
+        static void           ShowIcon(IconType iconType, int posX, int posY, bool isTop);
+        static void           ShowIcon(IconType iconType, int posX, int posY, int sizeX, int sizeY, bool isTop);
+
+        /**
+         * \brief Remove a rendered built-in icon
+         * \param cb Parameters passed should be indentical to what was used with RenderIcon
+         */
+        static void           HideIcon(IconType iconType, int posX, int posY, bool isTop);
+        static void           HideIcon(IconType iconType, int posX, int posY, int sizeX, int sizeY, bool isTop);
+
 
         static void     Lock(void);
         static bool     TryLock(void); //false success, true failure
