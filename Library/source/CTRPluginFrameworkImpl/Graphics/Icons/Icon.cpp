@@ -16,6 +16,7 @@ namespace CTRPluginFramework
     extern "C" unsigned char *About15;
     extern "C" unsigned char *AddFavorite25;
     extern "C" unsigned char *AddFavoriteFilled25;
+    extern "C" unsigned char *Arrow7Down15;
     extern "C" unsigned char *CheckedCheckbox;
     extern "C" unsigned char *UnCheckedCheckbox;
     extern "C" unsigned char *CapsLockOn15;
@@ -71,6 +72,7 @@ namespace CTRPluginFramework
         {About15, 15, 15},
         {AddFavorite25, 25, 25},
         {AddFavoriteFilled25, 25, 25},
+        {Arrow7Down15, 15, 15},
         {CheckedCheckbox, 15, 15},
         {UnCheckedCheckbox, 15, 15},
         {CapsLockOn15, 15, 15},

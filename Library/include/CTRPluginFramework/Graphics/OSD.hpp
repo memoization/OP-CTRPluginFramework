@@ -97,6 +97,7 @@ namespace CTRPluginFramework
             About,
             AddFavorite,
             AddFavoriteFilled,
+            Arrow7Down,
             CheckedCheckbox,
             UnCheckedCheckbox,
             CapsLockOn,
