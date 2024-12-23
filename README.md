@@ -6,7 +6,7 @@
 - Colored menu item text for enabled cheats and settings
 - Clean up the bottom screen plugin home page -- disabled buttons that had no functional feature
 - Moved *About* button to the plugin home page
-- Auto load settings enabled by default for first time plugin load
+- "Auto load" settings are enabled by default for first time plugin load
 
 ## Building
 The latest version of devkitARM and libctru is needed to build the framework. You can run `make dist-bin` (or execute the `build.bat` file) in the `Library` folder to generate a *tar* file containing the library and include files.
